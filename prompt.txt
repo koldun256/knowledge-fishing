@@ -17,7 +17,6 @@
 3) Анимация: крючок опускается на центр уровня цели → рыба быстро подплывает к крючку → вываживание вверх.
 4) Открывается модалка с вопросом/ответом и оценкой 1–4. Пока окно открыто, рыба привязана к крючку.
 5) Отправка оценки PUT /fishes/{id}/review возвращает обновлённую рыбу с новым depth_level.
-6) Завершение сессии POST /fishing-sessions/{id}/end, закрываем модалку, FSM → idle. Кнопка старта снова доступна.
 
 API СЕРВЕРА (сейчас моками)
 Базовый URL: https://api.knowledge-fishing.com/v1
@@ -25,7 +24,7 @@ API СЕРВЕРА (сейчас моками)
 Эндпоинты:
 - Пруды: GET /ponds/{id}
 - Рыбы: GET /ponds/{id}/fishes, GET /fishes/next, PUT /fishes/{id}/review
-- Сессии: POST /fishing-sessions/start, POST /fishing-sessions/{id}/end
+- Сессии: GET /fishing-sessions/
 
 АРХИТЕКТУРА ФРОНТА
 Файловая структура:
@@ -59,6 +58,7 @@ src/
 
 ## src/context/PondContext.jsx
 
+// context/PondContext.jsx
 import React, { createContext, useContext, useRef, useState, useMemo } from 'react';
 
 const PondContext = createContext(null);
@@ -68,8 +68,9 @@ export function PondProvider({ children }) {
   const [fishes, setFishes] = useState([]);
   const [boat, setBoat] = useState({ x: 200 });
 
+  // fishing state
   const [fishing, setFishingState] = useState({
-    phase: 'idle', // 'idle' | 'casting' | 'luring' | 'reeling' | 'done'
+    phase: 'idle',        // 'idle' | 'casting' | 'luring' | 'reeling' | 'done'
     sessionId: null,
     targetFishId: null,
     hookX: null,
@@ -77,14 +78,16 @@ export function PondProvider({ children }) {
     boatX: 200,
   });
 
+  // dialog state
   const [dialog, setDialog] = useState({
     open: false,
-    fish: null,
+    fish: null,            // объект рыбы
     sessionId: null,
   });
 
-  const setFishing = (updater) =>
+  const setFishing = (updater) => {
     setFishingState((prev) => (typeof updater === 'function' ? updater(prev) : updater));
+  };
 
   const resetFishing = () => {
     setFishingState({
@@ -97,11 +100,12 @@ export function PondProvider({ children }) {
     });
   };
 
-  const stateRef = useRef(null);
+  const stateRef = useRef({ pond: null, fishes: [], boat: { x: 200 }, fishing: null, dialog: null });
   stateRef.current = { pond, fishes, boat, fishing, dialog };
 
   const setBoatX = (x) => setBoat((prev) => ({ ...prev, x }));
 
+  // волны
   const waveFnRef = useRef(null);
   const setWaveFn = (fn) => { waveFnRef.current = fn; };
   const getWaveFn = () => waveFnRef.current;
@@ -109,11 +113,13 @@ export function PondProvider({ children }) {
   const value = useMemo(() => ({
     pond, fishes, boat, fishing, dialog,
     setPond, setFishes, setBoatX,
-    setFishing, resetFishing, setDialog,
+    setFishing, resetFishing,
+    setDialog,
     setWaveFn, getWaveFn,
     getState: () => ({
       pond, fishes, boat, fishing, dialog,
-      setFishing, resetFishing, setDialog, setWaveFn, getWaveFn,
+      setFishing, resetFishing, setDialog,
+      setWaveFn, getWaveFn,
     }),
   }), [pond, fishes, boat, fishing, dialog]);
 
@@ -126,20 +132,28 @@ export function usePond() {
   return ctx;
 }
 
+
 ## src/components/CanvasStage.jsx
 
+// components/CanvasStage.jsx
 import React, { useRef, useEffect } from 'react';
 
-export default function CanvasStage({ className='fixed inset-0 block', style, skyRatio=0.12, layers=[], getState }) {
+export default function CanvasStage({
+  className = 'fixed inset-0 block',
+  style,
+  skyRatio = 0.12,
+  layers = [],
+  getState, // <- возьмём из контекста
+}) {
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
-  const lastRef = useRef(0);
+  const lastTimeRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d', { alpha: false });
 
+    const ctx = canvas.getContext('2d', { alpha: false });
     const resize = () => {
       const w = Math.round(window.innerWidth);
       const h = Math.round(window.innerHeight);
@@ -150,24 +164,26 @@ export default function CanvasStage({ className='fixed inset-0 block', style, sk
       canvas.style.height = `${h}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
+
     resize();
     window.addEventListener('resize', resize, { passive: true });
 
-    const loop = (now) => {
+    const loop = (nowMs) => {
       const w = Math.round(window.innerWidth);
       const h = Math.round(window.innerHeight);
-      const t = now / 1000;
-      const dt = lastRef.current ? (now - lastRef.current) / 1000 : 0;
-      lastRef.current = now;
+      const t = nowMs / 1000;
+      const dt = lastTimeRef.current ? (nowMs - lastTimeRef.current) / 1000 : 0;
+      lastTimeRef.current = nowMs;
 
       ctx.fillStyle = '#87CEEB';
       ctx.fillRect(0, 0, w, h);
 
       const frame = { ctx, t, dt, w, h, pondTop: Math.round(h * skyRatio), skyRatio };
 
-      for (const layer of layers.slice().sort((a,b)=>(a.order??0)-(b.order??0))) {
+      for (const layer of layers.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))) {
         layer.draw && layer.draw(frame, getState);
       }
+
       rafRef.current = requestAnimationFrame(loop);
     };
 
@@ -180,6 +196,7 @@ export default function CanvasStage({ className='fixed inset-0 block', style, sk
 
   return <canvas ref={canvasRef} className={className} style={style} />;
 }
+
 
 
 ## src/layers/waterSurface.js
@@ -247,148 +264,214 @@ export default function createWaterSurfaceLayer(options = {}) {
 
 ## src/layers/fishes.js
 
+// layers/fishes.js
+// Спрайтовые рыбы: плавают туда-сюда, не доходя до краёв,
+// меняют высоту в пределах уровня. "Готовые" — цветные,
+// "неготовые" — серые силуэты и плывут медленнее.
+// Во время рыбалки рыба-цель подплывает к крючку и "вываживается".
+
 import { Assets } from '../utils/assets';
 
 export default function createFishesLayer(options = {}) {
   const {
-    leftMargin=36, rightMargin=36,
-    speedRangeReady=[28,72], speedRangeIdle=[18,46],
-    vertAmpRange=[6,18], vertFreqRange=[0.3,0.9],
-    levelCount=4, levelPadding=8,
-    sheetKey='fishSheet', SPR_W=16, SPR_H=12, FRAMES=4, scale=2.5,
-    idleAlpha=0.85, useGrayscaleFilter=true,
-    lureSpeedBoost=220, reelFollowOffset=10, lureSnapDist=18,
+    leftMargin = 36,
+    rightMargin = 36,
+    speedRangeReady = [28, 72],
+    speedRangeIdle  = [18, 46],
+    vertAmpRange = [6, 18],
+    vertFreqRange = [0.3, 0.9],
+    levelCount = 4,
+    levelPadding = 8,
+    sheetKey = 'fishSheet',
+    SPR_W = 16,
+    SPR_H = 12,
+    FRAMES = 4,
+    scale = 2.5,
+    idleAlpha = 0.85,
+    useGrayscaleFilter = true,
+    // параметры "приманивания" и вываживания
+    lureSpeedBoost = 220,     // скорость сближения к крючку (px/s)
+    reelFollowOffset = 10,    // рыба висит чуть ниже крючка при вываживании
+    lureSnapDist = 18,        // дистанция "схватился" (px)
   } = options;
 
   const fishState = new Map();
-  const rnd=(a,b)=>a+Math.random()*(b-a);
-  const dir=()=> (Math.random()<0.5?-1:1);
-  const clampLev=(l,c)=>Math.min(c-1,Math.max(0,l|0));
-  const levelToRow=(l)=>Math.min(2,Math.max(0,l));
+  const randIn = (a, b) => a + Math.random() * (b - a);
+  const pickDir = () => (Math.random() < 0.5 ? -1 : 1);
+  const clampLevel = (lvl, count) => Math.min(count - 1, Math.max(0, lvl | 0));
+  const levelToRow = (level) => Math.min(2, Math.max(0, level)); // 3 вида в спрайте
 
-  const centerY=(lev, top, h)=> {
-    const L = (h)/levelCount;
-    const t = top + lev*L + levelPadding;
-    const b = top + (lev+1)*L - levelPadding;
-    return (t+b)*0.5;
+  const levelCenterY = (level, pondTop, levelH) => {
+    const top = pondTop + level * levelH + levelPadding;
+    const bottom = pondTop + (level + 1) * levelH - levelPadding;
+    return (top + bottom) * 0.5;
   };
-  const rangeY=(lev, top, h)=> {
-    const L = (h)/levelCount;
-    return [ top + lev*L + levelPadding, top + (lev+1)*L - levelPadding ];
+  const levelRange = (level, pondTop, levelH) => {
+    const top = pondTop + level * levelH + levelPadding;
+    const bottom = pondTop + (level + 1) * levelH - levelPadding;
+    return [top, bottom];
   };
 
-  const ensure = (f, w, pondTop, pondH, ready) => {
+  const ensureFishState = (f, w, pondTop, levelH, isReady) => {
     let s = fishState.get(f.id);
-    const lev = clampLev(f.depth_level ?? 0, levelCount);
-    if(!s){
+    if (!s) {
+      const level = clampLevel(f.depth_level ?? 0, levelCount);
       s = {
-        x: rnd(leftMargin + SPR_W*scale, w - rightMargin - SPR_W*scale),
-        dir: dir(),
-        speed: rnd(...(ready?speedRangeReady:speedRangeIdle)),
-        phase: Math.random()*Math.PI*2,
-        amp: rnd(...vertAmpRange),
-        freq: rnd(...vertFreqRange)*Math.PI*2,
-        level: lev,
-        centerY: centerY(lev, pondTop, pondH),
-      }; fishState.set(f.id, s);
+        x: randIn(leftMargin + SPR_W * scale, w - rightMargin - SPR_W * scale),
+        dir: pickDir(),
+        speed: randIn(...(isReady ? speedRangeReady : speedRangeIdle)),
+        phase: Math.random() * Math.PI * 2,
+        amp: randIn(...vertAmpRange),
+        freq: randIn(...vertFreqRange) * Math.PI * 2,
+        level,
+        centerY: levelCenterY(level, pondTop, levelH),
+      };
+      fishState.set(f.id, s);
     } else {
-      if (lev!==s.level) { s.level=lev; s.centerY=centerY(lev, pondTop, pondH); s.amp=rnd(...vertAmpRange); }
-      const target = rnd(...(ready?speedRangeReady:speedRangeIdle));
-      s.speed = s.speed*0.85 + target*0.15;
+      const newLevel = clampLevel(f.depth_level ?? 0, levelCount);
+      if (newLevel !== s.level) {
+        s.level = newLevel;
+        s.centerY = levelCenterY(newLevel, pondTop, levelH);
+        s.amp = randIn(...vertAmpRange);
+      }
+      // подстройка скорости под готовность
+      const target = randIn(...(isReady ? speedRangeReady : speedRangeIdle));
+      s.speed = s.speed * 0.85 + target * 0.15;
     }
     return s;
   };
 
-  const frameIdx=(t,speed,ready)=> {
-    const base= ready?8:6, plus=Math.min(6, speed/14);
-    return Math.floor(t*(base+plus)) % FRAMES;
+  const frameIndex = (t, speed, isReady) => {
+    const baseFps = isReady ? 8 : 6;
+    const plus = Math.min(6, speed / 14);
+    return Math.floor(t * (baseFps + plus)) % FRAMES;
   };
 
-  const drawSprite=(ctx,img,sx,sy,sw,sh,dx,dy,flipX,scale,gray,alpha)=>{
+  function drawSprite(ctx, img, sx, sy, sw, sh, dx, dy, flipX, scale, asGray, alpha) {
     ctx.save();
-    ctx.translate(dx,dy);
-    if (flipX) ctx.scale(-1,1);
-    ctx.imageSmoothingEnabled=false;
-    if (gray && useGrayscaleFilter){ ctx.filter='grayscale(100%) saturate(0%) brightness(85%)'; ctx.globalAlpha=alpha; }
-    else if (gray){ ctx.globalAlpha=alpha; }
-    ctx.drawImage(img,sx,sy,sw,sh, -sw*0.5*scale, -sh*0.5*scale, sw*scale, sh*scale);
-    if (gray && useGrayscaleFilter) ctx.filter='none';
+    ctx.translate(dx, dy);
+    if (flipX) ctx.scale(-1, 1);
+    ctx.imageSmoothingEnabled = false;
+    if (asGray && useGrayscaleFilter) {
+      ctx.filter = 'grayscale(100%) saturate(0%) brightness(85%)';
+      ctx.globalAlpha = alpha;
+    } else if (asGray) {
+      ctx.globalAlpha = alpha;
+    }
+    ctx.drawImage(img, sx, sy, sw, sh, -sw * 0.5 * scale, -sh * 0.5 * scale, sw * scale, sh * scale);
+    if (asGray && useGrayscaleFilter) ctx.filter = 'none';
     ctx.restore();
-  };
+  }
 
   return {
-    id:'fishes', order:20,
-    draw:(frame,getState)=>{
-      const {ctx,t,dt,w,h,pondTop}=frame;
+    id: 'fishes',
+    order: 20,
+    draw: (frame, getState) => {
+      const { ctx, t, dt, w, h, pondTop } = frame;
       const gs = getState?.() || {};
-      const fishes = gs.fishes || [];
-      const fishing = gs.fishing || {};
-      const dialogOpen = !!gs.dialog?.open;
-      if(!fishes.length) return;
+    const fishes = gs.fishes || [];
+    const fishing = gs.fishing || {};
+    const dialogOpen = !!gs.dialog?.open;
 
-      const pondH = Math.max(0, h-pondTop);
+      if (!fishes.length) return;
+
+      const pondH = Math.max(0, h - pondTop);
+      const levelH = pondH / 4;
       const sheet = Assets.get(sheetKey);
 
-      fishes.forEach((f)=>{
-        const ready = !!f.ready;
-        const s = ensure(f, w, pondTop, pondH, ready);
+      fishes.forEach((f) => {
+        const isReady = !!f.ready; // Готовность берём из f.ready (bool)
+        const s = ensureFishState(f, w, pondTop, levelH, isReady);
 
-        let override=false;
+        // базовое движение (если нет захвата сценарием рыбалки)
+        let overridePos = false;
 
-        if (fishing?.targetFishId===f.id && fishing?.phase){
-          // цель рыбалки
-          if (fishing.phase==='luring'){
-            const tx=fishing.hookX, ty=fishing.hookY;
-            const dy = ty - (s.centerY);
+        // если эта рыба — цель рыбалки
+        if (fishing?.targetFishId === f.id && fishing?.phase) {
+          if (fishing.phase === 'luring') {
+            // быстро подплывает к крючку
+            const tx = fishing.hookX;
+            const ty = fishing.hookY;
             const dx = tx - s.x;
-            const dist = Math.hypot(dx,dy);
-            if (dist>1e-3){
-              s.x += (dx/dist)*lureSpeedBoost*dt;
-              s.centerY += (dy/dist)*lureSpeedBoost*dt;
+            const dy = ty - (s.centerY + Math.sin(t * s.freq + s.phase) * s.amp);
+            const dist = Math.hypot(dx, dy);
+            if (dist > 1e-3) {
+              const vx = (dx / dist) * lureSpeedBoost;
+              const vy = (dy / dist) * lureSpeedBoost;
+              s.x += vx * dt;
+              // верт. вести к цели без строгого ограничения диапазоном уровня (чуть свободнее)
+              const newY = (s.centerY) + vy * dt;
+              s.centerY = newY; // смещаем центр, чтобы рыба могла подняться/опуститься к крючку
             }
-            if (dist <= lureSnapDist && gs.setFishing){
-              gs.setFishing(prev=> prev?.phase==='luring'? {...prev, phase:'reeling'} : prev);
+            // если почти у крючка — дальше стадия "reeling" (решает fishingLayer)
+            overridePos = true; // ничего больше по базовой логике не делаем
+            if (dist <= lureSnapDist && gs.setFishing) {
+                gs.setFishing(prev => prev?.phase === 'luring' ? { ...prev, phase: 'reeling' } : prev);
             }
-            override=true;
-          } else if (fishing.phase==='reeling' || (fishing.phase==='done' && dialogOpen)){
-            // висим на крючке и во время подъёма, и пока открыт диалог
+          } else if (fishing.phase === 'reeling') {
+            // «прилипает» к крючку, чуть ниже
             s.x = fishing.hookX;
-            s.centerY = fishing.hookY + 10;
-            override=true;
+            s.centerY = fishing.hookY + reelFollowOffset;
+            overridePos = true;
+          } else if (fishing.phase === 'done' && dialogOpen) {
+            // диалог открыт — рыба продолжает висеть на крючке у лодки
+            s.x = fishing.hookX;
+            s.centerY = fishing.hookY + reelFollowOffset;
+            overridePos = true;
           }
         }
 
-        if (!override){
+        if (!overridePos) {
+          // Горизонталь + разворот до границ
           s.x += s.dir * s.speed * dt;
-          const halfW = (SPR_W*scale)*0.5;
+          const halfW = (SPR_W * scale) * 0.5;
           const leftLimit = leftMargin + halfW;
           const rightLimit = w - rightMargin - halfW;
-          if (s.x<=leftLimit){ s.x=leftLimit; s.dir=1; }
-          else if (s.x>=rightLimit){ s.x=rightLimit; s.dir=-1; }
+          if (s.x <= leftLimit) { s.x = leftLimit; s.dir = 1; }
+          else if (s.x >= rightLimit) { s.x = rightLimit; s.dir = -1; }
 
-          const [yMin,yMax] = rangeY(s.level, pondTop, pondH);
-          const yOsc = Math.sin(t*s.freq + s.phase)*s.amp;
+          // Вертикальные колебания внутри уровня
+          const [yMin, yMax] = levelRange(s.level, pondTop, levelH);
+          const yOsc = Math.sin(t * s.freq + s.phase) * s.amp;
           let ny = s.centerY + yOsc;
-          if (ny<yMin) ny=yMin; if (ny>yMax) ny=yMax;
-          s.centerY = s.centerY*0.9 + ny*0.1;
+          if (ny < yMin) ny = yMin;
+          if (ny > yMax) ny = yMax;
+          s.centerY = (s.centerY * 0.9) + (ny * 0.1); // лёгкая инерция
         }
 
-        const row = Math.min(2, Math.max(0, s.level));
-        const col = frameIdx(t, s.speed, ready);
-        const sx = col*SPR_W, sy=row*SPR_H;
-        const flipX = (s.dir > 0); // фикс: теперь не «задом наперёд»
+        // итоговая Y
+        const y = s.centerY;
 
-        if (sheet){
-          if (ready) drawSprite(ctx, sheet, sx, sy, SPR_W, SPR_H, s.x, s.centerY, flipX, scale, false, 1);
-          else       drawSprite(ctx, sheet, sx, sy, SPR_W, SPR_H, s.x, s.centerY, flipX, scale, true, 0.85);
+        // отрисовка
+        if (sheet) {
+          const row = levelToRow(s.level);
+          const col = frameIndex(t, s.speed, isReady);
+          const sx = col * SPR_W;
+          const sy = row * SPR_H;
+
+          // ВАЖНО: раньше рыбы «плыли задом наперёд». Меняем знак flipX:
+          // flipX = (s.dir < 0)  было → стало:
+          const flipX = (s.dir > 0); // теперь спрайт разворачивается корректно
+
+          if (isReady) {
+            drawSprite(ctx, sheet, sx, sy, SPR_W, SPR_H, s.x, y, flipX, scale, false, 1);
+          } else {
+            drawSprite(ctx, sheet, sx, sy, SPR_W, SPR_H, s.x, y, flipX, scale, true, idleAlpha);
+          }
         } else {
-          ctx.save(); ctx.fillStyle= ready?'#FFD54F':'rgba(180,180,180,0.8)';
-          ctx.beginPath(); ctx.arc(s.x, s.centerY, SPR_H*0.6, 0, Math.PI*2); ctx.fill(); ctx.restore();
+          // fallback
+          ctx.save();
+          ctx.fillStyle = isReady ? '#FFD54F' : 'rgba(180,180,180,0.8)';
+          ctx.beginPath();
+          ctx.arc(s.x, y, SPR_H * 0.6, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
         }
       });
-    }
+    },
   };
 }
+
 
 
 ## src/layers/fishingLine.js
@@ -487,13 +570,12 @@ export default function createBoatLayer() {
   };
 }
 
-
 ## src/components/FishingDialog.jsx
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { usePond } from '../context/PondContext';
-import { fishService } from '../../services/fishService';
-import { sessionService } from '../../services/sessionService';
+import { fishService } from '../services/fishService';
+import { sessionService } from '../services/sessionService';
 
 export default function FishingDialog() {
   const { dialog, setDialog, resetFishing, fishes, setFishes } = usePond();
@@ -501,32 +583,66 @@ export default function FishingDialog() {
   const [submitting, setSubmitting] = useState(false);
   const fish = dialog?.fish || null;
 
-  useEffect(()=>{ if(dialog.open){ setScore(null); setSubmitting(false);} },[dialog.open]);
+  // Сброс локального состояния при открытии/закрытии
+  useEffect(() => {
+    if (dialog.open) {
+      setScore(null);
+      setSubmitting(false);
+    }
+  }, [dialog.open]);
 
-  const closeAndReset=()=>{ setDialog({open:false, fish:null, sessionId:null}); resetFishing(); };
+  // Хоткеи: 1..4 — выбрать оценку, Enter — отправить, Esc — отмена
+  const onKey = useCallback((e) => {
+    if (!dialog.open) return;
+    if (e.key >= '1' && e.key <= '4') {
+      setScore(Number(e.key));
+    } else if (e.key === 'Enter' && score != null && !submitting) {
+      e.preventDefault();
+      handleSubmit();
+    } else if (e.key === 'Escape' && !submitting) {
+      handleCancel();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dialog.open, score, submitting]);
 
-  const handleSubmit=async()=>{
-    if (score==null || submitting || !fish) return;
-    setSubmitting(true);
-    try{
-      const updated = await fishService.reviewFish(fish.id, { score });
-      const idx = fishes.findIndex(x=>String(x.id)===String(fish.id));
-      if (idx!==-1){ const next=fishes.slice(); next[idx]=updated; setFishes(next); }
-      if (dialog.sessionId){ await sessionService.end(dialog.sessionId,{fishes_caught:1, session_score:score}); }
-    }catch(e){ console.error(e); }
-    finally{ setSubmitting(false); closeAndReset(); }
+  useEffect(() => {
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onKey]);
+
+  const closeAndReset = () => {
+    setDialog({ open: false, fish: null, sessionId: null });
+    resetFishing(); // переведёт FSM в 'idle' и освободит крючок/рыбу
   };
 
-  const handleCancel=()=>{ if(!submitting) closeAndReset(); };
+  const handleCancel = () => {
+    if (submitting) return;
+    closeAndReset();
+  };
 
-  const onKey=useCallback((e)=>{
-    if(!dialog.open) return;
-    if (e.key>='1' && e.key<='4') setScore(Number(e.key));
-    else if (e.key==='Enter' && score!=null && !submitting) handleSubmit();
-    else if (e.key==='Escape' && !submitting) handleCancel();
-  },[dialog.open, score, submitting]);
+  const handleSubmit = async () => {
+    if (score == null || submitting || !fish) return;
+    setSubmitting(true);
+    try {
+      // 1) Отправляем оценку — возвращается обновлённая рыба (новый depth_level и т.п.)
+      const updated = await fishService.reviewFish(fish.id, { score });
 
-  useEffect(()=>{ window.addEventListener('keydown', onKey); return ()=>window.removeEventListener('keydown', onKey); },[onKey]);
+      // 2) Обновляем локальный список рыб
+      const idx = fishes.findIndex((x) => String(x.id) === String(fish.id));
+      if (idx !== -1) {
+        const next = fishes.slice();
+        next[idx] = updated;
+        setFishes(next);
+      }
+
+    } catch (err) {
+      console.error('Ошибка при отправке результата:', err);
+      // Можно показать тост/сообщение — пока просто закрываем диалог, чтобы не блокировать цикл
+    } finally {
+      setSubmitting(false);
+      closeAndReset();
+    }
+  };
 
   if (!dialog.open || !fish) return null;
 
@@ -537,37 +653,63 @@ export default function FishingDialog() {
 
         <div className="mb-3">
           <div className="text-sm text-gray-500">Вопрос</div>
-          <div className="font-medium text-gray-900 whitespace-pre-wrap">{fish.question || '—'}</div>
+          <div className="font-medium text-gray-900 whitespace-pre-wrap">
+            {fish.question || '—'}
+          </div>
         </div>
 
         <div className="mb-4">
           <div className="text-sm text-gray-500">Ответ</div>
-          <div className="p-3 bg-gray-50 rounded text-gray-800 whitespace-pre-wrap">{fish.answer || '—'}</div>
+          <div className="p-3 bg-gray-50 rounded text-gray-800 whitespace-pre-wrap">
+            {fish.answer || '—'}
+          </div>
         </div>
 
         <div className="mb-4">
           <div className="font-semibold mb-2">Насколько хорошо вы вспомнили?</div>
           <div className="grid grid-cols-4 gap-2">
-            {[1,2,3,4].map(v=>(
-              <button key={v} onClick={()=>setScore(v)} disabled={submitting}
-                className={`py-2 rounded border ${score===v?'bg-blue-600 text-white border-blue-600':'bg-white hover:bg-gray-50'}`}>
+            {[1, 2, 3, 4].map((v) => (
+              <button
+                key={v}
+                onClick={() => setScore(v)}
+                disabled={submitting}
+                className={`py-2 rounded border transition ${
+                  score === v
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white hover:bg-gray-50'
+                }`}
+                aria-pressed={score === v}
+              >
                 {v}
               </button>
             ))}
           </div>
-          <p className="text-xs text-gray-500 mt-2">Горячие клавиши: 1–4, Enter — отправить, Esc — отмена.</p>
+          <p className="text-xs text-gray-500 mt-2">
+            Горячие клавиши: 1–4 для выбора, Enter — отправить, Esc — отмена.
+          </p>
         </div>
 
         <div className="flex justify-end gap-2">
-          <button onClick={handleCancel} disabled={submitting} className="px-4 py-2 rounded border hover:bg-gray-50 disabled:opacity-50">Отмена</button>
-          <button onClick={handleSubmit} disabled={score==null||submitting} className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50">
-            {submitting?'Сохраняю…':'Сохранить'}
+          <button
+            onClick={handleCancel}
+            disabled={submitting}
+            className="px-4 py-2 rounded border hover:bg-gray-50 disabled:opacity-50"
+          >
+            Отмена
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={score == null || submitting}
+            className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+          >
+            {submitting ? 'Сохраняю…' : 'Сохранить'}
           </button>
         </div>
       </div>
     </div>
   );
 }
+
 
 
 ## src/utils/assets.js
@@ -587,167 +729,181 @@ export const Assets = {
 };
 
 
-## src/data/mockData.js
-
-export const mockPonds = [
-  {
-    id: 1,
-    name: "Математический анализ",
-    description: "Пределы, производные, интегралы",
-    topic: "Математика",
-    created_at: "2024-01-15",
-    updated_at: "2024-01-20"
-  },
-  {
-    id: 2,
-    name: "Физика квантовых процессов",
-    description: "Квантовая механика и термодинамика",
-    topic: "Физика",
-    created_at: "2024-01-10",
-    updated_at: "2024-01-18"
-  }
-];
-
-export const mockFishes = [
-  {
-    id: 1,
-    pond_id: 1,
-    question: "Что такое производная функции?",
-    ready: false,
-    answer: "Производная функции в точке — это скорость изменения функции в этой точке.",
-    depth_level: 1,
-    status: "new"
-  },
-  {
-    id: 2,
-    pond_id: 1,
-    ready: true,
-    question: "Формула Ньютона-Лейбница",
-    answer: "∫ₐᵇ f(x)dx = F(b) - F(a), где F — первообразная f",
-    depth_level: 2,
-    status: "reviewing"
-  },
-  {
-    id: 3,
-    pond_id: 1,
-    question: "Определение предела функции",
-    answer: "Число A называется пределом функции f(x) при x→a, если для любого ε>0 существует δ>0 такое, что |f(x)-A|<ε при 0<|x-a|<δ",
-    ready: true,
-    depth_level: 3,
-    status: "mastered"
-  },
-  {
-    id: 4,
-    pond_id: 2,
-    question: "Принцип неопределенности Гейзенберга",
-    answer: "Δx·Δp ≥ ℏ/2, где Δx — неопределенность координаты, Δp — импульса",
-    ready: false,
-    depth_level: 1,
-    status: "new"
-  }
-];
-
 ## src/services/pondService.js
 
-import { mockPonds } from '../data/mockData';
+import { API_CONFIG } from '../config/api';
 
 export const pondService = {
-  getAllPonds: () => {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(mockPonds), 500);
+  getAllPonds: async () => {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/ponds`, {
+      credentials: API_CONFIG.withCredentials ? 'include' : 'omit'
     });
+    if (!response.ok) throw new Error('Failed to fetch ponds');
+    return response.json();
   },
-  getPondById: (id) => {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(mockPonds.find(pond => pond.id === parseInt(id))), 500);
+
+  getPondById: async (id) => {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/ponds/${id}`, {
+      credentials: API_CONFIG.withCredentials ? 'include' : 'omit'
     });
+    if (!response.ok) throw new Error('Failed to fetch pond');
+    return response.json();
   }
 };
 
 
+
 ## src/components/Pond.jsx
 
+// src/pages/Pond.jsx
 import React, { useEffect, useMemo, useState } from 'react';
+
+// контекст
 import { PondProvider, usePond } from '../context/PondContext';
+
+// канвас-сцена
 import CanvasStage from '../components/CanvasStage';
+
+// слои
 import createWaterSurfaceLayer from '../layers/waterSurface';
 import createUnderwaterBackLayer from '../layers/underwaterBack';
 import createUnderwaterFrontLayer from '../layers/underwaterFront';
 import createFishesLayer from '../layers/fishes';
 import createFishingLineLayer from '../layers/fishingLine';
 import createBoatLayer from '../layers/boat';
+
+// диалог
 import FishingDialog from '../components/FishingDialog';
-import { pondService } from '../../services/pondService';
-import { fishService } from '../../services/fishService';
-import { sessionService } from '../../services/sessionService';
+
+// сервисы (моки)
+import { pondService } from '../services/pondService';
+import { fishService } from '../services/fishService';
+
+// ассеты (спрайт рыб)
 import { Assets } from '../utils/assets';
 
 function PondInner({ pondId }) {
-  const { pond, setPond, fishes, setFishes, getState, fishing, setFishing, boat, dialog } = usePond();
+  const {
+    pond, setPond,
+    fishes, setFishes,
+    getState,
+    fishing, setFishing,
+    boat,
+    dialog,
+  } = usePond();
+
   const [loading, setLoading] = useState(true);
 
-  useEffect(()=>{
-    let cancelled=false;
-    (async()=>{
-      try{
+  // загрузка ассетов + данных пруда/рыб
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
         setLoading(true);
-        await Assets.loadImage('fishSheet','/assets/fish_spritesheet_px.png').catch(()=>{});
-        const [p, fs]= await Promise.all([ pondService.getPondById(pondId), fishService.getFishesByPondId(pondId) ]);
-        if(!cancelled){ setPond(p); setFishes(fs); }
-      }catch(e){ console.error(e); }
-      finally{ if(!cancelled) setLoading(false); }
+        // спрайт рыб (если уже загружен — вернётся мгновенно)
+        await Assets.loadImage('fishSheet', '/assets/fish_spritesheet_px.png').catch(() => {});
+        // данные
+        const [pondData, fishesData] = await Promise.all([
+          pondService.getPondById(pondId),
+          fishService.getFishesByPondId(pondId),
+        ]);
+        if (!cancelled) {
+          setPond(pondData);
+          setFishes(fishesData);
+        }
+      } catch (e) {
+        console.error('Ошибка загрузки данных:', e);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     })();
-    return ()=>{ cancelled=true; };
-  },[pondId, setPond, setFishes]);
+    return () => { cancelled = true; };
+  }, [pondId, setPond, setFishes]);
 
-  const layers = useMemo(()=>[
-    createWaterSurfaceLayer(),
-    createUnderwaterBackLayer({ enableGradient:true, enableVegetation:true }),
-    createFishesLayer(),
-    createUnderwaterFrontLayer({ enableDepthFog:true, enableMotes:true, enableBubbles:true }),
-    createFishingLineLayer(),
+  // слои сцены
+  const layers = useMemo(() => ([
+    createWaterSurfaceLayer({
+      // жёсткие границы между уровнями (внутренности — сплошные цвета)
+      levelGradients: [
+        ['#7EC8FA', '#5FB4F5'], // уровень 0 (верх)
+        ['#57ABF2', '#2F8EE8'], // уровень 1
+        ['#277FD7', '#1B63B9'], // уровень 2
+        ['#134A97', '#0C3877'], // уровень 3 (низ)
+      ],
+    }),
+    createUnderwaterBackLayer({
+      enableGradient: true,
+      enableVegetation: true,
+      enableInternalWaves: false,
+      enableCaustics: false,
+    }),
+    createFishesLayer(), // рыбы учитывают ready из fish.ready и корректный flipX
+    createUnderwaterFrontLayer({
+      enableDepthFog: true,
+      enableMotes: true,
+      enableBubbles: true,
+    }),
+    createFishingLineLayer(), // крючок/леска + управление фазами и открытие диалога
     createBoatLayer(),
-  ],[]);
+  ]), []);
 
-  const startFishing = async ()=>{
-    try{
-      if (fishing.phase!=='idle' || dialog.open) return;
-      const session = await sessionService.start();
-      const nextFish = await fishService.getNextFish();
-      setFishing(prev=>({
+  // запуск рыбалки (мок-API)
+  const startFishing = async () => {
+    try {
+      // не допускаем повторного старта, пока не idle или открыт диалог
+      if (fishing.phase !== 'idle' || dialog.open) return;
+
+      const nextFish = await fishService.getNextFish();  // { id, depth_level, ready, ... } — мок
+
+      setFishing(prev => ({
         ...prev,
-        sessionId: session.id,
         phase: 'casting',
         targetFishId: nextFish.id,
-        boatX: boat?.x ?? window.innerWidth*0.5,
-        hookX: null, hookY: null,
+        boatX: boat?.x ?? window.innerWidth * 0.5,
+        hookX: null,
+        hookY: null,
       }));
-    }catch(e){ console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   if (loading) return <div className="p-8 text-center">Загрузка пруда...</div>;
-  if (!pond)   return <div className="p-8 text-center text-red-500">Пруд не найден</div>;
+  if (!pond) return <div className="p-8 text-center text-red-500">Пруд не найден</div>;
 
-  const canStart = fishing.phase==='idle' && !dialog.open;
+  const canStart = fishing.phase === 'idle' && !dialog.open;
 
   return (
     <>
-      <CanvasStage skyRatio={0.12} layers={layers} getState={getState}/>
+      <CanvasStage
+        skyRatio={0.12}
+        layers={layers}
+        getState={getState}
+      />
+
+      {/* Кнопка — скрыта, пока предыдущая попытка не завершена */}
       {canStart && (
-        <button onClick={startFishing} className="fixed top-4 left-4 z-[60] bg-white/85 hover:bg-white text-slate-800 px-4 py-2 rounded shadow">
+        <button
+          onClick={startFishing}
+          className="fixed top-4 left-4 z-[60] bg-white/85 hover:bg-white text-slate-800 px-4 py-2 rounded shadow"
+        >
           Начать рыбалку
         </button>
       )}
-      <FishingDialog/>
+
+      {/* Диалог-оверлей с оценкой (1..4) */}
+      <FishingDialog />
     </>
   );
 }
 
+// Экспорт страницы с провайдером контекста
 export default function Pond({ pondId }) {
   return (
     <PondProvider>
-      <PondInner pondId={pondId}/>
+      <PondInner pondId={pondId} />
     </PondProvider>
   );
 }
+
 

@@ -1,14 +1,19 @@
-import { mockPonds } from '../data/mockData';
+import { API_CONFIG } from '../config/api';
 
 export const pondService = {
-  getAllPonds: () => {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(mockPonds), 500);
+  getAllPonds: async () => {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/ponds`, {
+      credentials: API_CONFIG.withCredentials ? 'include' : 'omit'
     });
+    if (!response.ok) throw new Error('Failed to fetch ponds');
+    return response.json();
   },
-  getPondById: (id) => {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(mockPonds.find(pond => pond.id === parseInt(id))), 500);
+
+  getPondById: async (id) => {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/ponds/${id}`, {
+      credentials: API_CONFIG.withCredentials ? 'include' : 'omit'
     });
+    if (!response.ok) throw new Error('Failed to fetch pond');
+    return response.json();
   }
 };

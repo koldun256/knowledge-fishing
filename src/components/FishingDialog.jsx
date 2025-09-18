@@ -62,10 +62,6 @@ export default function FishingDialog() {
         setFishes(next);
       }
 
-      // 3) Завершаем мок-сессию (если есть)
-      if (dialog.sessionId) {
-        await sessionService.end(dialog.sessionId, { fishes_caught: 1, session_score: score });
-      }
     } catch (err) {
       console.error('Ошибка при отправке результата:', err);
       // Можно показать тост/сообщение — пока просто закрываем диалог, чтобы не блокировать цикл

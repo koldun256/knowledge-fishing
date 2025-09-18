@@ -21,7 +21,6 @@ import FishingDialog from '../components/FishingDialog';
 // сервисы (моки)
 import { pondService } from '../services/pondService';
 import { fishService } from '../services/fishService';
-import { sessionService } from '../services/sessionService';
 
 // ассеты (спрайт рыб)
 import { Assets } from '../utils/assets';
@@ -97,12 +96,10 @@ function PondInner({ pondId }) {
       // не допускаем повторного старта, пока не idle или открыт диалог
       if (fishing.phase !== 'idle' || dialog.open) return;
 
-      const session = await sessionService.start();      // { id, ... } — мок
       const nextFish = await fishService.getNextFish();  // { id, depth_level, ready, ... } — мок
 
       setFishing(prev => ({
         ...prev,
-        sessionId: session.id,
         phase: 'casting',
         targetFishId: nextFish.id,
         boatX: boat?.x ?? window.innerWidth * 0.5,
