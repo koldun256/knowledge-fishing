@@ -24,7 +24,7 @@ export default function createFishesLayer(options = {}) {
     idleAlpha = 0.85,
     useGrayscaleFilter = true,
     // параметры "приманивания" и вываживания
-    lureSpeedBoost = 220,     // скорость сближения к крючку (px/s)
+    lureSpeedBoost = 400,     // скорость сближения к крючку (px/s)
     reelFollowOffset = 10,    // рыба висит чуть ниже крючка при вываживании
     lureSnapDist = 18,        // дистанция "схватился" (px)
   } = options;
@@ -114,7 +114,7 @@ export default function createFishesLayer(options = {}) {
       const sheet = Assets.get(sheetKey);
 
       fishes.forEach((f) => {
-        const isReady = !!f.ready; // Готовность берём из f.ready (bool)
+        const isReady = (f.status == 'ready'); // Готовность берём из f.ready (bool)
         const s = ensureFishState(f, w, pondTop, levelH, isReady);
 
         // базовое движение (если нет захвата сценарием рыбалки)

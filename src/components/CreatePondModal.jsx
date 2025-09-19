@@ -1,5 +1,5 @@
 // src/components/CreatePondModal.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function CreatePondModal({ isOpen, onClose, onCreate }) {
   const [formData, setFormData] = useState({
@@ -8,17 +8,58 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
     topic: 'programming'
   });
   const [loading, setLoading] = useState(false);
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState('');
+  const [categories, setCategories] = useState([
+    'programming',
+    'math',
+    'science',
+    'history',
+    'languages'
+  ]);
+
+  // Сбрасываем поля при открытии модального окна
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        name: '',
+        description: '',
+        topic: 'programming'
+      });
+      setShowNewCategory(false);
+      setNewCategory('');
+    }
+  }, [isOpen]);
+
+  const handleAddNewCategory = () => {
+    if (newCategory.trim() && !categories.includes(newCategory.trim().toLowerCase())) {
+      const newCat = newCategory.trim().toLowerCase();
+      setCategories(prev => [...prev, newCat]);
+      setFormData(prev => ({ ...prev, topic: newCat }));
+      setNewCategory('');
+      setShowNewCategory(false);
+    }
+  };
+
+  const handleCategoryChange = (e) => {
+    if (e.target.value === 'new') {
+      setShowNewCategory(true);
+      setFormData(prev => ({ ...prev, topic: '' }));
+    } else {
+      setFormData(prev => ({ ...prev, topic: e.target.value }));
+      setShowNewCategory(false);
+    }
+  };
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim()) return;
+    if (!formData.name.trim() || !formData.topic) return;
 
     setLoading(true);
     try {
       await onCreate(formData);
-      setFormData({ name: '', description: '', topic: 'programming' });
       onClose();
     } catch (error) {
       console.error('Error creating pond:', error);
@@ -35,14 +76,51 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg w-full max-w-md p-6">
-        <h2 className="text-2xl font-bold mb-4">Создать новый пруд</h2>
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1000
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '24px',
+        borderRadius: '12px',
+        width: '90%',
+        maxWidth: '500px',
+        boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
+      }}>
+        <h2 style={{ 
+          margin: '0 0 20px 0', 
+          fontSize: '28px', 
+          fontWeight: '800',
+          color: '#013b45ff',
+          textAlign: 'center',
+          fontFamily: 'MT Sans Full, sans-serif',
+        }}>
+          СОЗДАТЬ НОВЫЙ ПРУД
+        </h2>
         
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Название пруда *
+          {/* Название пруда */}
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              fontSize: '16px',
+              color: '#34495e',
+              fontFamily: 'Arial, sans-serif',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              НАЗВАНИЕ ПРУДА *
             </label>
             <input
               type="text"
@@ -50,14 +128,33 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
               value={formData.name}
               onChange={handleChange}
               placeholder="Например: JavaScript основы"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '2px solid #bdc3c7',
+                borderRadius: '8px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                fontFamily: 'Arial, sans-serif',
+                transition: 'border-color 0.3s ease'
+              }}
               required
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Описание
+          {/* Описание */}
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              fontSize: '16px',
+              color: '#34495e',
+              fontFamily: 'Arial, sans-serif',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              ОПИСАНИЕ
             </label>
             <textarea
               name="description"
@@ -65,43 +162,181 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
               onChange={handleChange}
               placeholder="Описание темы пруда..."
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '2px solid #bdc3c7',
+                borderRadius: '8px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                fontFamily: 'Arial, sans-serif',
+                transition: 'border-color 0.3s ease'
+              }}
             />
           </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Категория
+          {/* Категория */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              fontSize: '16px',
+              color: '#34495e',
+              fontFamily: 'Arial, sans-serif',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              КАТЕГОРИЯ *
             </label>
-            <select
-              name="topic"
-              value={formData.topic}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="programming">Программирование</option>
-              <option value="math">Математика</option>
-              <option value="science">Наука</option>
-              <option value="history">История</option>
-              <option value="languages">Языки</option>
-            </select>
+            
+            {!showNewCategory ? (
+              <>
+                <select
+                  name="topic"
+                  value={formData.topic}
+                  onChange={handleCategoryChange}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '2px solid #bdc3c7',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box',
+                    fontFamily: 'Arial, sans-serif',
+                    backgroundColor: 'white',
+                    cursor: 'pointer',
+                    marginBottom: '8px'
+                  }}
+                >
+                  {categories.map(category => (
+                    <option key={category} value={category}>
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </option>
+                  ))}
+                  <option value="new">+ Добавить новую категорию</option>
+                </select>
+              </>
+            ) : (
+              <div style={{
+                display: 'flex',
+                gap: '8px',
+                alignItems: 'center'
+              }}>
+                <input
+                  type="text"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  placeholder="Введите название категории..."
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    border: '2px solid #bdc3c7',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box',
+                    fontFamily: 'Arial, sans-serif'
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddNewCategory}
+                  disabled={!newCategory.trim()}
+                  style={{
+                    padding: '12px 16px',
+                    border: 'none',
+                    borderRadius: '8px',
+                    backgroundColor: '#27ae60',
+                    color: 'white',
+                    cursor: newCategory.trim() ? 'pointer' : 'not-allowed',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    fontFamily: 'Arial, sans-serif',
+                    opacity: newCategory.trim() ? 1 : 0.6
+                  }}
+                >
+                  ✓
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowNewCategory(false);
+                    setNewCategory('');
+                    setFormData(prev => ({ ...prev, topic: 'programming' }));
+                  }}
+                  style={{
+                    padding: '12px 16px',
+                    border: '2px solid #95a5a6',
+                    borderRadius: '8px',
+                    backgroundColor: '#ecf0f1',
+                    color: '#7f8c8d',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    fontFamily: 'Arial, sans-serif'
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+            
+            {showNewCategory && (
+              <p style={{
+                fontSize: '12px',
+                color: '#7f8c8d',
+                fontFamily: 'Arial, sans-serif',
+                margin: '8px 0 0 0'
+              }}>
+                Введите название новой категории и нажмите ✓ для добавления
+              </p>
+            )}
           </div>
 
-          <div className="flex justify-end gap-3">
+          {/* Кнопки */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '12px'
+          }}>
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+              style={{
+                padding: '12px 24px',
+                border: '2px solid #95a5a6',
+                borderRadius: '8px',
+                backgroundColor: '#ecf0f1',
+                color: '#7f8c8d',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                fontFamily: 'Arial, sans-serif',
+                transition: 'all 0.3s ease',
+                opacity: loading ? 0.6 : 1
+              }}
             >
-              Отмена
+              ОТМЕНА
             </button>
             <button
               type="submit"
-              disabled={loading || !formData.name.trim()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading || !formData.name.trim() || !formData.topic}
+              style={{
+                padding: '12px 24px',
+                border: 'none',
+                borderRadius: '8px',
+                backgroundColor: loading ? '#95a5a6' : '#27ae60',
+                color: 'white',
+                cursor: (loading || !formData.name.trim() || !formData.topic) ? 'not-allowed' : 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                fontFamily: 'Arial, sans-serif',
+                transition: 'all 0.3s ease',
+                opacity: (loading || !formData.name.trim() || !formData.topic) ? 0.6 : 1
+              }}
             >
-              {loading ? 'Создание...' : 'Создать пруд'}
+              {loading ? 'СОЗДАНИЕ...' : 'СОЗДАТЬ ПРУД'}
             </button>
           </div>
         </form>

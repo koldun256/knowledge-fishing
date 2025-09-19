@@ -1,5 +1,5 @@
-// src/components/CreateFishModal.jsx
-import React, { useState } from 'react';
+// Простой CreateFishModal.jsx
+import React, { useState, useEffect } from 'react';
 
 export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
   const [formData, setFormData] = useState({
@@ -7,25 +7,27 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
     answer: '',
     depth_level: 0
   });
-  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        question: '',
+        answer: '',
+        depth_level: 0
+      });
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.question.trim() || !formData.answer.trim()) return;
-
-    setLoading(true);
-    try {
-      await onCreate(pondId, formData);
-      setFormData({ question: '', answer: '', depth_level: 0 });
-      onClose();
-    } catch (error) {
-      console.error('Error creating fish:', error);
-      alert('Ошибка при создании рыбы');
-    } finally {
-      setLoading(false);
+    if (!formData.question.trim() || !formData.answer.trim()) {
+      alert('Заполните вопрос и ответ');
+      return;
     }
+    onCreate(pondId, formData);
+    onClose();
   };
 
   const handleChange = (e) => {
@@ -36,15 +38,51 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[110] bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-4">Создать новую рыбу</h2>
-        <p className="text-gray-600 mb-6">Добавьте вопрос и ответ для новой рыбы в пруде</p>
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1000
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '24px',
+        borderRadius: '12px',
+        width: '90%',
+        maxWidth: '500px',
+        boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
+      }}>
+        <h2 style={{ 
+          margin: '0 0 20px 0', 
+          fontSize: '28px', 
+          fontWeight: '800',
+          color: '#013b45ff',
+          textAlign: 'center',
+          fontFamily: 'MT Sans Full', // Шрифт
+        }}>
+          Добавить новую рыбу
+        </h2>
         
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Вопрос *
+          {/* Поле Вопрос */}
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',        // Более жирный шрифт
+              fontSize: '16px',         // Увеличенный размер
+              color: '#34495e',         // Цвет текста
+              fontFamily: 'Arial, sans-serif', // Шрифт
+              textTransform: 'uppercase', // Заглавные буквы
+              letterSpacing: '0.5px'    // Межбуквенное расстояние
+            }}>
+              ВОПРОС *
             </label>
             <textarea
               name="question"
@@ -52,61 +90,131 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
               onChange={handleChange}
               placeholder="Введите вопрос..."
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '2px solid #bdc3c7',
+                borderRadius: '8px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                fontFamily: 'Arial, sans-serif',
+                transition: 'border-color 0.3s ease'
+              }}
               required
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Ответ *
+          {/* Поле Ответ */}
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',        // Более жирный шрифт
+              fontSize: '16px',         // Увеличенный размер
+              color: '#34495e',         // Цвет текста
+              fontFamily: 'Arial, sans-serif', // Шрифт
+              textTransform: 'uppercase', // Заглавные буквы
+              letterSpacing: '0.5px'    // Межбуквенное расстояние
+            }}>
+              ОТВЕТ *
             </label>
             <textarea
               name="answer"
               value={formData.answer}
               onChange={handleChange}
               placeholder="Введите ответ..."
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={3}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '2px solid #bdc3c7',
+                borderRadius: '8px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                fontFamily: 'Arial, sans-serif',
+                transition: 'border-color 0.3s ease'
+              }}
               required
             />
           </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Уровень глубины
+          {/* Поле Глубина */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              fontSize: '16px',
+              color: '#34495e',
+              fontFamily: 'Arial, sans-serif',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              УРОВЕНЬ ГЛУБИНЫ
             </label>
             <select
               name="depth_level"
               value={formData.depth_level}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '2px solid #bdc3c7',
+                borderRadius: '8px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                fontFamily: 'Arial, sans-serif',
+                backgroundColor: 'white',
+                cursor: 'pointer'
+              }}
             >
-              <option value={0}>🟦 Уровень 0 (Мелководье)</option>
-              <option value={1}>🟪 Уровень 1</option>
-              <option value={2}>🟫 Уровень 2</option>
-              <option value={3}>⬛ Уровень 3 (Глубина)</option>
+              <option value={0}>Уровень 0 (Мелководье)</option>
+              <option value={1}>Уровень 1</option>
+              <option value={2}>Уровень 2</option>
+              <option value={3}>Уровень 3 (Глубина)</option>
             </select>
-            <p className="text-sm text-gray-500 mt-1">
-              Выберите уровень глубины, на котором будет плавать рыба
-            </p>
           </div>
 
-          <div className="flex justify-end gap-3">
+          {/* Кнопки */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '12px'
+          }}>
             <button
               type="button"
               onClick={onClose}
-              disabled={loading}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+              style={{
+                padding: '12px 24px',
+                border: '2px solid #95a5a6',
+                borderRadius: '8px',
+                backgroundColor: '#ecf0f1',
+                color: '#7f8c8d',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                fontFamily: 'Arial, sans-serif',
+                transition: 'all 0.3s ease'
+              }}
             >
-              Отмена
+              ОТМЕНА
             </button>
             <button
               type="submit"
-              disabled={loading || !formData.question.trim() || !formData.answer.trim()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                padding: '12px 24px',
+                border: 'none',
+                borderRadius: '8px',
+                backgroundColor: '#27ae60',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                fontFamily: 'Arial, sans-serif',
+                transition: 'all 0.3s ease'
+              }}
             >
-              {loading ? 'Создание...' : 'Создать рыбу'}
+              СОЗДАТЬ РЫБУ
             </button>
           </div>
         </form>

@@ -2,7 +2,7 @@
 import React, { useRef, useEffect } from 'react';
 
 export default function CanvasStage({
-  className = 'fixed inset-0 block',
+  className = 'fixed inset-0 block z-0',
   style,
   skyRatio = 0.12,
   layers = [],
@@ -57,5 +57,15 @@ export default function CanvasStage({
     };
   }, [layers, getState, skyRatio]);
 
-  return <canvas ref={canvasRef} className={className} style={style} />;
+  return (
+    <canvas 
+      ref={canvasRef} 
+      className={className} 
+      style={{ 
+        ...style, 
+        zIndex: 0, // Принудительно устанавливаем низкий z-index
+        pointerEvents: 'none' // Разрешаем клики сквозь канвас
+      }} 
+    />
+  );
 }

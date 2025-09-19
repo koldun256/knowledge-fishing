@@ -1,5 +1,6 @@
 // src/pages/Pond.jsx
 import React, { useEffect, useMemo, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 
 // контекст
@@ -168,64 +169,47 @@ function PondInner() {
 
   const canStart = fishing.phase === 'idle' && !dialog.open;
 
+
   return (
     <>
       <CanvasStage
         skyRatio={0.12}
         layers={layers}
         getState={getState}
+        className="fixed inset-0 z-0"
       />
 
-      {/* Контейнер для кнопок вверху страницы */}
-      <div className="fixed top-0 left-0 right-0 z-[100] bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm p-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          {/* Левая группа кнопок */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2 bg-white/90 hover:bg-white text-slate-800 px-4 py-2 rounded-xl shadow-md border border-gray-200/50 transition-all hover:shadow-lg"
-            >
-              <span className="text-lg">←</span>
-              <span className="font-medium">К прудам</span>
-            </button>
-
-            {/* Кнопка создания рыбы */}
-            <button
-              onClick={() => setIsCreateFishModalOpen(true)}
-              className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl shadow-md transition-all hover:shadow-lg"
-              title="Создать новую рыбу"
-            >
-              <span className="text-lg">🐟</span>
-              <span className="font-medium">Создать рыбу</span>
-            </button>
-          </div>
-
-          {/* Название пруда по центру */}
-          <div className="text-center">
-            <h1 className="text-xl font-bold text-white drop-shadow-md">
-              {pond?.name || 'Пруд знаний'}
-            </h1>
-            <p className="text-sm text-white/80">
-              Рыб: {fishes.length} | Уровень: {pond?.completion_rate || 0}%
-            </p>
-          </div>
-
-          {/* Кнопка "Начать рыбалку" */}
-          {canStart && (
-            <button
-              onClick={startFishing}
-              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl shadow-md transition-all hover:shadow-lg font-semibold"
-            >
-              <span className="text-lg">🎣</span>
-              <span>Начать рыбалку</span>
-            </button>
-          )}
+      {/* Кнопки с transform для создания нового контекста стекинга */}
+      <div className="absolute top-4 left-4 z-[9999] transform">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/')}
+            className="bg-white/95 hover:bg-white text-slate-800 px-4 py-2 rounded-lg shadow-lg border border-gray-300 transition-all"
+          >
+            ← Назад к прудам
+          </button>
+          
+          <button
+            onClick={() => setIsCreateFishModalOpen(true)}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
+          >
+            🐟 Создать рыбу
+          </button>
         </div>
       </div>
 
+      {canStart && (
+        <div className="absolute top-4 right-4 z-[9999] transform">
+          <button
+            onClick={startFishing}
+            className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg shadow-lg transition-all"
+          >
+            🎣 Начать рыбалку
+          </button>
+        </div>
+      )}
+
       <FishingDialog />
-      
-      {/* Модальное окно создания рыбы */}
       <CreateFishModal
         isOpen={isCreateFishModalOpen}
         onClose={() => setIsCreateFishModalOpen(false)}
@@ -235,6 +219,7 @@ function PondInner() {
     </>
   );
 }
+      
 
 export default function Pond() {
   return (

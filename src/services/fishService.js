@@ -9,14 +9,10 @@ export const fishService = {
     return response.json();
   },
 
-  reviewFish: async (fishId, { score }) => {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/fishes/${fishId}/caught`, {
+  reviewFish: async (fishId, { quality }) => {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/fishes/${fishId}/caught?quality=${quality}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       credentials: API_CONFIG.withCredentials ? 'include' : 'omit',
-      body: JSON.stringify({ score })
     });
     if (!response.ok) throw new Error('Failed to review fish');
     return response.json();

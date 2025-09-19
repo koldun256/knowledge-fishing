@@ -8,6 +8,7 @@ export default function FishingDialog() {
   const { dialog, setDialog, resetFishing, fishes, setFishes } = usePond();
   const [score, setScore] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false); // Новое состояние для показа ответа
   const fish = dialog?.fish || null;
 
   // Сброс локального состояния при открытии/закрытии
@@ -15,6 +16,7 @@ export default function FishingDialog() {
     if (dialog.open) {
       setScore(null);
       setSubmitting(false);
+      setShowAnswer(false); // Сбрасываем показ ответа при открытии
     }
   }, [dialog.open]);
 
@@ -52,7 +54,9 @@ export default function FishingDialog() {
     setSubmitting(true);
     try {
       // 1) Отправляем оценку — возвращается обновлённая рыба (новый depth_level и т.п.)
-      const updated = await fishService.reviewFish(fish.id, { score });
+      console.log('score = ', score);
+      const quality = parseInt(score, 10);
+      const updated = await fishService.reviewFish(fish.id, { quality });
 
       // 2) Обновляем локальный список рыб
       const idx = fishes.findIndex((x) => String(x.id) === String(fish.id));
@@ -71,65 +75,227 @@ export default function FishingDialog() {
     }
   };
 
+  const toggleAnswer = () => {
+    setShowAnswer(prev => !prev);
+  };
+
   if (!dialog.open || !fish) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4">
-      <div className="w-full max-w-xl bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-xl font-semibold mb-2">Оцените вспоминание</h2>
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1000
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '24px',
+        borderRadius: '12px',
+        width: '90%',
+        maxWidth: '500px',
+        boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
+      }}>
+        <h2 style={{ 
+          margin: '0 0 20px 0', 
+          fontSize: '28px', 
+          fontWeight: '800',
+          color: '#013b45ff',
+          textAlign: 'center',
+          fontFamily: 'MT Sans Full, sans-serif',
+        }}>
+          Оцените вспоминание
+        </h2>
 
-        <div className="mb-3">
-          <div className="text-sm text-gray-500">Вопрос</div>
-          <div className="font-medium text-gray-900 whitespace-pre-wrap">
+        {/* Вопрос */}
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{
+            display: 'block',
+            marginBottom: '8px',
+            fontWeight: '600',
+            fontSize: '16px',
+            color: '#34495e',
+            fontFamily: 'Arial, sans-serif',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>
+            ВОПРОС
+          </div>
+          <div style={{
+            padding: '12px',
+            border: '2px solid #bdc3c7',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontFamily: 'Arial, sans-serif',
+            backgroundColor: '#f8f9fa',
+            minHeight: '60px',
+            lineHeight: '1.4'
+          }}>
             {fish.question || '—'}
           </div>
         </div>
 
-        <div className="mb-4">
-          <div className="text-sm text-gray-500">Ответ</div>
-          <div className="p-3 bg-gray-50 rounded text-gray-800 whitespace-pre-wrap">
-            {fish.answer || '—'}
+        {/* Ответ */}
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{
+            display: 'block',
+            marginBottom: '8px',
+            fontWeight: '600',
+            fontSize: '16px',
+            color: '#34495e',
+            fontFamily: 'Arial, sans-serif',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>
+            ОТВЕТ
+          </div>
+          <div 
+            onClick={toggleAnswer}
+            style={{
+              padding: '12px',
+              border: '2px solid #bdc3c7',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontFamily: 'Arial, sans-serif',
+              backgroundColor: showAnswer ? '#f8f9fa' : '#e8f4f8',
+              minHeight: '80px',
+              lineHeight: '1.4',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              position: 'relative',
+              color: showAnswer ? 'inherit' : '#7f8c8d'
+            }}
+          >
+            {showAnswer ? (
+              fish.answer || '—'
+            ) : (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                fontStyle: 'italic'
+              }}>
+                Нажмите, чтобы посмотреть ответ
+              </div>
+            )}
+            {/* {!showAnswer && (
+              <div style={{
+                position: 'absolute',
+                top: '8px',
+                right: '8px',
+                fontSize: '12px',
+                color: '#3498db'
+              }}>
+                🔍
+              </div>
+            )} */}
           </div>
         </div>
 
-        <div className="mb-4">
-          <div className="font-semibold mb-2">Насколько хорошо вы вспомнили?</div>
-          <div className="grid grid-cols-4 gap-2">
+        {/* Оценка */}
+        <div style={{ marginBottom: '24px' }}>
+          <div style={{
+            display: 'block',
+            marginBottom: '8px',
+            fontWeight: '600',
+            fontSize: '16px',
+            color: '#34495e',
+            fontFamily: 'Arial, sans-serif',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
+          }}>
+            НАСКОЛЬКО ХОРОШО ВЫ ВСПОМНИЛИ?
+          </div>
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '8px',
+            marginBottom: '8px'
+          }}>
             {[1, 2, 3, 4].map((v) => (
               <button
                 key={v}
                 onClick={() => setScore(v)}
                 disabled={submitting}
-                className={`py-2 rounded border transition ${
-                  score === v
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white hover:bg-gray-50'
-                }`}
+                style={{
+                  padding: '12px',
+                  border: '2px solid',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  fontFamily: 'Arial, sans-serif',
+                  cursor: submitting ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.3s ease',
+                  borderColor: score === v ? '#27ae60' : '#bdc3c7',
+                  backgroundColor: score === v ? '#27ae60' : 'white',
+                  color: score === v ? 'white' : '#34495e'
+                }}
                 aria-pressed={score === v}
               >
                 {v}
               </button>
             ))}
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          
+          <p style={{
+            fontSize: '12px',
+            color: '#7f8c8d',
+            fontFamily: 'Arial, sans-serif',
+            margin: 0
+          }}>
             Горячие клавиши: 1–4 для выбора, Enter — отправить, Esc — отмена.
           </p>
         </div>
 
-        <div className="flex justify-end gap-2">
+        {/* Кнопки */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: '12px'
+        }}>
           <button
             onClick={handleCancel}
             disabled={submitting}
-            className="px-4 py-2 rounded border hover:bg-gray-50 disabled:opacity-50"
+            style={{
+              padding: '12px 24px',
+              border: '2px solid #95a5a6',
+              borderRadius: '8px',
+              backgroundColor: '#ecf0f1',
+              color: '#7f8c8d',
+              cursor: submitting ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+              fontWeight: '600',
+              fontFamily: 'Arial, sans-serif',
+              transition: 'all 0.3s ease'
+            }}
           >
-            Отмена
+            ОТМЕНА
           </button>
           <button
             onClick={handleSubmit}
             disabled={score == null || submitting}
-            className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+            style={{
+              padding: '12px 24px',
+              border: 'none',
+              borderRadius: '8px',
+              backgroundColor: submitting ? '#95a5a6' : '#27ae60',
+              color: 'white',
+              cursor: (score == null || submitting) ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+              fontWeight: '600',
+              fontFamily: 'Arial, sans-serif',
+              transition: 'all 0.3s ease'
+            }}
           >
-            {submitting ? 'Сохраняю…' : 'Сохранить'}
+            {submitting ? 'СОХРАНЯЕМ…' : 'СОХРАНИТЬ'}
           </button>
         </div>
       </div>

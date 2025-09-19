@@ -16,7 +16,6 @@ export const authService = {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      console.log('✅ User initialization successful:', data);
     } catch (error) {
       console.error('❌ User initialization failed:', error);
     }
