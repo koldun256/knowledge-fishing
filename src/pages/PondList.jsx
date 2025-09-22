@@ -3,14 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { pondService } from '../services/pondService';
 import { authService } from '../services/authService';
-import CreatePondModal from '../components/CreatePondModal'; // Добавляем импорт
+import CreatePondModal from '../components/CreatePondModal';
+import '../index.css';
 
 export default function PondsList() {
   const [ponds, setPonds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userInitialized, setUserInitialized] = useState(false);
   const [error, setError] = useState(null);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false); // Состояние модалки
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
     console.log('PondsList component mounted - useEffect triggered');
@@ -40,13 +41,11 @@ export default function PondsList() {
     initializeApp();
   }, []);
 
-  // Функция создания нового пруда
   const handleCreatePond = async (pondData) => {
     try {
       console.log('Creating pond with data:', pondData);
       const newPond = await pondService.createPond(pondData);
       
-      // Добавляем новый пруд в список
       setPonds(prev => [...prev, newPond]);
       console.log('Pond created and added to list:', newPond);
       
@@ -57,9 +56,25 @@ export default function PondsList() {
     }
   };
 
+  const pondImages = [
+    'pond1.png',
+    'pond2.png',
+    'pond3.png',
+    'pond4.png',
+    'pond5.png',
+    'pond6.png',
+    'pond7.png',
+    'pond8.png',
+  ];
+
+  const getPondImage = (pondId) => {
+    const index = parseInt(pondId[0], 16) % pondImages.length;
+    return `${process.env.PUBLIC_URL}/assets/${pondImages[index]}`;
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-green-50 flex items-center justify-center">
+      <div className="min-h-screen bg-green-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Инициализация пользователя и загрузка прудов...</p>
@@ -70,7 +85,7 @@ export default function PondsList() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-green-50 flex items-center justify-center">
+      <div className="min-h-screen bg-green-100 flex items-center justify-center">
         <div className="text-center">
           <div className="text-red-500 text-4xl mb-4">⚠️</div>
           <h2 className="text-xl font-semibold text-gray-800 mb-2">Ошибка загрузки</h2>
@@ -88,7 +103,7 @@ export default function PondsList() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-green-50 p-8">
+      <div className="min-h-screen bg-green-grass p-8" style={{color: '#00a028ff'}}>
         <div className="max-w-6xl mx-auto">
           <header className="flex justify-between items-center mb-8">
             <div>
@@ -98,32 +113,29 @@ export default function PondsList() {
               )}
             </div>
             <button 
-              onClick={() => setIsCreateModalOpen(true)} // Открываем модалку
+              onClick={() => setIsCreateModalOpen(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-md transition-colors"
             >
               Создать новый пруд
             </button>
           </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {ponds.map((pond) => (
               <Link
                 key={pond.id}
                 to={`/pond/${pond.id}`}
-                className="block bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-6 border-2 border-transparent hover:border-blue-300"
+                className="block relative"
               >
-                <div className="text-center">
-                  <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-4xl text-white">🌊</span>
-                  </div>
-                  <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                <img 
+                  src={getPondImage(pond.id)} 
+                  alt={pond.name}
+                  className="w-full h-auto"
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <h3 className="text-white text-xl font-bold text-center px-4 text-shadow">
                     {pond.name}
-                  </h2>
-                  <p className="text-gray-600 mb-4">{pond.description}</p>
-                  <div className="flex justify-between text-sm text-gray-500">
-                    <span>🐟 {pond.fish_count || 0} рыб</span>
-                    <span>⭐ {pond.completion_rate || 0}%</span>
-                  </div>
+                  </h3>
                 </div>
               </Link>
             ))}
@@ -149,7 +161,6 @@ export default function PondsList() {
         </div>
       </div>
 
-      {/* Модальное окно создания пруда */}
       <CreatePondModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}

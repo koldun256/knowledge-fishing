@@ -15,3 +15,112 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.image-container {
+  position: relative;
+  display: inline-block;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.image-container img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: none;
+  outline: none;
+  border-radius: 12px;
+}
+
+.centered-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  width: 90%;
+  margin: 0;
+}
+
+/* Убираем стандартные стили ссылок */
+.image-container {
+  text-decoration: none;
+}
+
+/* Эффект при наведении */
+.image-container:hover img {
+  opacity: 0.9;
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
+
+/* Убираем outline для аккуратного вида */
+.image-container:focus {
+  outline: none;
+}
+
+.image-container:focus img {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+/* Убираем все рамки и фоны */
+.bg-white {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Стили для текста поверх картинки */
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Убираем стандартные отступы */
+.p-3 {
+  padding: 0.5rem !important;
+}
+
+/* Убираем hover эффекты для карточки */
+.bg-white:hover {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Делаем ссылку блочным элементом */
+.block {
+  display: block;
+}
+
+/* Убираем скругления у внешнего контейнера */
+.rounded-xl {
+  border-radius: 0 !important;
+}
+
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Убедитесь, что маски поддерживаются */
+.pond-mask-container {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* Для браузеров, поддерживающих маски */
+@supports (mask-image: none) or (-webkit-mask-image: none) {
+  .pond-mask-container {
+    -webkit-mask-image: var(--mask-url);
+    mask-image: var(--mask-url);
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+} 
