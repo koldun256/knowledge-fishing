@@ -20,6 +20,7 @@ import createBoatLayer from '../layers/boat';
 // диалог
 import FishingDialog from '../components/FishingDialog';
 import CreateFishModal from '../components/CreateFishModal';
+import CreateFishesModal from '../components/CreateFishesModal'; // Новый компонент
 
 // сервисы (моки)
 import { pondService } from '../services/pondService';
@@ -42,11 +43,11 @@ function PondInner() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isCreateFishModalOpen, setIsCreateFishModalOpen] = useState(false); // Состояние для модалки
+  const [isCreateFishModalOpen, setIsCreateFishModalOpen] = useState(false);
+  const [isCreateFishesModalOpen, setIsCreateFishesModalOpen] = useState(false); // Новое состояние
 
   // Загрузка ассетов + данных пруда/рыб
   useEffect(() => {
-    // Если pondId не передан, не пытаемся загружать данные
     if (!pondId) {
       setError('ID пруда не указан');
       setLoading(false);
@@ -62,12 +63,10 @@ function PondInner() {
         
         console.log('Loading pond data for ID:', pondId);
         
-        // Сначала загружаем спрайт
         await Assets.loadImage('fishSheet', '/assets/fish_spritesheet_px.png').catch((e) => {
           console.warn('Failed to load fish sprite:', e);
         });
         
-        // Затем загружаем данные пруда и рыб
         const [pondData, fishesData] = await Promise.all([
           pondService.getPondById(pondId),
           fishService.getFishesByPondId(pondId),
@@ -96,7 +95,6 @@ function PondInner() {
       console.log('Creating fish with data:', fishData);
       const newFish = await fishService.createFish(pondId, fishData);
       
-      // Добавляем новую рыбу в список
       setFishes(prev => [...prev, newFish]);
       console.log('Fish created and added to list:', newFish);
       
@@ -107,7 +105,31 @@ function PondInner() {
     }
   };
 
-  // слои сцены
+  // Новая функция для создания нескольких рыб
+  const handleCreateFishes = async (pondId, fishesData) => {
+    try {
+      console.log('Creating multiple fishes with data:', fishesData);
+      
+      // Создаем массив промисов для создания всех рыб
+      // const createPromises = Object.entries(fishesData).map(([key, fishData]) => {
+      //   return fishService.createFish(pondId, fishData);
+      // });
+
+      
+      // Ждем завершения всех запросов
+      const newFishes = await fishService.createFishes(pondId, fishesData);
+      
+      // Добавляем всех новых рыб в список
+      setFishes(prev => [...prev, ...newFishes]);
+      console.log('Fishes created and added to list:', newFishes);
+      
+      return newFishes;
+    } catch (error) {
+      console.error('Error in handleCreateFishes:', error);
+      throw error;
+    }
+  };
+
   const layers = useMemo(() => ([
     createWaterSurfaceLayer({
       levelGradients: [
@@ -133,7 +155,6 @@ function PondInner() {
     createBoatLayer(),
   ]), []);
 
-  // запуск рыбалки
   const startFishing = async () => {
     try {
       if (fishing.phase !== 'idle' || dialog.open) return;
@@ -169,7 +190,6 @@ function PondInner() {
 
   const canStart = fishing.phase === 'idle' && !dialog.open;
 
-
   return (
     <>
       <CanvasStage
@@ -195,6 +215,14 @@ function PondInner() {
           >
             🐟 Создать рыбу
           </button>
+          
+          {/* Новая кнопка для создания нескольких рыб */}
+          <button
+            onClick={() => setIsCreateFishesModalOpen(true)}
+            className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
+          >
+            🐟🐟 Создать рыб
+          </button>
         </div>
       </div>
 
@@ -214,6 +242,14 @@ function PondInner() {
         isOpen={isCreateFishModalOpen}
         onClose={() => setIsCreateFishModalOpen(false)}
         onCreate={handleCreateFish}
+        pondId={pondId}
+      />
+      
+      {/* Новое модальное окно для создания нескольких рыб */}
+      <CreateFishesModal
+        isOpen={isCreateFishesModalOpen}
+        onClose={() => setIsCreateFishesModalOpen(false)}
+        onCreate={handleCreateFishes}
         pondId={pondId}
       />
     </>

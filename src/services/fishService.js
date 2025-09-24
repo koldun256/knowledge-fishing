@@ -27,13 +27,29 @@ export const fishService = {
   },
 
   createFish: async (pondId, fishData) => {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/ponds/${pondId}/fishes`, {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/ponds/${pondId}/fish`, {
       method: 'POST',
       credentials: API_CONFIG.withCredentials ? 'include' : 'omit',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(fishData)
+    });
+    
+    if (!response.ok) throw new Error(`Failed to create fish: ${response.status}`);
+    const data = await response.json();
+    console.log('Fish created successfully:', data);
+    return data;
+  },
+
+  createFishes: async (pondId, fishesData) => {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/ponds/${pondId}/fishes`, {
+      method: 'POST',
+      credentials: API_CONFIG.withCredentials ? 'include' : 'omit',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(fishesData)
     });
     
     if (!response.ok) throw new Error(`Failed to create fish: ${response.status}`);

@@ -6,6 +6,7 @@ export const pondService = {
       credentials: API_CONFIG.withCredentials ? 'include' : 'omit'
     });
     if (!response.ok) throw new Error('Failed to fetch ponds');
+    console.log(`response = ${response}`);
     return response.json();
   },
 
@@ -35,6 +36,31 @@ export const pondService = {
       credentials: API_CONFIG.withCredentials ? 'include' : 'omit'
     });
     if (!response.ok) throw new Error('Failed to get next fish');
+    return response.json();
+  },
+
+  updatePond: async (id, pondData) => {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/ponds/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: API_CONFIG.withCredentials ? 'include' : 'omit',
+      body: JSON.stringify(pondData)
+    });
+    if (!response.ok) throw new Error('Failed to update pond');
+    return response.json();
+  },
+
+  deletePond: async (id) => {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/ponds/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: API_CONFIG.withCredentials ? 'include' : 'omit'
+    });
+    if (!response.ok) throw new Error('Failed to delete pond');
     return response.json();
   },
 };

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { pondService } from '../services/pondService';
 import { authService } from '../services/authService';
 import CreatePondModal from '../components/CreatePondModal';
+import EditPondModal from '../components/EditPondModal';
 import '../index.css';
 
 export default function PondsList() {
@@ -12,6 +13,7 @@ export default function PondsList() {
   const [userInitialized, setUserInitialized] = useState(false);
   const [error, setError] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [editingPond, setEditingPond] = useState(null);
 
   useEffect(() => {
     console.log('PondsList component mounted - useEffect triggered');
@@ -20,8 +22,8 @@ export default function PondsList() {
       try {
         console.log('Step 1: Starting user initialization...');
         
-        const userData = await authService.initializeUser();
-        console.log('User initialized successfully:', userData);
+        await authService.initializeUser();
+        console.log('User initialized successfully');
         setUserInitialized(true);
         
         console.log('Step 2: Loading ponds after user initialization...');
@@ -54,6 +56,45 @@ export default function PondsList() {
       console.error('Error in handleCreatePond:', error);
       throw error;
     }
+  };
+
+  const handleEditPond = async (pondData) => {
+    try {
+      console.log('Editing pond with data:', pondData);
+      const updatedPond = await pondService.updatePond(editingPond.id, pondData);
+      
+      setPonds(prev => prev.map(pond => 
+        pond.id === editingPond.id ? updatedPond : pond
+      ));
+      console.log('Pond updated:', updatedPond);
+      
+      setEditingPond(null);
+      return updatedPond;
+    } catch (error) {
+      console.error('Error in handleEditPond:', error);
+      throw error;
+    }
+  };
+
+  const handleDeletePond = async (pondId) => {
+    try {
+      console.log('Deleting pond:', pondId);
+      await pondService.deletePond(pondId);
+      
+      setPonds(prev => prev.filter(pond => pond.id !== pondId));
+      console.log('Pond deleted successfully');
+      
+      setEditingPond(null);
+    } catch (error) {
+      console.error('Error in handleDeletePond:', error);
+      throw error;
+    }
+  };
+
+  const handleContextMenu = (e, pond) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditingPond(pond);
   };
 
   const pondImages = [
@@ -104,7 +145,7 @@ export default function PondsList() {
   return (
     <>
       <div className="min-h-screen bg-green-grass p-8" style={{color: '#00a028ff'}}>
-        <div className="max-w-6xl mx-auto">
+        <div className="mx-auto">
           <header className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-3xl font-bold text-gray-800">Мои пруды знаний</h1>
@@ -112,52 +153,60 @@ export default function PondsList() {
                 <p className="text-green-600 text-sm mt-1">✓ Пользователь инициализирован</p>
               )}
             </div>
-            <button 
-              onClick={() => setIsCreateModalOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-md transition-colors"
-            >
-              Создать новый пруд
-            </button>
           </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
             {ponds.map((pond) => (
-              <Link
-                key={pond.id}
-                to={`/pond/${pond.id}`}
-                className="block relative"
-              >
-                <img 
-                  src={getPondImage(pond.id)} 
-                  alt={pond.name}
-                  className="w-full h-auto"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <h3 className="text-white text-xl font-bold text-center px-4 text-shadow">
-                    {pond.name}
-                  </h3>
-                </div>
-              </Link>
+              <div key={pond.id} className="relative group">
+                <Link
+                  to={`/pond/${pond.id}`}
+                  className="block"
+                  onContextMenu={(e) => handleContextMenu(e, pond)}
+                >
+                  <img 
+                    src={getPondImage(pond.id)} 
+                    alt={pond.name}
+                    className="w-full h-auto transition-transform group-hover:scale-105"
+                  />
+                  <div 
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{
+                      margin: '23%',
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    <h3 
+                      className="text-black text-xl font-bold text-center w-full"
+                      style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                        lineHeight: '1.2',
+                        maxHeight: '3.6em',
+                        wordBreak: 'break-word'
+                      }}
+                      title={pond.name}
+                    >
+                      {pond.name}
+                    </h3>
+                  </div>
+                </Link>
+              </div>
             ))}
+            
+            <button 
+              onClick={() => setIsCreateModalOpen(true)}
+              className="block relative focus:outline-none group"
+            >
+              <img 
+                src={`${process.env.PUBLIC_URL}/assets/pond_add.png`} 
+                alt="Создать новый пруд"
+                className="w-full h-auto transition-transform group-hover:scale-105"
+              />
+            </button>
           </div>
-
-          {ponds.length === 0 && (
-            <div className="text-center py-16">
-              <div className="text-6xl mb-4">🎣</div>
-              <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-                У вас пока нет прудов
-              </h2>
-              <p className="text-gray-600 mb-8">
-                Создайте свой первый пруд знаний и начните рыбалку!
-              </p>
-              <button 
-                onClick={() => setIsCreateModalOpen(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-lg transition-colors"
-              >
-                Создать первый пруд
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
@@ -165,6 +214,14 @@ export default function PondsList() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onCreate={handleCreatePond}
+      />
+
+      <EditPondModal
+        isOpen={!!editingPond}
+        onClose={() => setEditingPond(null)}
+        onSave={handleEditPond}
+        onDelete={handleDeletePond}
+        pond={editingPond}
       />
     </>
   );

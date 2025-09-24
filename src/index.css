@@ -124,3 +124,30 @@ code {
     mask-repeat: no-repeat;
   }
 } 
+
+/* Дополнительные стили для текста прудов */
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Адаптивный размер текста для прудов */
+@media (max-width: 640px) {
+  .pond-text {
+    font-size: 16px;
+    max-width: 85%;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .pond-text {
+    font-size: 18px;
+    max-width: 80%;
+  }
+}
+
+@media (min-width: 1025px) {
+  .pond-text {
+    font-size: 20px;
+    max-width: 75%;
+  }
+}
