@@ -7,6 +7,6 @@ const getBaseUrl = () => {
 };
 
 export const API_CONFIG = {
-  BASE_URL: 'http://localhost:8000',
+  BASE_URL: getBaseUrl(),
   withCredentials: true
 };
