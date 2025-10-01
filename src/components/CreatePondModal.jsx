@@ -5,7 +5,8 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    topic: 'programming'
+    topic: 'programming',
+    intervals: ['0:1:0', '1:0:0', '7:0:0', '30:0:0'] // 4 интервала по умолчанию
   });
   const [loading, setLoading] = useState(false);
   const [showNewCategory, setShowNewCategory] = useState(false);
@@ -24,7 +25,8 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
       setFormData({
         name: '',
         description: '',
-        topic: 'programming'
+        topic: 'programming',
+        intervals: ['0:1:0', '1:0:0', '7:0:0', '30:0:0']
       });
       setShowNewCategory(false);
       setNewCategory('');
@@ -51,6 +53,45 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
     }
   };
 
+  // Обработчик изменения интервала для конкретного слоя
+  const handleIntervalChange = (index, value) => {
+    const newIntervals = [...formData.intervals];
+    newIntervals[index] = value;
+    setFormData(prev => ({
+      ...prev,
+      intervals: newIntervals
+    }));
+  };
+
+  // Функция для преобразования строки интервала в timedelta объект
+  const parseIntervalToTimedelta = (intervalStr) => {
+    const nums = intervalStr.split(':');
+    return { days: parseInt(nums[0], 10), hours: parseInt(nums[1], 10), minutes: parseInt(nums[2], 10)};
+
+    const lowerStr = intervalStr.toLowerCase().trim();
+    
+    if (lowerStr.includes('hour')) {
+      const hours = parseInt(lowerStr) || 1;
+      return { hours };
+    } else if (lowerStr.includes('day')) {
+      const days = parseInt(lowerStr) || 1;
+      return { days };
+    } else if (lowerStr.includes('week')) {
+      const weeks = parseInt(lowerStr) || 1;
+      return { days: weeks * 7 };
+    } else if (lowerStr.includes('month')) {
+      const months = parseInt(lowerStr) || 1;
+      return { days: months * 30 };
+    } else {
+      // Попытка парсинга числового значения
+      const num = parseInt(lowerStr);
+      if (!isNaN(num)) {
+        return { days: num };
+      }
+      return { days: 1 }; // значение по умолчанию
+    }
+  };
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
@@ -59,7 +100,16 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
 
     setLoading(true);
     try {
-      await onCreate(formData);
+      // Преобразуем строки интервалов в timedelta объекты
+      const intervalObjects = formData.intervals.map(parseIntervalToTimedelta);
+      
+      // Создаем объект с данными пруда, включая интервалы
+      const pondData = {
+        ...formData,
+        intervals: intervalObjects
+      };
+      
+      await onCreate(pondData);
       onClose();
     } catch (error) {
       console.error('Error creating pond:', error);
@@ -176,7 +226,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
           </div>
 
           {/* Категория */}
-          <div style={{ marginBottom: '24px' }}>
+          <div style={{ marginBottom: '20px' }}>
             <label style={{
               display: 'block',
               marginBottom: '8px',
@@ -291,6 +341,64 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                 Введите название новой категории и нажмите ✓ для добавления
               </p>
             )}
+          </div>
+
+          {/* Интервалы времени для каждого слоя */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '6px',
+              fontWeight: '600',
+              fontSize: '16px',
+              color: '#34495e',
+              fontFamily: 'Arial, sans-serif',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              ИНТЕРВАЛЫ ПОВТОРЕНИЯ
+            </label>
+
+            <p style={{
+              marginBottom: '6px',
+              fontSize: '12px',
+              color: '#7f8c8d',
+              fontFamily: 'Arial, sans-serif',
+              margin: '8px 0 0 0',
+              lineHeight: '1.4'
+            }}>
+              В формате дни:часы:минуты (сейчас установлены час, день, неделя и месяц)
+            </p>
+            
+            {formData.intervals.map((interval, index) => (
+              <div key={index} style={{ marginBottom: '10px' }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '6px',
+                  fontWeight: '500',
+                  fontSize: '14px',
+                  color: '#2c3e50',
+                  fontFamily: 'Arial, sans-serif'
+                }}>
+                  {index + 1}-е повторение:
+                </label>
+                <input
+                  type="text"
+                  value={interval}
+                  onChange={(e) => handleIntervalChange(index, e.target.value)}
+                  placeholder={`Интервал для слоя ${index + 1}`}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '2px solid #bdc3c7',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box',
+                    fontFamily: 'Arial, sans-serif',
+                    transition: 'border-color 0.3s ease'
+                  }}
+                />
+              </div>
+            ))}
           </div>
 
           {/* Кнопки */}
