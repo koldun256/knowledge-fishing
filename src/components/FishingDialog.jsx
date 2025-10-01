@@ -23,7 +23,7 @@ export default function FishingDialog() {
   // Хоткеи: 1..4 — выбрать оценку, Enter — отправить, Esc — отмена
   const onKey = useCallback((e) => {
     if (!dialog.open) return;
-    if (e.key >= '1' && e.key <= '4') {
+    if (e.key >= '0' && e.key <= '2') {
       setScore(Number(e.key));
     } else if (e.key === 'Enter' && score != null && !submitting) {
       e.preventDefault();
@@ -220,7 +220,7 @@ export default function FishingDialog() {
             gap: '8px',
             marginBottom: '8px'
           }}>
-            {[1, 2, 3, 4].map((v) => (
+            {[0, 1, 2].map((v) => (
               <button
                 key={v}
                 onClick={() => setScore(v)}
