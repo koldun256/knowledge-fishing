@@ -22,8 +22,8 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.question.trim() || !formData.answer.trim()) {
-      alert('Заполните вопрос и ответ');
+    if (!formData.question.trim()) {
+      alert('Заполните вопрос');
       return;
     }
     onCreate(pondId, formData);
@@ -116,7 +116,7 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
               textTransform: 'uppercase', // Заглавные буквы
               letterSpacing: '0.5px'    // Межбуквенное расстояние
             }}>
-              ОТВЕТ *
+              ОТВЕТ
             </label>
             <textarea
               name="answer"
@@ -136,43 +136,6 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
               }}
               required
             />
-          </div>
-
-          {/* Поле Глубина */}
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{
-              display: 'block',
-              marginBottom: '8px',
-              fontWeight: '600',
-              fontSize: '16px',
-              color: '#34495e',
-              fontFamily: 'Arial, sans-serif',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>
-              УРОВЕНЬ ГЛУБИНЫ
-            </label>
-            <select
-              name="depth_level"
-              value={formData.depth_level}
-              onChange={handleChange}
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '2px solid #bdc3c7',
-                borderRadius: '8px',
-                fontSize: '14px',
-                boxSizing: 'border-box',
-                fontFamily: 'Arial, sans-serif',
-                backgroundColor: 'white',
-                cursor: 'pointer'
-              }}
-            >
-              <option value={0}>Уровень 0 (Мелководье)</option>
-              <option value={1}>Уровень 1</option>
-              <option value={2}>Уровень 2</option>
-              <option value={3}>Уровень 3 (Глубина)</option>
-            </select>
           </div>
 
           {/* Кнопки */}

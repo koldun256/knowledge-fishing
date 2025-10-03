@@ -67,29 +67,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
   const parseIntervalToTimedelta = (intervalStr) => {
     const nums = intervalStr.split(':');
     return { days: parseInt(nums[0], 10), hours: parseInt(nums[1], 10), minutes: parseInt(nums[2], 10)};
-
-    const lowerStr = intervalStr.toLowerCase().trim();
-    
-    if (lowerStr.includes('hour')) {
-      const hours = parseInt(lowerStr) || 1;
-      return { hours };
-    } else if (lowerStr.includes('day')) {
-      const days = parseInt(lowerStr) || 1;
-      return { days };
-    } else if (lowerStr.includes('week')) {
-      const weeks = parseInt(lowerStr) || 1;
-      return { days: weeks * 7 };
-    } else if (lowerStr.includes('month')) {
-      const months = parseInt(lowerStr) || 1;
-      return { days: months * 30 };
-    } else {
-      // Попытка парсинга числового значения
-      const num = parseInt(lowerStr);
-      if (!isNaN(num)) {
-        return { days: num };
-      }
-      return { days: 1 }; // значение по умолчанию
-    }
   };
 
   if (!isOpen) return null;
@@ -225,7 +202,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
             />
           </div>
 
-          {/* Категория */}
+          {/* Категория
           <div style={{ marginBottom: '20px' }}>
             <label style={{
               display: 'block',
@@ -341,7 +318,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                 Введите название новой категории и нажмите ✓ для добавления
               </p>
             )}
-          </div>
+          </div> */}
 
           {/* Интервалы времени для каждого слоя */}
           <div style={{ marginBottom: '24px' }}>

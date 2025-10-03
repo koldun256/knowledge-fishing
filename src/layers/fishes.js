@@ -5,6 +5,7 @@
 // Во время рыбалки рыба-цель подплывает к крючку и "вываживается".
 
 import { Assets } from '../utils/assets';
+import { setExternalResetFishState } from '../components/FishingDialog.jsx'
 
 export default function createFishesLayer(options = {}) {
   const {
@@ -45,6 +46,13 @@ export default function createFishesLayer(options = {}) {
     const bottom = pondTop + (level + 1) * levelH - levelPadding;
     return [top, bottom];
   };
+
+  const resetFishState = (fishId) => {
+    fishState.delete(fishId);
+  };
+
+  // Экспортируем функцию для сброса
+  setExternalResetFishState(resetFishState);
 
   const ensureFishState = (f, w, pondTop, levelH, isReady) => {
     let s = fishState.get(f.id);

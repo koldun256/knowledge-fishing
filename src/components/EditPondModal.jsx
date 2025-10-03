@@ -5,7 +5,8 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    topic: 'programming'
+    topic: 'programming',
+    intervals: ['0:1:0', '1:0:0', '7:0:0', '30:0:0'] // 4 интервала по умолчанию
   });
   const [loading, setLoading] = useState(false);
   const [showNewCategory, setShowNewCategory] = useState(false);
@@ -18,13 +19,55 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     'languages'
   ]);
 
+  // Функция для преобразования timedelta объекта в строку
+  const timedeltaToString = (timedeltaObj) => {
+    // Получаем общее количество минут
+    const totalMinutes = Math.floor(timedeltaObj.totalSeconds / 60);
+    
+    // Вычисляем дни, часы и минуты
+    const days = Math.floor(totalMinutes / (24 * 60));
+    const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+    const minutes = totalMinutes % 60;
+    
+    // Форматируем с ведущими нулями для часов и минут
+    const formattedHours = hours.toString().padStart(2, '0');
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    
+    return `${days}:${formattedHours}:${formattedMinutes}`;
+  };
+
+  // Функция для преобразования строки интервала в timedelta объект
+  const parseIntervalToTimedelta = (intervalStr) => {
+    const nums = intervalStr.split(':');
+    return { days: parseInt(nums[0], 10), hours: parseInt(nums[1], 10), minutes: parseInt(nums[2], 10)};
+  };
+
+  function createTimedelta(seconds) {
+    return {
+        totalSeconds: seconds,
+        days: Math.floor(seconds / 86400),
+        hours: Math.floor((seconds % 86400) / 3600),
+        minutes: Math.floor((seconds % 3600) / 60),
+        seconds: Math.floor(seconds % 60)
+    };
+  }
+
   // Заполняем поля данными пруда при открытии модального окна
   useEffect(() => {
     if (isOpen && pond) {
+      // Преобразуем интервалы из timedelta объектов в строки
+      let intervals = ['0:1:0', '1:0:0', '7:0:0', '30:0:0'];
+      if (pond.intervals) {
+        const secondsArray = JSON.parse(pond.intervals);
+        const timedeltas = secondsArray.map(createTimedelta);
+        intervals = timedeltas.map(timedeltaToString);
+      }
+      
       setFormData({
         name: pond.name || '',
         description: pond.description || '',
-        topic: pond.topic || 'programming'
+        topic: pond.topic || 'programming',
+        intervals: intervals
       });
       setShowNewCategory(false);
       setNewCategory('');
@@ -51,6 +94,16 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     }
   };
 
+  // Обработчик изменения интервала для конкретного слоя
+  const handleIntervalChange = (index, value) => {
+    const newIntervals = [...formData.intervals];
+    newIntervals[index] = value;
+    setFormData(prev => ({
+      ...prev,
+      intervals: newIntervals
+    }));
+  };
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
@@ -59,7 +112,16 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
 
     setLoading(true);
     try {
-      await onSave(formData);
+      // Преобразуем строки интервалов в timedelta объекты
+      const intervalObjects = formData.intervals.map(parseIntervalToTimedelta);
+      
+      // Создаем объект с данными пруда, включая интервалы
+      const pondData = {
+        ...formData,
+        intervals: intervalObjects
+      };
+      
+      await onSave(pondData);
       onClose();
     } catch (error) {
       console.error('Error updating pond:', error);
@@ -191,8 +253,8 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
             />
           </div>
 
-          {/* Категория */}
-          <div style={{ marginBottom: '24px' }}>
+          {/* Категория
+          <div style={{ marginBottom: '20px' }}>
             <label style={{
               display: 'block',
               marginBottom: '8px',
@@ -295,9 +357,9 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                   ✕
                 </button>
               </div>
-            )}
+            )} */}
             
-            {showNewCategory && (
+            {/* {showNewCategory && (
               <p style={{
                 fontSize: '12px',
                 color: '#7f8c8d',
@@ -307,6 +369,64 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                 Введите название новой категории и нажмите ✓ для добавления
               </p>
             )}
+          </div> */}
+
+          {/* Интервалы времени для каждого слоя */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '6px',
+              fontWeight: '600',
+              fontSize: '16px',
+              color: '#34495e',
+              fontFamily: 'Arial, sans-serif',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              ИНТЕРВАЛЫ ПОВТОРЕНИЯ
+            </label>
+
+            <p style={{
+              marginBottom: '6px',
+              fontSize: '12px',
+              color: '#7f8c8d',
+              fontFamily: 'Arial, sans-serif',
+              margin: '8px 0 0 0',
+              lineHeight: '1.4'
+            }}>
+              В формате дни:часы:минуты
+            </p>
+            
+            {formData.intervals.map((interval, index) => (
+              <div key={index} style={{ marginBottom: '10px' }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '6px',
+                  fontWeight: '500',
+                  fontSize: '14px',
+                  color: '#2c3e50',
+                  fontFamily: 'Arial, sans-serif'
+                }}>
+                  {index + 1}-е повторение:
+                </label>
+                <input
+                  type="text"
+                  value={interval}
+                  onChange={(e) => handleIntervalChange(index, e.target.value)}
+                  placeholder={`Интервал для слоя ${index + 1}`}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '2px solid #bdc3c7',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box',
+                    fontFamily: 'Arial, sans-serif',
+                    transition: 'border-color 0.3s ease'
+                  }}
+                />
+              </div>
+            ))}
           </div>
 
           {/* Кнопки */}

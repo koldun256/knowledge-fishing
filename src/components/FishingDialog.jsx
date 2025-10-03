@@ -4,6 +4,11 @@
   import { fishService } from '../services/fishService';
   import { sessionService } from '../services/sessionService';
 
+  let externalResetFishState = null;
+  export function setExternalResetFishState(fn) {
+    externalResetFishState = fn;
+  }
+
   export default function FishingDialog() {
     const { dialog, setDialog, resetFishing, fishes, setFishes } = usePond();
     const [score, setScore] = useState(null);
@@ -61,6 +66,10 @@
         console.log('score = ', score);
         const quality = parseInt(score, 10);
         const updated = await fishService.reviewFish(fish.id, { quality });
+
+        if (externalResetFishState) {
+          externalResetFishState(fish.id);
+        }
 
         // 2) Обновляем локальный список рыб
         const idx = fishes.findIndex((x) => String(x.id) === String(fish.id));
