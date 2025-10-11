@@ -32,6 +32,7 @@ export default function createFishesLayer(options = {}) {
 
   const fishState = new Map();
   const randIn = (a, b) => a + Math.random() * (b - a);
+  const randInByString = (hash, a, b) => a + (hash / 0x7FFFFFFF) * (b - a);
   const pickDir = () => (Math.random() < 0.5 ? -1 : 1);
   const clampLevel = (lvl, count) => Math.min(count - 1, Math.max(0, lvl | 0));
   const levelToRow = (level) => Math.min(2, Math.max(0, level)); // 3 вида в спрайте
@@ -56,15 +57,21 @@ export default function createFishesLayer(options = {}) {
 
   const ensureFishState = (f, w, pondTop, levelH, isReady) => {
     let s = fishState.get(f.id);
+    // const hash = 10;
+    const hash = Array.from(String(f.id)).reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a & 0x7FFFFFFF;
+    }, 0);
+    // console.log('hash = ', hash, 'id = ', f.id);
     if (!s) {
       const level = clampLevel(f.depth_level ?? 0, levelCount);
       s = {
-        x: randIn(leftMargin + SPR_W * scale, w - rightMargin - SPR_W * scale),
+        x: randInByString(hash, leftMargin + SPR_W * scale, w - rightMargin - SPR_W * scale),
         dir: pickDir(),
-        speed: randIn(...(isReady ? speedRangeReady : speedRangeIdle)),
+        speed: randInByString(hash, ...(isReady ? speedRangeReady : speedRangeIdle)),
         phase: Math.random() * Math.PI * 2,
-        amp: randIn(...vertAmpRange),
-        freq: randIn(...vertFreqRange) * Math.PI * 2,
+        amp: randInByString(hash, ...vertAmpRange),
+        freq: randInByString(hash, ...vertFreqRange) * Math.PI * 2,
         level,
         centerY: levelCenterY(level, pondTop, levelH),
       };
@@ -74,10 +81,10 @@ export default function createFishesLayer(options = {}) {
       if (newLevel !== s.level) {
         s.level = newLevel;
         s.centerY = levelCenterY(newLevel, pondTop, levelH);
-        s.amp = randIn(...vertAmpRange);
+        s.amp = randInByString(hash, ...vertAmpRange);
       }
       // подстройка скорости под готовность
-      const target = randIn(...(isReady ? speedRangeReady : speedRangeIdle));
+      const target = randInByString(hash, ...(isReady ? speedRangeReady : speedRangeIdle));
       s.speed = s.speed * 0.85 + target * 0.15;
     }
     return s;
@@ -123,7 +130,6 @@ export default function createFishesLayer(options = {}) {
 
       fishes.forEach((f) => {
         const isReady = (new Date(f.next_review_date + 'Z').getTime() <= Date.now());
-        console.log(new Date(f.next_review_date + 'Z').getTime(), Date.now());
         const s = ensureFishState(f, w, pondTop, levelH, isReady);
 
         // базовое движение (если нет захвата сценарием рыбалки)

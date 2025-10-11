@@ -15,6 +15,13 @@ export default function PondsList() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingPond, setEditingPond] = useState(null);
 
+  // Функция для правильного склонения слова "рыба"
+  const getFishWord = (count) => {
+    if (count === 1) return 'рыба';
+    if (count >= 2 && count <= 4) return 'рыбы';
+    return 'рыб';
+  };
+
   useEffect(() => {
     console.log('PondsList component mounted - useEffect triggered');
     
@@ -148,10 +155,7 @@ export default function PondsList() {
         <div className="mx-auto">
           <header className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">Мои пруды знаний</h1>
-              {userInitialized && (
-                <p className="text-green-600 text-sm mt-1">✓ Пользователь инициализирован</p>
-              )}
+              <h1 className="text-4xl font-bold text-gray-800">Где будем рыбачить?</h1>
             </div>
           </header>
 
@@ -169,28 +173,41 @@ export default function PondsList() {
                     className="w-full h-auto transition-transform group-hover:scale-105"
                   />
                   <div 
-                    className="absolute inset-0 flex items-center justify-center"
+                    className="absolute inset-0 flex flex-col items-center justify-center"
                     style={{
                       margin: '23%',
                       pointerEvents: 'none'
                     }}
                   >
                     <h3 
-                      className="text-black text-xl font-bold text-center w-full"
+                      className="text-black text-2xl font-bold text-center w-full mb-2"
                       style={{
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         display: '-webkit-box',
-                        WebkitLineClamp: 3,
+                        WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
                         lineHeight: '1.2',
-                        maxHeight: '3.6em',
+                        maxHeight: '2.4em',
                         wordBreak: 'break-word'
                       }}
                       title={pond.name}
                     >
                       {pond.name}
                     </h3>
+                    {/* Добавленная надпись о голодных рыбах */}
+                    <div className="text-black text-base font-medium text-center w-full px-2 leading-tight">
+                      {pond.cnt_ready_fishes !== undefined && pond.cnt_fishes !== undefined ? (
+                        <div className="flex flex-col items-center">
+                          <span className="whitespace-nowrap">
+                            {pond.cnt_ready_fishes} {getFishWord(pond.cnt_ready_fishes)} из {pond.cnt_fishes}
+                          </span>
+                          <span>уже проголодались</span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-500 text-sm">Информация о рыбах недоступна</span>
+                      )}
+                    </div>
                   </div>
                 </Link>
               </div>

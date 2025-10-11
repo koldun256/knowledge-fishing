@@ -129,7 +129,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
           fontWeight: '800',
           color: '#013b45ff',
           textAlign: 'center',
-          fontFamily: 'MT Sans Full, sans-serif',
         }}>
           СОЗДАТЬ НОВЫЙ ПРУД
         </h2>
@@ -143,7 +142,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
               fontWeight: '600',
               fontSize: '16px',
               color: '#34495e',
-              fontFamily: 'Arial, sans-serif',
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
@@ -154,7 +152,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Например: JavaScript основы"
+              placeholder="Рыбы и их повадки"
               style={{
                 width: '100%',
                 padding: '12px',
@@ -162,7 +160,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                 borderRadius: '8px',
                 fontSize: '14px',
                 boxSizing: 'border-box',
-                fontFamily: 'Arial, sans-serif',
                 transition: 'border-color 0.3s ease'
               }}
               required
@@ -177,7 +174,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
               fontWeight: '600',
               fontSize: '16px',
               color: '#34495e',
-              fontFamily: 'Arial, sans-serif',
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
@@ -187,7 +183,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
               name="description"
               value={formData.description}
               onChange={handleChange}
-              placeholder="Описание темы пруда..."
+              placeholder="Ответы на самые популярные вопросы - какие бывают? что кушают? чем занимаются в свободное время?"
               rows={3}
               style={{
                 width: '100%',
@@ -196,129 +192,10 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                 borderRadius: '8px',
                 fontSize: '14px',
                 boxSizing: 'border-box',
-                fontFamily: 'Arial, sans-serif',
                 transition: 'border-color 0.3s ease'
               }}
             />
           </div>
-
-          {/* Категория
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{
-              display: 'block',
-              marginBottom: '8px',
-              fontWeight: '600',
-              fontSize: '16px',
-              color: '#34495e',
-              fontFamily: 'Arial, sans-serif',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>
-              КАТЕГОРИЯ *
-            </label>
-            
-            {!showNewCategory ? (
-              <>
-                <select
-                  name="topic"
-                  value={formData.topic}
-                  onChange={handleCategoryChange}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '2px solid #bdc3c7',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                    fontFamily: 'Arial, sans-serif',
-                    backgroundColor: 'white',
-                    cursor: 'pointer',
-                    marginBottom: '8px'
-                  }}
-                >
-                  {categories.map(category => (
-                    <option key={category} value={category}>
-                      {category.charAt(0).toUpperCase() + category.slice(1)}
-                    </option>
-                  ))}
-                  <option value="new">+ Добавить новую категорию</option>
-                </select>
-              </>
-            ) : (
-              <div style={{
-                display: 'flex',
-                gap: '8px',
-                alignItems: 'center'
-              }}>
-                <input
-                  type="text"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  placeholder="Введите название категории..."
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    border: '2px solid #bdc3c7',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                    fontFamily: 'Arial, sans-serif'
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={handleAddNewCategory}
-                  disabled={!newCategory.trim()}
-                  style={{
-                    padding: '12px 16px',
-                    border: 'none',
-                    borderRadius: '8px',
-                    backgroundColor: '#27ae60',
-                    color: 'white',
-                    cursor: newCategory.trim() ? 'pointer' : 'not-allowed',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    fontFamily: 'Arial, sans-serif',
-                    opacity: newCategory.trim() ? 1 : 0.6
-                  }}
-                >
-                  ✓
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowNewCategory(false);
-                    setNewCategory('');
-                    setFormData(prev => ({ ...prev, topic: 'programming' }));
-                  }}
-                  style={{
-                    padding: '12px 16px',
-                    border: '2px solid #95a5a6',
-                    borderRadius: '8px',
-                    backgroundColor: '#ecf0f1',
-                    color: '#7f8c8d',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    fontFamily: 'Arial, sans-serif'
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-            )}
-            
-            {showNewCategory && (
-              <p style={{
-                fontSize: '12px',
-                color: '#7f8c8d',
-                fontFamily: 'Arial, sans-serif',
-                margin: '8px 0 0 0'
-              }}>
-                Введите название новой категории и нажмите ✓ для добавления
-              </p>
-            )}
-          </div> */}
 
           {/* Интервалы времени для каждого слоя */}
           <div style={{ marginBottom: '24px' }}>
@@ -328,7 +205,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
               fontWeight: '600',
               fontSize: '16px',
               color: '#34495e',
-              fontFamily: 'Arial, sans-serif',
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
@@ -337,13 +213,12 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
 
             <p style={{
               marginBottom: '6px',
-              fontSize: '12px',
+              fontSize: '14px',
               color: '#7f8c8d',
-              fontFamily: 'Arial, sans-serif',
               margin: '8px 0 0 0',
               lineHeight: '1.4'
             }}>
-              В формате дни:часы:минуты (сейчас установлены час, день, неделя и месяц)
+              В формате <strong>дни:часы:минуты</strong> (сейчас установлены час, день, неделя и месяц)
             </p>
             
             {formData.intervals.map((interval, index) => (
@@ -354,7 +229,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                   fontWeight: '500',
                   fontSize: '14px',
                   color: '#2c3e50',
-                  fontFamily: 'Arial, sans-serif'
                 }}>
                   {index + 1}-е повторение:
                 </label>
@@ -370,7 +244,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                     borderRadius: '6px',
                     fontSize: '14px',
                     boxSizing: 'border-box',
-                    fontFamily: 'Arial, sans-serif',
                     transition: 'border-color 0.3s ease'
                   }}
                 />
@@ -397,7 +270,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                 cursor: loading ? 'not-allowed' : 'pointer',
                 fontSize: '14px',
                 fontWeight: '600',
-                fontFamily: 'Arial, sans-serif',
                 transition: 'all 0.3s ease',
                 opacity: loading ? 0.6 : 1
               }}
@@ -416,7 +288,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                 cursor: (loading || !formData.name.trim() || !formData.topic) ? 'not-allowed' : 'pointer',
                 fontSize: '14px',
                 fontWeight: '600',
-                fontFamily: 'Arial, sans-serif',
                 transition: 'all 0.3s ease',
                 opacity: (loading || !formData.name.trim() || !formData.topic) ? 0.6 : 1
               }}

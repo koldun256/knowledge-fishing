@@ -1,11 +1,37 @@
 // src/components/CreateFishesModal.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
   const [jsonInput, setJsonInput] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
+  };
+
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        handleClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setJsonInput('');
+      setError('');
+      setCopySuccess(false);
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,20 +43,14 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
     }
 
     try {
-      // Парсим JSON
       const fishesData = JSON.parse(jsonInput);
       
-      // Проверяем, что это объект с вопросами-ответами
       if (typeof fishesData !== 'object' || fishesData === null || Array.isArray(fishesData)) {
         throw new Error('JSON должен быть объектом в формате {"question1": "answer1", "question2": "answer2", ...}');
       }
 
       setIsLoading(true);
-      
-      // Вызываем функцию создания рыб
       await onCreate(pondId, fishesData);
-      
-      // Закрываем модальное окно и очищаем форму
       setJsonInput('');
       onClose();
       
@@ -48,76 +68,226 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
     onClose();
   };
 
-  // Пример правильного формата для подсказки
+  const queryString = 'Сгенерируй 20 пар вопрос и ответ о снастях для рыбалки. Вопрос - название снасти, ответ - что это такое и для чего предназначено. Вопросы и ответы должны быть длиной не более 1000 символов. Верни ответ в формате {"question1": "answer1", "question2": "answer2", ...}" без другого форматирования и лишних слов.'
+
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(queryString)
+      .then(() => {
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      })
+      .catch(err => {
+        console.error('Ошибка копирования: ', err);
+      });
+  };
+
   const exampleJson = `{
-  "Какая рыба самая быстрая?": "Парусник",
-  "Сколько лет живет карп?": "20-30 лет",
-  "Какого размера достигает щука?": "до 1.5 метров"
-}`;
+    "Какая рыба самая быстрая?": "Парусник",
+    "Сколько лет живет карп?": "20-30 лет",
+    "Какого размера достигает щука?": "до 1.5 метров"
+  }`;
 
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-800">Создать несколько рыб</h2>
-            <button
-              onClick={handleClose}
-              className="text-gray-500 hover:text-gray-700 text-2xl"
-            >
-              ×
-            </button>
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 10000,
+      padding: '16px'
+    }} onClick={handleBackdropClick}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '24px',
+        borderRadius: '12px',
+        width: '90%',
+        maxWidth: '600px',
+        maxHeight: '90vh',
+        boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        <h2 style={{ 
+          margin: '0 0 20px 0', 
+          fontSize: '28px', 
+          fontWeight: '800',
+          color: '#013b45ff',
+          textAlign: 'center',
+        }}>
+          Добавить несколько рыб
+        </h2>
+        
+        <form onSubmit={handleSubmit} style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          {/* Поле JSON */}
+          <div style={{ marginBottom: '20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              fontSize: '16px',
+              color: '#34495e',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              ВВЕДИТЕ ДАННЫЕ РЫБ В ФОРМАТЕ JSON *
+            </label>
+            <textarea
+              value={jsonInput}
+              onChange={(e) => setJsonInput(e.target.value)}
+              placeholder={exampleJson}
+              rows={12}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '2px solid #bdc3c7',
+                borderRadius: '8px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                transition: 'border-color 0.3s ease',
+                fontFamily: 'monospace',
+                resize: 'none',
+                flex: 1,
+                minHeight: '200px'
+              }}
+              spellCheck="false"
+              required
+            />
+            <div style={{
+              marginTop: '8px',
+              fontSize: '12px',
+              color: '#7f8c8d',
+              fontWeight: '600'
+            }}>
+              <strong>Формат: {"{\"question1\": \"answer1\", \"question2\": \"answer2\", ...}"}</strong>
+            </div>
           </div>
-          
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Введите данные рыб в формате JSON:
-              </label>
-              <textarea
-                value={jsonInput}
-                onChange={(e) => setJsonInput(e.target.value)}
-                placeholder={exampleJson}
-                className="w-full h-64 p-3 border border-gray-300 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                spellCheck="false"
-              />
-              <div className="mt-1 text-xs text-gray-500">
-                Формат: {"{\"question1\": \"answer1\", \"question2\": \"answer2\", ...}"}
-              </div>
+
+          {/* Поле для ИИ генерации */}
+          <div style={{
+            marginBottom: '20px',
+            padding: '16px',
+            backgroundColor: '#f8f9fa',
+            border: '1px solid #e9ecef',
+            borderRadius: '8px'
+          }}>
+            <div style={{
+              marginBottom: '12px',
+              fontSize: '14px',
+              color: '#495057',
+              fontWeight: '500'
+            }}>
+              Вы можете использовать ИИ для генерации вопросов и ответов. Вот пример запроса к ИИ:
             </div>
             
-            {error && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                {error}
+            <div style={{
+              display: 'flex',
+              gap: '8px',
+              alignItems: 'flex-start'
+            }}>
+              <div style={{
+                flex: 1,
+                padding: '12px',
+                backgroundColor: 'white',
+                border: '1px solid #ced4da',
+                borderRadius: '6px',
+                fontSize: '14px',
+                color: '#212529',
+                fontFamily: 'monospace',
+                wordBreak: 'break-all'
+              }}>
+                '{queryString}'
               </div>
-            )}
-            
-            <div className="flex justify-end gap-3">
+              
               <button
                 type="button"
-                onClick={handleClose}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-                disabled={isLoading}
+                onClick={handleCopyToClipboard}
+                style={{
+                  padding: '12px 16px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  backgroundColor: copySuccess ? '#28a745' : '#6c757d',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.3s ease',
+                  whiteSpace: 'nowrap'
+                }}
               >
-                Отмена
-              </button>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? 'Создание...' : 'Создать рыб'}
+                {copySuccess ? 'Скопировано!' : 'Скопировать'}
               </button>
             </div>
-          </form>
-          
-          <div className="mt-4 p-3 bg-blue-50 rounded-md">
-            <h3 className="font-medium text-blue-800 mb-1">Пример правильного формата:</h3>
-            <pre className="text-xs text-blue-700 whitespace-pre-wrap">{exampleJson}</pre>
           </div>
-        </div>
+
+          {/* Сообщение об ошибке */}
+          {error && (
+            <div style={{
+              marginBottom: '20px',
+              padding: '12px',
+              backgroundColor: '#fde8e8',
+              border: '2px solid #f56565',
+              borderRadius: '8px',
+              color: '#c53030',
+              fontSize: '14px'
+            }}>
+              {error}
+            </div>
+          )}
+
+          {/* Кнопки */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '12px',
+            marginTop: 'auto'
+          }}>
+            <button
+              type="button"
+              onClick={handleClose}
+              disabled={isLoading}
+              style={{
+                padding: '12px 24px',
+                border: '2px solid #95a5a6',
+                borderRadius: '8px',
+                backgroundColor: '#ecf0f1',
+                color: '#7f8c8d',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                transition: 'all 0.3s ease',
+                opacity: isLoading ? 0.6 : 1
+              }}
+            >
+              ОТМЕНА
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              style={{
+                padding: '12px 24px',
+                border: 'none',
+                borderRadius: '8px',
+                backgroundColor: '#27ae60',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                transition: 'all 0.3s ease',
+                opacity: isLoading ? 0.6 : 1
+              }}
+            >
+              {isLoading ? 'СОЗДАНИЕ...' : 'ДОБАВИТЬ РЫБ'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>,
     document.body

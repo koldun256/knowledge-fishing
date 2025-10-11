@@ -64,7 +64,6 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
           fontWeight: '800',
           color: '#013b45ff',
           textAlign: 'center',
-          fontFamily: 'MT Sans Full', // Шрифт
         }}>
           Добавить новую рыбу
         </h2>
@@ -75,12 +74,11 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
             <label style={{
               display: 'block',
               marginBottom: '8px',
-              fontWeight: '600',        // Более жирный шрифт
-              fontSize: '16px',         // Увеличенный размер
-              color: '#34495e',         // Цвет текста
-              fontFamily: 'Arial, sans-serif', // Шрифт
-              textTransform: 'uppercase', // Заглавные буквы
-              letterSpacing: '0.5px'    // Межбуквенное расстояние
+              fontWeight: '600',
+              fontSize: '16px',
+              color: '#34495e',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
             }}>
               ВОПРОС *
             </label>
@@ -88,7 +86,7 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
               name="question"
               value={formData.question}
               onChange={handleChange}
-              placeholder="Введите вопрос..."
+              placeholder="Чем занимаются карпы в свободное время?"
               rows={3}
               style={{
                 width: '100%',
@@ -97,24 +95,22 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
                 borderRadius: '8px',
                 fontSize: '14px',
                 boxSizing: 'border-box',
-                fontFamily: 'Arial, sans-serif',
                 transition: 'border-color 0.3s ease'
               }}
               required
             />
           </div>
 
-          {/* Поле Ответ */}
+          {/* Поле Ответ - убрано required */}
           <div style={{ marginBottom: '20px' }}>
             <label style={{
               display: 'block',
               marginBottom: '8px',
-              fontWeight: '600',        // Более жирный шрифт
-              fontSize: '16px',         // Увеличенный размер
-              color: '#34495e',         // Цвет текста
-              fontFamily: 'Arial, sans-serif', // Шрифт
-              textTransform: 'uppercase', // Заглавные буквы
-              letterSpacing: '0.5px'    // Межбуквенное расстояние
+              fontWeight: '600',
+              fontSize: '16px',
+              color: '#34495e',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
             }}>
               ОТВЕТ
             </label>
@@ -122,7 +118,7 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
               name="answer"
               value={formData.answer}
               onChange={handleChange}
-              placeholder="Введите ответ..."
+              placeholder="Замаривают червячка"
               rows={3}
               style={{
                 width: '100%',
@@ -131,10 +127,9 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
                 borderRadius: '8px',
                 fontSize: '14px',
                 boxSizing: 'border-box',
-                fontFamily: 'Arial, sans-serif',
                 transition: 'border-color 0.3s ease'
               }}
-              required
+              // Убрано: required
             />
           </div>
 
@@ -156,7 +151,6 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
                 cursor: 'pointer',
                 fontSize: '14px',
                 fontWeight: '600',
-                fontFamily: 'Arial, sans-serif',
                 transition: 'all 0.3s ease'
               }}
             >
@@ -173,11 +167,10 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
                 cursor: 'pointer',
                 fontSize: '14px',
                 fontWeight: '600',
-                fontFamily: 'Arial, sans-serif',
                 transition: 'all 0.3s ease'
               }}
             >
-              СОЗДАТЬ РЫБУ
+              ДОБАВИТЬ РЫБУ
             </button>
           </div>
         </form>

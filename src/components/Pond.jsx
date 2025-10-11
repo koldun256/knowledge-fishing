@@ -118,9 +118,14 @@ function PondInner() {
       
       // Ждем завершения всех запросов
       const newFishes = await fishService.createFishes(pondId, fishesData);
+      console.log('newFishes = ', newFishes);
       
       // Добавляем всех новых рыб в список
-      setFishes(prev => [...prev, ...newFishes]);
+      
+      for (const fish of newFishes) {
+        setFishes(prev => [...prev, fish]);
+      }
+      // setFishes(prev => [...prev, ...newFishes]);
       console.log('Fishes created and added to list:', newFishes);
       
       return newFishes;

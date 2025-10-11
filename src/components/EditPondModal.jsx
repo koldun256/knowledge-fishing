@@ -104,6 +104,13 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     }));
   };
 
+  // Обработчик клика по фону модального окна
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
@@ -154,33 +161,67 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 1000
-    }}>
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000,
+        overflow: 'auto',
+        padding: '20px 0'
+      }}
+      onClick={handleBackdropClick}
+    >
       <div style={{
         backgroundColor: 'white',
         padding: '24px',
         borderRadius: '12px',
         width: '90%',
         maxWidth: '500px',
-        boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
+        boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+        position: 'relative',
+        margin: 'auto'
       }}>
+        {/* Крестик для закрытия */}
+        <button
+          type="button"
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '12px',
+            right: '12px',
+            background: 'none',
+            border: 'none',
+            fontSize: '24px',
+            cursor: 'pointer',
+            color: '#7f8c8d',
+            width: '32px',
+            height: '32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '4px',
+            transition: 'background-color 0.3s ease'
+          }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+        >
+          ×
+        </button>
+        
         <h2 style={{ 
           margin: '0 0 20px 0', 
           fontSize: '28px', 
           fontWeight: '800',
           color: '#013b45ff',
           textAlign: 'center',
-          fontFamily: 'MT Sans Full, sans-serif',
+          paddingRight: '30px'
         }}>
           РЕДАКТИРОВАТЬ ПРУД
         </h2>
@@ -194,7 +235,6 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
               fontWeight: '600',
               fontSize: '16px',
               color: '#34495e',
-              fontFamily: 'Arial, sans-serif',
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
@@ -213,7 +253,6 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                 borderRadius: '8px',
                 fontSize: '14px',
                 boxSizing: 'border-box',
-                fontFamily: 'Arial, sans-serif',
                 transition: 'border-color 0.3s ease'
               }}
               required
@@ -228,7 +267,6 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
               fontWeight: '600',
               fontSize: '16px',
               color: '#34495e',
-              fontFamily: 'Arial, sans-serif',
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
@@ -238,7 +276,6 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
               name="description"
               value={formData.description}
               onChange={handleChange}
-              placeholder="Описание темы пруда..."
               rows={3}
               style={{
                 width: '100%',
@@ -247,129 +284,10 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                 borderRadius: '8px',
                 fontSize: '14px',
                 boxSizing: 'border-box',
-                fontFamily: 'Arial, sans-serif',
                 transition: 'border-color 0.3s ease'
               }}
             />
           </div>
-
-          {/* Категория
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{
-              display: 'block',
-              marginBottom: '8px',
-              fontWeight: '600',
-              fontSize: '16px',
-              color: '#34495e',
-              fontFamily: 'Arial, sans-serif',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>
-              КАТЕГОРИЯ *
-            </label>
-            
-            {!showNewCategory ? (
-              <>
-                <select
-                  name="topic"
-                  value={formData.topic}
-                  onChange={handleCategoryChange}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '2px solid #bdc3c7',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                    fontFamily: 'Arial, sans-serif',
-                    backgroundColor: 'white',
-                    cursor: 'pointer',
-                    marginBottom: '8px'
-                  }}
-                >
-                  {categories.map(category => (
-                    <option key={category} value={category}>
-                      {category.charAt(0).toUpperCase() + category.slice(1)}
-                    </option>
-                  ))}
-                  <option value="new">+ Добавить новую категорию</option>
-                </select>
-              </>
-            ) : (
-              <div style={{
-                display: 'flex',
-                gap: '8px',
-                alignItems: 'center'
-              }}>
-                <input
-                  type="text"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  placeholder="Введите название категории..."
-                  style={{
-                    flex: 1,
-                    padding: '12px',
-                    border: '2px solid #bdc3c7',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                    fontFamily: 'Arial, sans-serif'
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={handleAddNewCategory}
-                  disabled={!newCategory.trim()}
-                  style={{
-                    padding: '12px 16px',
-                    border: 'none',
-                    borderRadius: '8px',
-                    backgroundColor: '#27ae60',
-                    color: 'white',
-                    cursor: newCategory.trim() ? 'pointer' : 'not-allowed',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    fontFamily: 'Arial, sans-serif',
-                    opacity: newCategory.trim() ? 1 : 0.6
-                  }}
-                >
-                  ✓
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowNewCategory(false);
-                    setNewCategory('');
-                    setFormData(prev => ({ ...prev, topic: pond.topic || 'programming' }));
-                  }}
-                  style={{
-                    padding: '12px 16px',
-                    border: '2px solid #95a5a6',
-                    borderRadius: '8px',
-                    backgroundColor: '#ecf0f1',
-                    color: '#7f8c8d',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    fontFamily: 'Arial, sans-serif'
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-            )} */}
-            
-            {/* {showNewCategory && (
-              <p style={{
-                fontSize: '12px',
-                color: '#7f8c8d',
-                fontFamily: 'Arial, sans-serif',
-                margin: '8px 0 0 0'
-              }}>
-                Введите название новой категории и нажмите ✓ для добавления
-              </p>
-            )}
-          </div> */}
 
           {/* Интервалы времени для каждого слоя */}
           <div style={{ marginBottom: '24px' }}>
@@ -379,7 +297,6 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
               fontWeight: '600',
               fontSize: '16px',
               color: '#34495e',
-              fontFamily: 'Arial, sans-serif',
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
@@ -388,13 +305,12 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
 
             <p style={{
               marginBottom: '6px',
-              fontSize: '12px',
+              fontSize: '14px',
               color: '#7f8c8d',
-              fontFamily: 'Arial, sans-serif',
               margin: '8px 0 0 0',
               lineHeight: '1.4'
             }}>
-              В формате дни:часы:минуты
+              В формате <strong>дни:часы:минуты</strong>
             </p>
             
             {formData.intervals.map((interval, index) => (
@@ -405,7 +321,6 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                   fontWeight: '500',
                   fontSize: '14px',
                   color: '#2c3e50',
-                  fontFamily: 'Arial, sans-serif'
                 }}>
                   {index + 1}-е повторение:
                 </label>
@@ -421,7 +336,6 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                     borderRadius: '6px',
                     fontSize: '14px',
                     boxSizing: 'border-box',
-                    fontFamily: 'Arial, sans-serif',
                     transition: 'border-color 0.3s ease'
                   }}
                 />
@@ -429,58 +343,12 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
             ))}
           </div>
 
-          {/* Кнопки */}
+          {/* Кнопки - теперь в одну строку */}
           <div style={{
             display: 'flex',
-            flexDirection: 'column',
+            justifyContent: 'space-between',
             gap: '12px'
           }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              gap: '12px'
-            }}>
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={loading}
-                style={{
-                  padding: '12px 24px',
-                  border: '2px solid #95a5a6',
-                  borderRadius: '8px',
-                  backgroundColor: '#ecf0f1',
-                  color: '#7f8c8d',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  fontFamily: 'Arial, sans-serif',
-                  transition: 'all 0.3s ease',
-                  opacity: loading ? 0.6 : 1
-                }}
-              >
-                ОТМЕНА
-              </button>
-              <button
-                type="submit"
-                disabled={loading || !formData.name.trim() || !formData.topic}
-                style={{
-                  padding: '12px 24px',
-                  border: 'none',
-                  borderRadius: '8px',
-                  backgroundColor: loading ? '#95a5a6' : '#3498db',
-                  color: 'white',
-                  cursor: (loading || !formData.name.trim() || !formData.topic) ? 'not-allowed' : 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  fontFamily: 'Arial, sans-serif',
-                  transition: 'all 0.3s ease',
-                  opacity: (loading || !formData.name.trim() || !formData.topic) ? 0.6 : 1
-                }}
-              >
-                {loading ? 'СОХРАНЕНИЕ...' : 'СОХРАНИТЬ'}
-              </button>
-            </div>
-            
             <button
               type="button"
               onClick={handleDelete}
@@ -494,12 +362,32 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                 cursor: loading ? 'not-allowed' : 'pointer',
                 fontSize: '14px',
                 fontWeight: '600',
-                fontFamily: 'Arial, sans-serif',
                 transition: 'all 0.3s ease',
-                opacity: loading ? 0.6 : 1
+                opacity: loading ? 0.6 : 1,
+                flex: 1
               }}
             >
-              {loading ? 'УДАЛЕНИЕ...' : '🗑️ УДАЛИТЬ ПРУД'}
+              {loading ? 'УДАЛЕНИЕ...' : 'УДАЛИТЬ ПРУД'}
+            </button>
+            
+            <button
+              type="submit"
+              disabled={loading || !formData.name.trim() || !formData.topic}
+              style={{
+                padding: '12px 24px',
+                border: 'none',
+                borderRadius: '8px',
+                backgroundColor: loading ? '#95a5a6' : '#3498db',
+                color: 'white',
+                cursor: (loading || !formData.name.trim() || !formData.topic) ? 'not-allowed' : 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                transition: 'all 0.3s ease',
+                opacity: (loading || !formData.name.trim() || !formData.topic) ? 0.6 : 1,
+                flex: 1
+              }}
+            >
+              {loading ? 'СОХРАНЕНИЕ...' : 'СОХРАНИТЬ'}
             </button>
           </div>
         </form>

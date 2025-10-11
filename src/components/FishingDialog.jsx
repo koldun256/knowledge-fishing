@@ -63,7 +63,6 @@
       setSubmitting(true);
       try {
         // 1) Отправляем оценку — возвращается обновлённая рыба (новый depth_level и т.п.)
-        console.log('score = ', score);
         const quality = parseInt(score, 10);
         const updated = await fishService.reviewFish(fish.id, { quality });
 
@@ -121,7 +120,6 @@
             fontWeight: '800',
             color: '#013b45ff',
             textAlign: 'center',
-            fontFamily: 'MT Sans Full, sans-serif',
           }}>
             Оцените вспоминание
           </h2>
@@ -134,7 +132,6 @@
               fontWeight: '600',
               fontSize: '16px',
               color: '#34495e',
-              fontFamily: 'Arial, sans-serif',
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
@@ -145,12 +142,11 @@
               border: '2px solid #bdc3c7',
               borderRadius: '8px',
               fontSize: '14px',
-              fontFamily: 'Arial, sans-serif',
               backgroundColor: '#f8f9fa',
               minHeight: '60px',
               lineHeight: '1.4'
             }}>
-              {fish.question || '—'}
+              {fish.question}
             </div>
           </div>
 
@@ -162,7 +158,6 @@
               fontWeight: '600',
               fontSize: '16px',
               color: '#34495e',
-              fontFamily: 'Arial, sans-serif',
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
@@ -175,7 +170,6 @@
                 border: '2px solid #bdc3c7',
                 borderRadius: '8px',
                 fontSize: '14px',
-                fontFamily: 'Arial, sans-serif',
                 backgroundColor: showAnswer ? '#f8f9fa' : '#e8f4f8',
                 minHeight: '80px',
                 lineHeight: '1.4',
@@ -186,7 +180,7 @@
               }}
             >
               {showAnswer ? (
-                fish.answer || '—'
+                fish.answer
               ) : (
                 <div style={{
                   display: 'flex',
@@ -220,7 +214,6 @@
               fontWeight: '600',
               fontSize: '16px',
               color: '#34495e',
-              fontFamily: 'Arial, sans-serif',
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
@@ -244,7 +237,6 @@
                     borderRadius: '8px',
                     fontSize: '16px',
                     fontWeight: '600',
-                    fontFamily: 'Arial, sans-serif',
                     cursor: submitting ? 'not-allowed' : 'pointer',
                     transition: 'all 0.3s ease',
                     borderColor: score === v ? '#27ae60' : '#bdc3c7',
@@ -261,7 +253,6 @@
             <p style={{
               fontSize: '12px',
               color: '#7f8c8d',
-              fontFamily: 'Arial, sans-serif',
               margin: 0
             }}>
               Горячие клавиши: -, 0, + для выбора, Enter — отправить, Esc — отмена.
@@ -286,7 +277,6 @@
                 cursor: submitting ? 'not-allowed' : 'pointer',
                 fontSize: '14px',
                 fontWeight: '600',
-                fontFamily: 'Arial, sans-serif',
                 transition: 'all 0.3s ease'
               }}
             >
@@ -304,7 +294,6 @@
                 cursor: (score == null || submitting) ? 'not-allowed' : 'pointer',
                 fontSize: '14px',
                 fontWeight: '600',
-                fontFamily: 'Arial, sans-serif',
                 transition: 'all 0.3s ease'
               }}
             >
