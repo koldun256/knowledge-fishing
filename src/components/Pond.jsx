@@ -1,5 +1,5 @@
 // src/pages/Pond.jsx
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -45,6 +45,46 @@ function PondInner() {
   const [error, setError] = useState(null);
   const [isCreateFishModalOpen, setIsCreateFishModalOpen] = useState(false);
   const [isCreateFishesModalOpen, setIsCreateFishesModalOpen] = useState(false); // Новое состояние
+  
+  // Состояния для адаптивного дизайна
+  const [showBackAsArrow, setShowBackAsArrow] = useState(false);
+  const [showMenuButton, setShowMenuButton] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Брейкпоинты для адаптивного дизайна
+  const BREAKPOINTS = {
+    MEDIUM: 768, // tablet
+    SMALL: 480   // mobile
+  };
+
+  // Проверка размера экрана и адаптация интерфейса
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const screenWidth = window.innerWidth;
+      
+      if (screenWidth <= BREAKPOINTS.SMALL) {
+        // Маленький экран: стрелка + меню
+        setShowBackAsArrow(true);
+        setShowMenuButton(true);
+      } else if (screenWidth <= BREAKPOINTS.MEDIUM) {
+        // Средний экран: стрелка + обычные кнопки
+        setShowBackAsArrow(true);
+        setShowMenuButton(false);
+      } else {
+        // Большой экран: полные кнопки
+        setShowBackAsArrow(false);
+        setShowMenuButton(false);
+      }
+    };
+    
+    // Проверяем при загрузке и изменении размера окна
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
 
   // Загрузка ассетов + данных пруда/рыб
   useEffect(() => {
@@ -110,28 +150,55 @@ function PondInner() {
     try {
       console.log('Creating multiple fishes with data:', fishesData);
       
-      // Создаем массив промисов для создания всех рыб
-      // const createPromises = Object.entries(fishesData).map(([key, fishData]) => {
-      //   return fishService.createFish(pondId, fishData);
-      // });
-
-      
-      // Ждем завершения всех запросов
       const newFishes = await fishService.createFishes(pondId, fishesData);
       console.log('newFishes = ', newFishes);
-      
-      // Добавляем всех новых рыб в список
       
       for (const fish of newFishes) {
         setFishes(prev => [...prev, fish]);
       }
-      // setFishes(prev => [...prev, ...newFishes]);
       console.log('Fishes created and added to list:', newFishes);
       
       return newFishes;
     } catch (error) {
       console.error('Error in handleCreateFishes:', error);
       throw error;
+    }
+  };
+
+  const startFishing = async () => {
+    try {
+      if (fishing.phase !== 'idle' || dialog.open) return;
+
+      const nextFish = await pondService.getNextFish(pondId);
+
+      setFishing(prev => ({
+        ...prev,
+        phase: 'casting',
+        targetFishId: nextFish.id,
+        boatX: boat?.x ?? window.innerWidth * 0.5,
+        hookX: null,
+        hookY: null,
+      }));
+    } catch (e) {
+      console.error('Ошибка начала рыбалки:', e);
+    }
+  };
+
+  // Обработчики для меню
+  const handleMenuAction = (action) => {
+    setIsMenuOpen(false);
+    switch (action) {
+      case 'addFish':
+        setIsCreateFishModalOpen(true);
+        break;
+      case 'addFishes':
+        setIsCreateFishesModalOpen(true);
+        break;
+      case 'startFishing':
+        startFishing();
+        break;
+      default:
+        break;
     }
   };
 
@@ -160,25 +227,6 @@ function PondInner() {
     createBoatLayer(),
   ]), []);
 
-  const startFishing = async () => {
-    try {
-      if (fishing.phase !== 'idle' || dialog.open) return;
-
-      const nextFish = await pondService.getNextFish(pondId);
-
-      setFishing(prev => ({
-        ...prev,
-        phase: 'casting',
-        targetFishId: nextFish.id,
-        boatX: boat?.x ?? window.innerWidth * 0.5,
-        hookX: null,
-        hookY: null,
-      }));
-    } catch (e) {
-      console.error('Ошибка начала рыбалки:', e);
-    }
-  };
-
   if (loading) return <div className="p-8 text-center">Загрузка пруда...</div>;
   if (error) return (
     <div className="p-8 text-center">
@@ -204,42 +252,137 @@ function PondInner() {
         className="fixed inset-0 z-0"
       />
 
-      {/* Кнопки с transform для создания нового контекста стекинга */}
+      {/* Левая группа кнопок */}
       <div className="absolute top-4 left-4 z-[9999] transform">
-        <div className="flex items-center gap-2">
+        {!showMenuButton ? (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate('/')}
+              className={`text-slate-800 px-4 py-2 rounded-lg transition-all ${
+                showBackAsArrow ? 'bg-green-0 w-10 h-10 flex items-center justify-center' : 'bg-white/95 hover:bg-white shadow-lg border border-gray-300'
+              }`}
+            >
+              {showBackAsArrow ? '←' : '← Назад к прудам'}
+            </button>
+            
+            {!showBackAsArrow ? (
+              // Большой экран: все кнопки полностью
+              <>
+                <button
+                  onClick={() => setIsCreateFishModalOpen(true)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
+                >
+                  🐟 Добавить рыбу
+                </button>
+                
+                <button
+                  onClick={() => setIsCreateFishesModalOpen(true)}
+                  className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
+                >
+                  🐟🐟 Добавить рыб
+                </button>
+              </>
+            ) : (
+              // Средний экран: стрелка + обычные кнопки
+              <>
+                <button
+                  onClick={() => setIsCreateFishModalOpen(true)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
+                >
+                  🐟 Добавить рыбу
+                </button>
+                
+                <button
+                  onClick={() => setIsCreateFishesModalOpen(true)}
+                  className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
+                >
+                  🐟🐟 Добавить рыб
+                </button>
+              </>
+            )}
+          </div>
+        ) : (
+          // Маленький экран: только стрелка слева
           <button
             onClick={() => navigate('/')}
-            className="bg-white/95 hover:bg-white text-slate-800 px-4 py-2 rounded-lg shadow-lg border border-gray-300 transition-all"
+            className=" text-slate-800 w-10 h-10 flex items-center justify-center rounded-lg transition-all"
           >
-            ← Назад к прудам
+            ←
           </button>
-          
-          <button
-            onClick={() => setIsCreateFishModalOpen(true)}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
-          >
-            🐟 Создать рыбу
-          </button>
-          
-          {/* Новая кнопка для создания нескольких рыб */}
-          <button
-            onClick={() => setIsCreateFishesModalOpen(true)}
-            className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
-          >
-            🐟🐟 Создать рыб
-          </button>
-        </div>
+        )}
       </div>
 
-      {canStart && (
-        <div className="absolute top-4 right-4 z-[9999] transform">
+      {/* Правая группа кнопок */}
+      <div className="absolute top-4 right-4 z-[9999] transform">
+        {!showMenuButton ? (
+          // Большой и средний экран: кнопка начала рыбалки
+          canStart && (
+            <button
+              onClick={startFishing}
+              className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg shadow-lg transition-all"
+            >
+              🎣 Начать рыбалку
+            </button>
+          )
+        ) : (
+          // Маленький экран: кнопка меню в правом верхнем углу
           <button
-            onClick={startFishing}
-            className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg shadow-lg transition-all"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="bg-green-600 hover:bg-green-700 text-white w-10 h-10 flex items-center justify-center rounded-lg shadow-lg transition-all"
           >
-            🎣 Начать рыбалку
+            ☰
           </button>
-        </div>
+        )}
+      </div>
+
+      {/* Выезжающее меню для маленьких экранов */}
+      {isMenuOpen && (
+        <>
+          {/* Затемнение фона */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-[10000]"
+            onClick={() => setIsMenuOpen(false)}
+          />
+          
+          {/* Меню */}
+          <div className="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-[10001] transform transition-transform">
+            {/* Заголовок меню с кнопкой закрытия */}
+            <div className="p-4 flex justify-end">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="bg-green-600 hover:bg-green-700 text-white w-10 h-10 flex items-center justify-center rounded-lg shadow-lg transition-all"
+              >
+                ☰
+              </button>
+            </div>
+            
+            {/* Кнопки меню */}
+            <div className="p-4 space-y-3">
+              <button
+                onClick={() => handleMenuAction('addFish')}
+                className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg shadow transition-all text-left"
+              >
+                🐟 Добавить рыбу
+              </button>
+              
+              <button
+                onClick={() => handleMenuAction('addFishes')}
+                className="w-full bg-green-700 hover:bg-green-800 text-white px-4 py-3 rounded-lg shadow transition-all text-left"
+              >
+                🐟🐟 Добавить рыб
+              </button>
+              
+              {canStart && (
+                <button
+                  onClick={() => handleMenuAction('startFishing')}
+                  className="w-full bg-blue-700 hover:bg-blue-800 text-white px-4 py-3 rounded-lg shadow transition-all text-left"
+                >
+                  🎣 Начать рыбалку
+                </button>
+              )}
+            </div>
+          </div>
+        </>
       )}
 
       <FishingDialog />
