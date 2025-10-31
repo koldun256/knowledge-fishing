@@ -86,6 +86,19 @@ function PondInner() {
     };
   }, []);
 
+  // Функция для загрузки данных о рыбах
+  const loadFishesData = async () => {
+    if (!pondId) return;
+    
+    try {
+      console.log('Refreshing fishes data for pond:', pondId);
+      const fishesData = await fishService.getFishesByPondId(pondId);
+      setFishes(fishesData);
+    } catch (error) {
+      console.error('Ошибка при обновлении списка рыб:', error);
+    }
+  };
+
   // Загрузка ассетов + данных пруда/рыб
   useEffect(() => {
     if (!pondId) {
@@ -129,6 +142,24 @@ function PondInner() {
     
     return () => { cancelled = true; };
   }, [pondId, setPond, setFishes]);
+
+  // Автоматическое обновление списка рыб каждые 30 секунд
+  useEffect(() => {
+    if (!pondId) return;
+
+    // Сразу загружаем данные при монтировании
+    loadFishesData();
+
+    // Устанавливаем интервал для обновления каждые 30 секунд
+    const intervalId = setInterval(() => {
+      loadFishesData();
+    }, 30000); // 30 секунд
+
+    // Очистка интервала при размонтировании компонента
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [pondId]); // Зависимость от pondId для перезапуска при смене пруда
 
   const handleCreateFish = async (pondId, fishData) => {
     try {

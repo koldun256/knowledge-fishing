@@ -1,5 +1,5 @@
 // src/components/CreateFishModal.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 
 export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
@@ -9,11 +9,27 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
     depth_level: 0
   });
 
-  const handleBackdropClick = (e) => {
+  const handleClose = useCallback(() => {
+    setFormData({
+      question: '',
+      answer: '',
+      depth_level: 0
+    });
+    onClose();
+  }, [onClose]);
+
+  const handleBackdropClick = useCallback((e) => {
     if (e.target === e.currentTarget) {
       handleClose();
     }
-  };
+  }, [handleClose]);
+
+  const handleChange = useCallback((e) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  }, []);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -35,7 +51,7 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
       });
     }
   }, [isOpen]);
-
+  
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
@@ -46,22 +62,6 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
     }
     onCreate(pondId, formData);
     handleClose();
-  };
-
-  const handleChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
-
-  const handleClose = () => {
-    setFormData({
-      question: '',
-      answer: '',
-      depth_level: 0
-    });
-    onClose();
   };
 
   return ReactDOM.createPortal(

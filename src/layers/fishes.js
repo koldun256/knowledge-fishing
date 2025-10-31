@@ -129,7 +129,8 @@ export default function createFishesLayer(options = {}) {
       const sheet = Assets.get(sheetKey);
 
       fishes.forEach((f) => {
-        const isReady = (new Date(f.next_review_date + 'Z').getTime() <= Date.now());
+        // const isReady = (new Date(f.next_review_date + 'Z').getTime() <= Date.now());
+        const isReady = f.ready;
         const s = ensureFishState(f, w, pondTop, levelH, isReady);
 
         // базовое движение (если нет захвата сценарием рыбалки)

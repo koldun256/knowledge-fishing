@@ -32,7 +32,11 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
 
   const parseIntervalToTimedelta = (intervalStr) => {
     const nums = intervalStr.split(':');
-    return { days: parseInt(nums[0], 10), hours: parseInt(nums[1], 10), minutes: parseInt(nums[2], 10)};
+    return { 
+      days: parseInt(nums[0] || 0, 10), 
+      hours: parseInt(nums[1] || 0, 10), 
+      minutes: parseInt(nums[2] || 0, 10)
+    };
   };
 
   function createTimedelta(seconds) {
@@ -44,6 +48,46 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
         seconds: Math.floor(seconds % 60)
     };
   }
+
+  // Новые функции для работы с интервалами в формате дней:часов:минут
+  const parseIntervalToParts = (intervalStr) => {
+    const [days = 0, hours = 0, minutes = 0] = intervalStr.split(':').map(Number);
+    return { days, hours, minutes };
+  };
+
+  const formatIntervalFromParts = (days, hours, minutes) => {
+    return `${days}:${hours}:${minutes}`;
+  };
+
+  const handleIntervalPartChange = (index, field, value) => {
+    // Ограничиваем значения
+    let numericValue = parseInt(value) || 0;
+    
+    if (field === 'hours' && numericValue > 23) numericValue = 23;
+    if (field === 'minutes' && numericValue > 59) numericValue = 59;
+    if (numericValue < 0) numericValue = 0;
+
+    const currentInterval = formData.intervals[index];
+    const parts = parseIntervalToParts(currentInterval);
+    
+    const newParts = {
+      ...parts,
+      [field]: numericValue
+    };
+
+    const newInterval = formatIntervalFromParts(
+      newParts.days,
+      newParts.hours,
+      newParts.minutes
+    );
+
+    const newIntervals = [...formData.intervals];
+    newIntervals[index] = newInterval;
+    setFormData(prev => ({
+      ...prev,
+      intervals: newIntervals
+    }));
+  };
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -104,15 +148,6 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     }
   };
 
-  const handleIntervalChange = (index, value) => {
-    const newIntervals = [...formData.intervals];
-    newIntervals[index] = value;
-    setFormData(prev => ({
-      ...prev,
-      intervals: newIntervals
-    }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.topic) return;
@@ -168,6 +203,63 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     onClose();
   };
 
+  // Стили для маски ввода
+  const maskedInputStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '10px 12px',
+    border: '2px solid #bdc3c7',
+    borderRadius: '6px',
+    backgroundColor: 'white',
+    transition: 'border-color 0.3s ease'
+  };
+
+  const numberInputStyle = {
+    border: 'none',
+    outline: 'none',
+    background: 'transparent',
+    width: '25px',
+    textAlign: 'center',
+    fontSize: '14px',
+    padding: '2px 4px',
+    borderRadius: '3px',
+    transition: 'background-color 0.2s ease',
+    // Полное удаление стрелок для всех браузеров
+    MozAppearance: 'textfield',
+    WebkitAppearance: 'none',
+    appearance: 'none',
+    margin: 0
+  };
+
+  const numberInputHoverStyle = {
+    backgroundColor: '#f8f9fa'
+  };
+
+  const numberInputFocusStyle = {
+    backgroundColor: '#e3f2fd',
+    boxShadow: '0 0 0 2px rgba(33, 150, 243, 0.2)'
+  };
+
+  const labelStyle = {
+    fontSize: '12px',
+    color: '#7f8c8d',
+    whiteSpace: 'nowrap'
+  };
+
+  // Стили для удаления стрелок в Webkit браузерах (Chrome, Safari, Edge)
+  const webkitSpinButtonStyles = `
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+  `;
+
   return ReactDOM.createPortal(
     <div style={{
       position: 'fixed',
@@ -182,6 +274,9 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
       zIndex: 10000,
       padding: '16px'
     }} onClick={handleBackdropClick}>
+      {/* Добавляем глобальные стили для удаления стрелок */}
+      <style>{webkitSpinButtonStyles}</style>
+      
       <div style={{
         backgroundColor: 'white',
         padding: '24px',
@@ -284,36 +379,6 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
               />
             </div>
 
-            {/* Описание */}
-            <div style={{ marginBottom: '20px', flexShrink: 0 }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontWeight: '600',
-                fontSize: '16px',
-                color: '#34495e',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                ОПИСАНИЕ
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows={3}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '2px solid #bdc3c7',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box',
-                  transition: 'border-color 0.3s ease'
-                }}
-              />
-            </div>
-
             {/* Интервалы времени для каждого слоя */}
             <div style={{ marginBottom: '24px', flexShrink: 0 }}>
               <label style={{
@@ -329,43 +394,81 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
               </label>
 
               <p style={{
-                marginBottom: '6px',
+                marginBottom: '12px',
                 fontSize: '14px',
                 color: '#7f8c8d',
-                margin: '8px 0 0 0',
                 lineHeight: '1.4'
               }}>
-                В формаate <strong>дни:часы:минуты</strong>
+                Укажите интервалы для каждого повторения:
               </p>
               
-              {formData.intervals.map((interval, index) => (
-                <div key={index} style={{ marginBottom: '10px' }}>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '6px',
-                    fontWeight: '500',
-                    fontSize: '14px',
-                    color: '#2c3e50',
-                  }}>
-                    {index + 1}-е повторение:
-                  </label>
-                  <input
-                    type="text"
-                    value={interval}
-                    onChange={(e) => handleIntervalChange(index, e.target.value)}
-                    placeholder={`Интервал для слоя ${index + 1}`}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '2px solid #bdc3c7',
-                      borderRadius: '6px',
+              {formData.intervals.map((interval, index) => {
+                const { days, hours, minutes } = parseIntervalToParts(interval);
+                
+                return (
+                  <div key={index} style={{ marginBottom: '16px' }}>
+                    <label style={{
+                      display: 'block',
+                      marginBottom: '6px',
+                      fontWeight: '500',
                       fontSize: '14px',
-                      boxSizing: 'border-box',
-                      transition: 'border-color 0.3s ease'
-                    }}
-                  />
-                </div>
-              ))}
+                      color: '#2c3e50',
+                    }}>
+                      {index + 1}-е повторение:
+                    </label>
+                    
+                    <div style={maskedInputStyle}>
+                      {/* Дни */}
+                      <input
+                        type="number"
+                        value={days}
+                        onChange={(e) => handleIntervalPartChange(index, 'days', e.target.value)}
+                        min="0"
+                        style={numberInputStyle}
+                        onMouseEnter={(e) => Object.assign(e.target.style, numberInputHoverStyle)}
+                        onMouseLeave={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent' })}
+                        onFocus={(e) => Object.assign(e.target.style, numberInputFocusStyle)}
+                        onBlur={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' })}
+                      />
+                      <span style={labelStyle}>дней,</span>
+                      
+                      {/* <span style={{ color: '#bdc3c7', margin: '0 4px' }}>,</span> */}
+                      
+                      {/* Часы */}
+                      <input
+                        type="number"
+                        value={hours}
+                        onChange={(e) => handleIntervalPartChange(index, 'hours', e.target.value)}
+                        min="0"
+                        max="23"
+                        style={numberInputStyle}
+                        onMouseEnter={(e) => Object.assign(e.target.style, numberInputHoverStyle)}
+                        onMouseLeave={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent' })}
+                        onFocus={(e) => Object.assign(e.target.style, numberInputFocusStyle)}
+                        onBlur={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' })}
+                      />
+                      <span style={labelStyle}>часов,</span>
+                      
+                      {/* <span style={{ color: '#bdc3c7', margin: '0 4px' }}>,</span> */}
+                      
+                      {/* Минуты */}
+                      <input
+                        type="number"
+                        value={minutes}
+                        onChange={(e) => handleIntervalPartChange(index, 'minutes', e.target.value)}
+                        min="0"
+                        max="59"
+                        style={numberInputStyle}
+                        onMouseEnter={(e) => Object.assign(e.target.style, numberInputHoverStyle)}
+                        onMouseLeave={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent' })}
+                        onFocus={(e) => Object.assign(e.target.style, numberInputFocusStyle)}
+                        onBlur={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' })}
+                      />
+                      <span style={labelStyle}>минут</span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Кнопки */}
