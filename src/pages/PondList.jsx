@@ -98,7 +98,7 @@ export default function PondsList() {
     }
   };
 
-  const handleContextMenu = (e, pond) => {
+  const handleSettingsClick = (e, pond) => {
     e.preventDefault();
     e.stopPropagation();
     setEditingPond(pond);
@@ -165,7 +165,6 @@ export default function PondsList() {
                 <Link
                   to={`/pond/${pond.id}`}
                   className="block"
-                  onContextMenu={(e) => handleContextMenu(e, pond)}
                 >
                   <img 
                     src={getPondImage(pond.id)} 
@@ -210,6 +209,19 @@ export default function PondsList() {
                     </div>
                   </div>
                 </Link>
+
+                {/* Кнопка настроек в правом верхнем углу */}
+                <button
+                  onClick={(e) => handleSettingsClick(e, pond)}
+                  className="absolute top-2 right-2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 transition-all duration-200 hover:scale-110 shadow-md"
+                  style={{ pointerEvents: 'auto' }}
+                >
+                  <img 
+                    src={`${process.env.PUBLIC_URL}/assets/settings.png`} 
+                    alt="Настройки пруда"
+                    className="w-6 h-6"
+                  />
+                </button>
               </div>
             ))}
             

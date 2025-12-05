@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { usePond } from '../context/PondContext';
 import { fishService } from '../services/fishService';
 import { sessionService } from '../services/sessionService';
-import formatStringForDisplay from '../helper/stringFormating';
+import { formatStringForDisplay } from '../helper/stringFormating';
 
 let externalResetFishState = null;
 export function setExternalResetFishState(fn) {

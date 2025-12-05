@@ -2,6 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
+// Импортируем функцию экранирования
+import { formatString, cleanJsonString } from '../helper/stringFormating';
+
 const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
   const [jsonInput, setJsonInput] = useState('');
   const [error, setError] = useState('');
@@ -43,13 +46,17 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
     }
 
     try {
-      const fishesData = JSON.parse(jsonInput);
+      jsonInput.trim();
+      const correctedInput = cleanJsonString(jsonInput);
+      console.log("jsonInput = ", correctedInput);
+      const fishesData = JSON.parse(correctedInput);
       
       if (typeof fishesData !== 'object' || fishesData === null || Array.isArray(fishesData)) {
         throw new Error('JSON должен быть объектом в формате {"question1": "answer1", "question2": "answer2", ...}');
       }
 
       setIsLoading(true);
+      // Передаем обработанные данные с экранированными символами
       await onCreate(pondId, fishesData);
       setJsonInput('');
       onClose();
@@ -92,11 +99,18 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
         });
     };
 
-    const exampleJson = `{
-    "Какая рыба самая быстрая?": "Парусник",
-    "Сколько лет живет карп?": "20-30 лет",
-    "Какого размера достигает щука?": "до 1.5 метров"
-  }`;
+  const exampleJson = `{
+  "Какая рыба самая быстрая?": "Парусник",
+  "Сколько лет живет карп?": "20-30 лет",
+  "Какого размера достигает щука?": "до 1.5 метров"
+}`;
+
+  // Пример JSON с специальными символами для демонстрации
+  const exampleWithSpecialChars = `{
+  "Что такое 'спиннинг'?": "Спиннинг - удилище для ловли хищной рыбы\\nОбычно используется с катушкой",
+  "Как выбрать леску?": "Леска бывает:\\n- Монофильная\\n- Плетеная\\n- Флюорокарбоновая",
+  "Что означает 'тест' удилища?": "Тест удилища - это рекомендуемый вес приманки.\\tНапример: 5-20 г"
+}`;
 
   if (!isOpen) return null;
 
@@ -225,6 +239,9 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
                 fontWeight: '600'
               }}>
                 <strong>Формат: {"{\"question1\": \"answer1\", \"question2\": \"answer2\", ...}"}</strong>
+                <div style={{ marginTop: '4px', fontSize: '11px', color: '#95a5a6' }}>
+                  Чтобы использовать кавычки, добавьте экранирование: \"
+                </div>
               </div>
             </div>
 

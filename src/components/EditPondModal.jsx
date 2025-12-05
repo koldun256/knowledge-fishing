@@ -219,16 +219,16 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     border: 'none',
     outline: 'none',
     background: 'transparent',
-    width: '25px',
+    width: '40px',
     textAlign: 'center',
     fontSize: '14px',
     padding: '2px 4px',
     borderRadius: '3px',
     transition: 'background-color 0.2s ease',
-    // Полное удаление стрелок для всех браузеров
-    MozAppearance: 'textfield',
+    // Убираем стрелки во всех браузерах
     WebkitAppearance: 'none',
-    appearance: 'none',
+    MozAppearance: 'textfield',
+    appearance: 'textfield',
     margin: 0
   };
 
@@ -255,8 +255,15 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
       margin: 0;
     }
     
+    /* Убираем стрелки в Firefox */
     input[type="number"] {
       -moz-appearance: textfield;
+    }
+    
+    /* Убираем стрелки в Edge */
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
     }
   `;
 
@@ -430,9 +437,9 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                         onFocus={(e) => Object.assign(e.target.style, numberInputFocusStyle)}
                         onBlur={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' })}
                       />
-                      <span style={labelStyle}>дней,</span>
+                      <span style={labelStyle}>дней</span>
                       
-                      {/* <span style={{ color: '#bdc3c7', margin: '0 4px' }}>,</span> */}
+                      <span style={{ color: '#bdc3c7', margin: '0 4px' }}>,</span>
                       
                       {/* Часы */}
                       <input
@@ -447,9 +454,9 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                         onFocus={(e) => Object.assign(e.target.style, numberInputFocusStyle)}
                         onBlur={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' })}
                       />
-                      <span style={labelStyle}>часов,</span>
+                      <span style={labelStyle}>часов</span>
                       
-                      {/* <span style={{ color: '#bdc3c7', margin: '0 4px' }}>,</span> */}
+                      <span style={{ color: '#bdc3c7', margin: '0 4px' }}>,</span>
                       
                       {/* Минуты */}
                       <input

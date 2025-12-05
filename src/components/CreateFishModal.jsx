@@ -1,6 +1,7 @@
 // src/components/CreateFishModal.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
+import { formatString } from '../helper/stringFormating'
 
 export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
   const [formData, setFormData] = useState({
@@ -60,7 +61,15 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
       alert('Заполните вопрос');
       return;
     }
-    onCreate(pondId, formData);
+    
+    // Экранируем специальные символы перед отправкой
+    const processedData = {
+      ...formData,
+      question: formatString(formData.question),
+      answer: formatString(formData.answer)
+    };
+    
+    onCreate(pondId, processedData);
     handleClose();
   };
 
