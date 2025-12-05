@@ -172,7 +172,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
     if (hours > 0) parts.push(`${hours} ${getHourWord(hours)}`);
     if (minutes > 0) parts.push(`${minutes} ${getMinuteWord(minutes)}`);
     
-    return parts.length > 0 ? parts.join(', ') : '0 минут';
+    return parts.length > 0 ? parts.join(' ') : '0 минут';
   };
 
   const getDayWord = (count) => {
@@ -217,13 +217,14 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
     border: 'none',
     outline: 'none',
     background: 'transparent',
-    width: '40px',
+    width: 'auto',
+    minWidth: '20px', // Минимальная ширина
+    maxWidth: '30px', // Максимальная ширина
     textAlign: 'center',
     fontSize: '14px',
-    padding: '2px 4px',
+    padding: '2px 2px', // Уменьшил padding по бокам
     borderRadius: '3px',
     transition: 'background-color 0.2s ease',
-    // Убираем стрелки во всех браузерах
     WebkitAppearance: 'none',
     MozAppearance: 'textfield',
     appearance: 'textfield',
@@ -338,7 +339,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
           paddingRight: '40px',
           flexShrink: 0
         }}>
-          СОЗДАТЬ НОВЫЙ ПРУД
+          Создать новый пруд
         </h2>
         
         {/* Основной контент - прокручиваемый с правильным отступом */}
@@ -358,7 +359,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                 display: 'block',
                 marginBottom: '8px',
                 fontWeight: '600',
-                fontSize: '16px',
+                fontSize: '18px',
                 color: '#34495e',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
@@ -395,7 +396,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                 <label style={{
                   display: 'block',
                   fontWeight: '600',
-                  fontSize: '16px',
+                  fontSize: '18px',
                   color: '#34495e',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
@@ -442,29 +443,31 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
               </div>
 
               {!showIntervals ? (
-                <div style={{
-                  backgroundColor: '#f8f9fa',
-                  border: '1px solid #e9ecef',
-                  borderRadius: '8px',
-                  padding: '8px 12px', // Уменьшил еще больше
-                  marginTop: '0px',
-                  marginBottom: '0px'
+              <div style={{
+                backgroundColor: '#ffffffff',
+                borderRadius: '8px',
+                padding: '8px 0px',
+                marginTop: '0px',
+                marginBottom: '0px'
+              }}>
+                <p style={{
+                  margin: '0',
+                  fontSize: '16px',
+                  color: '#495057',
+                  lineHeight: '1.3',
+                  padding: '0'
                 }}>
-                  <p style={{
-                    margin: '0',
-                    fontSize: '14px',
-                    color: '#495057',
-                    lineHeight: '1.3', // Уменьшил межстрочный интервал
-                    padding: '0'
-                  }}>
-                    Сейчас установлены час, день, неделя и месяц
-                  </p>
-                </div>
+                  Сейчас установлены: {formData.intervals.map((interval, index) => {
+                    const readable = formatIntervalToReadable(interval);
+                    return `${readable}`;
+                  }).join(', ')}
+                </p>
+              </div>
               ) : (
                 <div style={{ marginTop: '8px' }}>
                   <p style={{
                     marginBottom: '12px',
-                    fontSize: '14px',
+                    fontSize: '16px',
                     color: '#7f8c8d',
                     lineHeight: '1.4'
                   }}>
@@ -498,14 +501,14 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                             min="0"
                             style={{
                               ...numberInputStyle,
-                              fontSize: '13px' // Уменьшил шрифт
+                              fontSize: '14px' // Уменьшил шрифт
                             }}
                             onMouseEnter={(e) => Object.assign(e.target.style, numberInputHoverStyle)}
                             onMouseLeave={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent' })}
                             onFocus={(e) => Object.assign(e.target.style, numberInputFocusStyle)}
                             onBlur={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' })}
                           />
-                          <span style={{ ...labelStyle, fontSize: '11px' }}>дней</span>
+                          <span style={{ ...labelStyle, fontSize: '14px' }}>дней</span>
                           
                           <span style={{ color: '#bdc3c7', margin: '0 3px' }}>,</span>
                           
@@ -518,14 +521,14 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                             max="23"
                             style={{
                               ...numberInputStyle,
-                              fontSize: '13px'
+                              fontSize: '14px'
                             }}
                             onMouseEnter={(e) => Object.assign(e.target.style, numberInputHoverStyle)}
                             onMouseLeave={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent' })}
                             onFocus={(e) => Object.assign(e.target.style, numberInputFocusStyle)}
                             onBlur={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' })}
                           />
-                          <span style={{ ...labelStyle, fontSize: '11px' }}>часов</span>
+                          <span style={{ ...labelStyle, fontSize: '14px' }}>часов</span>
                           
                           <span style={{ color: '#bdc3c7', margin: '0 3px' }}>,</span>
                           
@@ -538,14 +541,14 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                             max="59"
                             style={{
                               ...numberInputStyle,
-                              fontSize: '13px'
+                              fontSize: '14px'
                             }}
                             onMouseEnter={(e) => Object.assign(e.target.style, numberInputHoverStyle)}
                             onMouseLeave={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent' })}
                             onFocus={(e) => Object.assign(e.target.style, numberInputFocusStyle)}
                             onBlur={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' })}
                           />
-                          <span style={{ ...labelStyle, fontSize: '11px' }}>минут</span>
+                          <span style={{ ...labelStyle, fontSize: '14px' }}>минут</span>
                         </div>
                       </div>
                     );
@@ -682,6 +685,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
               display: 'flex',
               justifyContent: 'flex-end',
               marginBottom: '20px',
+              marginTop: '20px',
               flexShrink: 0
             }}>
               <button

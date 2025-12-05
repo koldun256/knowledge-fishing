@@ -89,15 +89,15 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
   ].join('\n');
   
   const handleCopyToClipboard = () => {
-      navigator.clipboard.writeText(queryString)
-        .then(() => {
-          setCopySuccess(true);
-          setTimeout(() => setCopySuccess(false), 2000);
-        })
-        .catch(err => {
-          console.error('Ошибка копирования: ', err);
-        });
-    };
+    navigator.clipboard.writeText(queryString)
+      .then(() => {
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      })
+      .catch(err => {
+        console.error('Ошибка копирования: ', err);
+      });
+  };
 
   const exampleJson = `{
   "Какая рыба самая быстрая?": "Парусник",
@@ -108,7 +108,7 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
   // Пример JSON с специальными символами для демонстрации
   const exampleWithSpecialChars = `{
   "Что такое 'спиннинг'?": "Спиннинг - удилище для ловли хищной рыбы\\nОбычно используется с катушкой",
-  "Как выбрать леску?": "Леска бывает:\\n- Монофильная\\n- Плетеная\\n- Флюорокарбоновая",
+  "Как выбрать леску?": "Леска бычает:\\n- Монофильная\\n- Плетеная\\n- Флюорокарбоновая",
   "Что означает 'тест' удилища?": "Тест удилища - это рекомендуемый вес приманки.\\tНапример: 5-20 г"
 }`;
 
@@ -204,7 +204,7 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
                 display: 'block',
                 marginBottom: '8px',
                 fontWeight: '600',
-                fontSize: '16px',
+                fontSize: '18px',
                 color: '#34495e',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
@@ -245,6 +245,22 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
               </div>
             </div>
 
+            {/* Сообщение об ошибке */}
+            {error && (
+              <div style={{
+                marginBottom: '20px',
+                padding: '12px',
+                backgroundColor: '#fde8e8',
+                border: '2px solid #f56565',
+                borderRadius: '8px',
+                color: '#c53030',
+                fontSize: '14px',
+                flexShrink: 0
+              }}>
+                {error}
+              </div>
+            )}
+
             {/* Кнопка создания - ПЕРЕМЕЩЕНА ВВЕРХ */}
             <div style={{
               display: 'flex',
@@ -263,7 +279,7 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
                   backgroundColor: '#27ae60',
                   color: 'white',
                   cursor: isLoading ? 'not-allowed' : 'pointer',
-                  fontSize: '14px',
+                  fontSize: '16px',
                   fontWeight: '600',
                   transition: 'all 0.3s ease',
                   opacity: isLoading ? 0.6 : 1
@@ -283,63 +299,119 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
               position: 'relative',
               flexShrink: 0
             }}>
+              {/* Пояснение отдельно */}
               <div style={{
-                marginBottom: '8px',
+                marginBottom: '12px',
                 fontSize: '14px',
                 color: '#495057',
-                fontWeight: '500',
-                paddingRight: '80px'
+                fontWeight: '500'
               }}>
                 Вы можете использовать ИИ для генерации вопросов и ответов. Вот пример запроса к ИИ (изменяемые параметры запроса находятся в первых четырех пунктах):
               </div>
               
+              {/* Контейнер для промпта с относительным позиционированием */}
               <div style={{
-                fontSize: '14px',
-                color: '#6c757d',
-                lineHeight: '1.4',
-                whiteSpace: 'pre-line'
+                position: 'relative'
               }}>
-                {queryString}
+                {/* Текст запроса с отступом для иконки */}
+                <div style={{
+                  fontSize: '14px',
+                  color: '#6c757d',
+                  lineHeight: '1.4',
+                  whiteSpace: 'pre-line',
+                  backgroundColor: '#fff',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  border: '1px solid #dee2e6',
+                  fontFamily: 'monospace',
+                  fontSize: '13px',
+                  paddingRight: '40px' // Больше отступа справа для иконки
+                }}>
+                  {queryString}
+                </div>
+                
+                {/* Иконка для копирования в правом верхнем углу контейнера промпта */}
+                <div 
+                  onClick={handleCopyToClipboard}
+                  style={{
+                    cursor: 'pointer',
+                    position: 'absolute',
+                    top: '8px', // Отступ сверху
+                    right: '8px', // Отступ справа
+                    width: '24px',
+                    height: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'white',
+                    borderRadius: '4px',
+                    border: '1px solid #dee2e6',
+                    zIndex: 2,
+                    opacity: 0.7,
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.opacity = '1';
+                    e.target.style.backgroundColor = '#f8f9fa';
+                    e.target.style.boxShadow = '0 2px 5px rgba(0,0,0,0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.opacity = '0.7';
+                    e.target.style.backgroundColor = 'white';
+                    e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                  }}
+                  title="Копировать промпт"
+                >
+                  {/* SVG иконка копирования */}
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="16" 
+                    height="16" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="#6c757d" 
+                    strokeWidth="1.5"
+                  >
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </div>
               </div>
 
-              {/* Маленькая кнопка копирования в правом верхнем углу блока */}
-              <button
-                type="button"
-                onClick={handleCopyToClipboard}
-                style={{
+              {/* Сообщение об успешном копировании */}
+              {copySuccess && (
+                <div style={{
                   position: 'absolute',
-                  top: '12px',
-                  right: '12px',
-                  padding: '6px 10px',
-                  border: 'none',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  padding: '8px 16px',
+                  backgroundColor: '#28a745',
+                  color: 'white',
+                  fontSize: '14px',
                   borderRadius: '4px',
-                  color: 'gray',
-                  cursor: 'pointer',
-                  fontSize: '11px',
-                  fontWeight: '500',
-                  transition: 'all 0.3s ease',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                {copySuccess ? 'Скопировано!' : 'Копировать'}
-              </button>
+                  whiteSpace: 'nowrap',
+                  zIndex: 100,
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                  animation: 'fadeInOut 2s ease'
+                }}>
+                  Скопировано!
+                </div>
+              )}
+
+              {/* Добавляем стили для анимации */}
+              <style>{`
+                @keyframes fadeInOut {
+                  0% { opacity: 0; }
+                  20% { opacity: 1; }
+                  80% { opacity: 1; }
+                  100% { opacity: 0; }
+                }
+              `}</style>
+
             </div>
 
-            {/* Сообщение об ошибке */}
-            {error && (
-              <div style={{
-                marginBottom: '20px',
-                padding: '12px',
-                backgroundColor: '#fde8e8',
-                border: '2px solid #f56565',
-                borderRadius: '8px',
-                color: '#c53030',
-                fontSize: '14px',
-                flexShrink: 0
-              }}>
-                {error}
-              </div>
-            )}
           </form>
         </div>
       </div>

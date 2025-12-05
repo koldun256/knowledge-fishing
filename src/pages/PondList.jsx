@@ -213,13 +213,13 @@ export default function PondsList() {
                 {/* Кнопка настроек в правом верхнем углу */}
                 <button
                   onClick={(e) => handleSettingsClick(e, pond)}
-                  className="absolute top-2 right-2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 transition-all duration-200 hover:scale-110 shadow-md"
+                  className="absolute top-4 right-4 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 transition-all duration-200 hover:scale-110 shadow-md"
                   style={{ pointerEvents: 'auto' }}
                 >
                   <img 
                     src={`${process.env.PUBLIC_URL}/assets/settings.png`} 
                     alt="Настройки пруда"
-                    className="w-6 h-6"
+                    className="w-8 h-8"
                   />
                 </button>
               </div>

@@ -163,7 +163,7 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
                 display: 'block',
                 marginBottom: '8px',
                 fontWeight: '600',
-                fontSize: '16px',
+                fontSize: '18px',
                 color: '#34495e',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
@@ -181,7 +181,7 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
                   padding: '12px',
                   border: '2px solid #bdc3c7',
                   borderRadius: '8px',
-                  fontSize: '14px',
+                  fontSize: '16px',
                   boxSizing: 'border-box',
                   transition: 'border-color 0.3s ease'
                 }}
@@ -195,7 +195,7 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
                 display: 'block',
                 marginBottom: '8px',
                 fontWeight: '600',
-                fontSize: '16px',
+                fontSize: '18px',
                 color: '#34495e',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
@@ -213,7 +213,7 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
                   padding: '12px',
                   border: '2px solid #bdc3c7',
                   borderRadius: '8px',
-                  fontSize: '14px',
+                  fontSize: '16px',
                   boxSizing: 'border-box',
                   transition: 'border-color 0.3s ease'
                 }}
@@ -236,7 +236,7 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
                   backgroundColor: '#27ae60',
                   color: 'white',
                   cursor: 'pointer',
-                  fontSize: '14px',
+                  fontSize: '16px',
                   fontWeight: '600',
                   transition: 'all 0.3s ease'
                 }}
