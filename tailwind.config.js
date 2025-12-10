@@ -9,6 +9,7 @@ module.exports = {
         'green-grass': '#278E2A',
         'pond-blue': '#00B5E6',
         'pond-yellow': '#EFD409',
+        'white-green': '#DAFFD5',
       },
     },
   },
