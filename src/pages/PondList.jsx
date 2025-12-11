@@ -574,13 +574,13 @@ export default function PondsList() {
           </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t border-green-800 border-opacity-30">
+        <div className="mt-8 pt-2 border-t border-green-800 border-opacity-30">
           <div className="flex justify-center">
             <button
               onClick={handleFeedbackClick}
               className="flex items-center justify-center bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-800 font-semibold py-3 px-6 rounded-full shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
             >
-              <img 
+              {/* <img 
                 src={`${process.env.PUBLIC_URL}/assets/feedback-icon.png`} 
                 alt="Обратная связь"
                 className="w-6 h-6 mr-3"
@@ -594,11 +594,11 @@ export default function PondsList() {
                     parent.insertBefore(span, e.target);
                   }
                 }}
-              />
+              /> */}
               <span className="text-lg">Обратная связь</span>
             </button>
           </div>
-          <p className="text-center text-gray-700 mt-3 text-sm">
+          <p className="text-center text-gray-700 mt-0 text-sm">
             Напиши нам, если у тебя есть предложения по улучшению сервиса или случилась какая-то ошибка
           </p>
         </div>
