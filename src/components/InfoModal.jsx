@@ -6,8 +6,23 @@ import { formatStringForDisplay } from '../helper/stringFormating';
 export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosition }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [animationState, setAnimationState] = useState('closed');
+  const [isMobile, setIsMobile] = useState(false);
   const modalRef = useRef(null);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
   
+  // Функция для проверки ширины экрана
+  const checkIsMobile = useCallback(() => {
+    setIsMobile(window.innerWidth < 500);
+  }, []);
+
+  // Проверяем при монтировании и при изменении размера окна
+  useEffect(() => {
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, [checkIsMobile]);
+
   const handleClose = useCallback(() => {
     setAnimationState('closing');
     setTimeout(() => {
@@ -34,6 +49,36 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
       setCurrentIndex(prev => prev + 1);
     }
   }, [currentIndex, infoItems.length]);
+
+  // Обработка свайпов
+  const handleTouchStart = useCallback((e) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchMove = useCallback((e) => {
+    touchEndX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!touchStartX.current || !touchEndX.current) return;
+
+    const diff = touchStartX.current - touchEndX.current;
+    const minSwipeDistance = 50; // минимальная дистанция для свайпа
+
+    if (Math.abs(diff) > minSwipeDistance) {
+      if (diff > 0) {
+        // Свайп влево - следующий слайд
+        handleNext();
+      } else {
+        // Свайп вправо - предыдущий слайд
+        handlePrev();
+      }
+    }
+
+    // Сброс значений
+    touchStartX.current = 0;
+    touchEndX.current = 0;
+  }, [handleNext, handlePrev]);
 
   useEffect(() => {
     if (isOpen && animationState === 'closed') {
@@ -108,11 +153,19 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
   };
 
   const getFinalStyle = () => {
+    // Определяем ширину экрана для отступов
+    const screenWidth = window.innerWidth;
+
     return {
       top: '50%',
       left: '50%',
       transform: 'translate(-50%, -50%) scale(1)',
-      opacity: 1
+      opacity: 1,
+      // Добавляем отступы по бокам на маленьких экранах
+      width: `calc(100% - ${isMobile ? '20px' : '40px'})`,
+      maxWidth: '600px',
+      marginLeft: 0,
+      marginRight: 0
     };
   };
 
@@ -144,10 +197,8 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
         animationState === 'closing' ? getClosingStyle() : 
         getFinalStyle()),
     backgroundColor: 'white',
-    padding: '16px',
+    padding: isMobile ? '12px' : '16px',
     borderRadius: '12px',
-    width: '90%',
-    maxWidth: '600px',
     maxHeight: '90vh',
     boxShadow: animationState === 'open' ? '0 10px 25px rgba(0,0,0,0.2)' : 'none',
     overflow: 'hidden',
@@ -155,6 +206,8 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
     flexDirection: 'column',
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     zIndex: 10000,
+    // Для свайпов на мобильных устройствах
+    touchAction: 'pan-y pinch-zoom',
   };
 
   const backdropStyle = {
@@ -173,14 +226,21 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
     <>
       <div style={backdropStyle} onClick={handleBackdropClick} />
       
-      <div style={modalStyle} ref={modalRef} onClick={(e) => e.stopPropagation()}>
+      <div 
+        style={modalStyle} 
+        ref={modalRef} 
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {/* Крестик закрытия */}
         <button
           onClick={handleClose}
           style={{
             position: 'absolute',
-            top: '16px',
-            right: '16px',
+            top: isMobile ? '12px' : '16px',
+            right: isMobile ? '12px' : '16px',
             background: 'none',
             border: 'none',
             fontSize: '24px',
@@ -229,13 +289,13 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
             disabled={!canGoPrev}
             style={{
               position: 'absolute',
-              left: '6px',
+              left: isMobile ? '-7px' : '6px',
               top: '50%',
               transform: 'translateY(-50%)',
               background: 'none',
               border: 'none',
               cursor: canGoPrev ? 'pointer' : 'default',
-              fontSize: '50px',
+              fontSize: isMobile ? '40px' : '50px',
               color: canGoPrev ? '#013b45ff' : '#cccccc',
               transition: 'all 0.3s ease',
               zIndex: 1,
@@ -266,13 +326,13 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
             disabled={!canGoNext}
             style={{
               position: 'absolute',
-              right: '6px',
+              right: isMobile ? '-7px' : '6px',
               top: '50%',
               transform: 'translateY(-50%)',
               background: 'none',
               border: 'none',
               cursor: canGoNext ? 'pointer' : 'default',
-              fontSize: '50px',
+              fontSize: isMobile ? '40px' : '50px',
               color: canGoNext ? '#013b45ff' : '#cccccc',
               transition: 'all 0.3s ease',
               zIndex: 1,
@@ -297,22 +357,31 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
             ›
           </button>
 
-          {/* Контейнер для текста */}
-          <div style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '10px',
-            borderRadius: '8px',
-            backgroundColor: '#ffffffff',
-            border: '2px solid #ffffffff',
-            overflow: 'auto',
-            margin: '0 30px',
-            transition: 'margin 0.3s ease'
-          }}>
+          {/* Контейнер для текста - с поддержкой свайпов */}
+          <div 
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              padding: isMobile ? '8px' : '10px',
+              borderRadius: '8px',
+              backgroundColor: '#ffffffff',
+              border: '2px solid #ffffffff',
+              overflow: 'auto',
+              margin: isMobile ? '0 15px' : '0 30px',
+              transition: 'margin 0.3s ease',
+              // Для лучшей поддержки свайпов
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              msUserSelect: 'none'
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             <h2 style={{ 
               margin: '0 0 20px 0', 
-              fontSize: '28px', 
+              fontSize: isMobile ? '24px' : '28px', 
               fontWeight: '800',
               color: '#013b45ff',
               textAlign: 'center',
@@ -324,7 +393,7 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
 
             <div style={{
               flex: 1,
-              fontSize: '18px',
+              fontSize: isMobile ? '16px' : '18px',
               lineHeight: '1.6',
               color: '#000000ff',
               whiteSpace: 'pre-line',
@@ -333,17 +402,17 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
               justifyContent: 'center',
               textAlign: 'justify',
               width: '100%'
-              }}>
+            }}>
               <div 
                 style={{
-                width: '100%',
-                maxHeight: '100%',
-                overflowY: 'auto',
-                padding: '10px 0'
+                  width: '100%',
+                  maxHeight: '100%',
+                  overflowY: 'auto',
+                  padding: '10px 0'
                 }}
                 dangerouslySetInnerHTML={{ __html: formatStringForDisplay(currentItem.text) }}
               />
-              </div>
+            </div>
           </div>
 
           {/* Индикаторы */}
@@ -359,8 +428,8 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
                 key={index}
                 onClick={() => animationState === 'open' && setCurrentIndex(index)}
                 style={{
-                  width: '12px',
-                  height: '12px',
+                  width: isMobile ? '10px' : '12px',
+                  height: isMobile ? '10px' : '12px',
                   borderRadius: '50%',
                   border: 'none',
                   backgroundColor: index === currentIndex ? '#013b45ff' : '#bdc3c7',
@@ -376,7 +445,7 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
           <div style={{
             textAlign: 'center',
             marginTop: '12px',
-            fontSize: '14px',
+            fontSize: isMobile ? '12px' : '14px',
             color: '#7f8c8d',
             fontWeight: '500'
           }}>
@@ -397,13 +466,13 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
             <button
               onClick={handleClose}
               style={{
-                padding: '12px 32px',
+                padding: isMobile ? '10px 24px' : '12px 32px',
                 border: '2px solid #013b45ff',
                 borderRadius: '8px',
                 backgroundColor: 'white',
                 color: '#013b45ff',
                 cursor: 'pointer',
-                fontSize: '16px',
+                fontSize: isMobile ? '14px' : '16px',
                 fontWeight: '600',
                 transition: 'all 0.3s ease',
                 textTransform: 'uppercase',
@@ -411,7 +480,7 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
               }}
               onMouseEnter={(e) => {
                 if (animationState === 'open') {
-                  e.target.style.backgroundColor = '#013b45ff';
+                  e.target.style.backgroundColor = '#10b132ff';
                   e.target.style.color = 'white';
                 }
               }}

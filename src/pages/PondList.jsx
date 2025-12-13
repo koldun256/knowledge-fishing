@@ -26,6 +26,9 @@ export default function PondsList() {
   
   const [infoButtonPosition, setInfoButtonPosition] = useState(null);
   const dropdownRef = useRef(null);
+  
+  // Добавлено: состояние для отслеживания ширины экрана
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
 
   const infoData = [
     {
@@ -46,14 +49,31 @@ export default function PondsList() {
     },
     {
       title: "Рыбалка",
-      text: "\\tГотовую рыбу можно поймать и повторить данные, за которые она отвечает. После нажатия на кнопку \"Начать рыбалку\" будет выбрана случайная готовая рыба и ты увидишь ее вопрос. А вот ответ будет скрыт, чтобы ты мог его вспомнить самостоятельно.\\n\\tПосле проверки ответа ты можешь выбрать, на какой уровень поместить рыбу. Базовый сценарий - опустить рыбу на слеюдущий уровень, но если ты понимаешь, что плохо вспомнил ответ, то можешь оставить ее на том же уровне или даже увеличить уровень - так она встретится быстрее"
+      text: "\\tГотовую рыбу можно поймать и повторить данные, за которые она отвечает. После нажатия на кнопку \"Начать рыбалку\" будет выбрана случайная готовая рыба и ты увидишь ее вопрос. А вот ответ будет скрыт, чтобы ты мог его вспомнить самостоятельно.\\n\\tПосле проверки ответа ты можешь выбрать, на какой уровень поместить рыба. Базовый сценарий - опустить рыбу на слеюдущий уровень, но если ты понимаешь, что плохо вспомнил ответ, то можешь оставить ее на том же уровне или даже увеличить уровень - так она встретится быстрее"
     },
     {
       title: "Авторизация",
       text: "\\tЧтобы не потерять свои данные, а также иметь доступ из всех браузеров и устройств, зарегистрируйтесь или войдите в аккаунт.\\n\\tНа этом все, ни хвоста, ни чешуи!"
     }
-    // ... остальные данные
   ];
+
+  // Добавлено: обработчик изменения размера окна
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 600);
+    };
+
+    // Устанавливаем начальное значение
+    handleResize();
+
+    // Добавляем слушатель события
+    window.addEventListener('resize', handleResize);
+
+    // Убираем слушатель при размонтировании
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   // Закрытие выпадающего меню при клике вне его
   useEffect(() => {
@@ -104,8 +124,8 @@ export default function PondsList() {
 
   // Эффект для автоматического открытия InfoModal при первом входе
   useEffect(() => {
-    if (user && isFirstVisit && !loading && !isInfoModalOpen) {
-      console.log('Opening welcome modal for first-time user:', user.username || user.login);
+    if (isFirstVisit && !loading && !isInfoModalOpen) {
+      console.log('Opening welcome modal for first-time user:', user?.username || user?.login);
       
       // Получаем позицию кнопки info для правильного позиционирования
       const infoButton = document.getElementById('info-button');
@@ -429,22 +449,44 @@ export default function PondsList() {
       <div className="min-h-screen bg-green-grass p-8 flex flex-col" style={{color: '#00a028ff'}}>
         <div className="mx-auto flex-grow">
           <header className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-4xl font-bold text-black">Где будем рыбачить?</h1>
+            <div style={{
+                width: 'fit-content',
+                maxWidth: 'calc(100vw - 200px)',
+                minWidth: 150 // важно для корректной работы flex-shrink
+              }}>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black">Где будем рыбачить?</h1>
             </div>
             
             <div className="flex items-center space-x-4">
               {user ? (
                 <div className="relative" ref={dropdownRef}>
-                  <button
-                    className="flex items-center justify-center w-auto h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full px-6 shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"
-                    onClick={handleUserClick}
-                    title="Нажмите для выхода"
-                  >
-                    <span className="text-2xl font-semibold text-gray-800">
-                      {user.login || user.username || user.email || 'Пользователь'}
-                    </span>
-                  </button>
+                  {isMobile ? (
+                    // На мобильных устройствах показываем иконку вместо текста
+                    <button
+                      className="flex items-center justify-center w-14 h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"
+                      onClick={handleUserClick}
+                      title={`${user.login || user.username || user.email || 'Пользователь'}`}
+                    >
+                      <img 
+                        src={
+                          `${process.env.PUBLIC_URL}/assets/signed-in-small.png`
+                        } 
+                        alt="Нажмите для выхода"
+                        className={isMobile ? "w-14 h-14" : "w-35 h-14"}
+                      />
+                    </button>
+                  ) : (
+                    // На десктопах показываем полную версию с текстом
+                    <button
+                      className="flex items-center justify-center w-auto h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full px-6 shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"
+                      onClick={handleUserClick}
+                      title="Нажмите для выхода"
+                    >
+                      <span className="text-2xl font-semibold text-gray-800 truncate max-w-[200px]">
+                        {user.login || user.username || user.email || 'Пользователь'}
+                      </span>
+                    </button>
+                  )}
                   
                   {showLogoutDropdown && (
                     <div className="absolute right-0 mt-2 w-full min-w-[120px] bg-white rounded-lg shadow-xl z-50 overflow-hidden border border-gray-200">
@@ -478,9 +520,13 @@ export default function PondsList() {
                   title="Вход/Регистрация"
                 >
                   <img 
-                    src={`${process.env.PUBLIC_URL}/assets/sign-in.png`} 
+                    src={
+                      isMobile 
+                        ? `${process.env.PUBLIC_URL}/assets/sign-in-small.png` 
+                        : `${process.env.PUBLIC_URL}/assets/sign-in.png`
+                    } 
                     alt="Вход/Регистрация"
-                    className="w-35 h-14"
+                    className={isMobile ? "w-14 h-14" : "w-35 h-14"}
                   />
                 </button>
               )}
@@ -502,8 +548,8 @@ export default function PondsList() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
             {ponds.map((pond) => (
-              <div key={pond.id} className="relative group">
-                <Link to={`/pond/${pond.id}`} className="block">
+              <div key={pond.id} className="relative">
+                <Link to={`/pond/${pond.id}`} className="block group">
                   <img 
                     src={getPondImage(pond.id)} 
                     alt={pond.name}
@@ -549,7 +595,7 @@ export default function PondsList() {
 
                 <button
                   onClick={(e) => handleSettingsClick(e, pond)}
-                  className="absolute top-4 right-4 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 transition-all duration-200 hover:scale-110 shadow-md"
+                  className="absolute top-4 right-4 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 transition-all duration-200 hover:scale-110 shadow-md settings-button"
                   style={{ pointerEvents: 'auto' }}
                 >
                   <img 
@@ -580,21 +626,6 @@ export default function PondsList() {
               onClick={handleFeedbackClick}
               className="flex items-center justify-center bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-800 font-semibold py-3 px-6 rounded-full shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
             >
-              {/* <img 
-                src={`${process.env.PUBLIC_URL}/assets/feedback-icon.png`} 
-                alt="Обратная связь"
-                className="w-6 h-6 mr-3"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  const parent = e.target.parentElement;
-                  if (parent) {
-                    const span = document.createElement('span');
-                    span.textContent = '📝';
-                    span.className = 'text-xl mr-3';
-                    parent.insertBefore(span, e.target);
-                  }
-                }}
-              /> */}
               <span className="text-lg">Обратная связь</span>
             </button>
           </div>

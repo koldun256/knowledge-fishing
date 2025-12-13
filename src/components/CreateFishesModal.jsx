@@ -52,7 +52,7 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
       const fishesData = JSON.parse(correctedInput);
       
       if (typeof fishesData !== 'object' || fishesData === null || Array.isArray(fishesData)) {
-        throw new Error('JSON должен быть объектом в формате {"question1": "answer1", "question2": "answer2", ...}');
+        throw new Error('Информация о рыбах должна быть в формате {"question1": "answer1", "question2": "answer2", ...}');
       }
 
       setIsLoading(true);
@@ -77,10 +77,10 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
 
   const queryString = [
     'Сгенерируй пары "вопрос-ответ". Требования:',
-    '1. Количество пар "вопрос-ответ" - 20',
-    '2. Тема: рыболовные снасти',
-    '3. Вопрос должен содержать название снасти',
-    '4. Ответ должен объяснять что это и для чего предназначено',
+    '1. Количество пар "вопрос-ответ" - *20*',
+    '2. Тема: *рыболовные снасти*',
+    '3. Вопрос должен содержать *название снасти*',
+    '4. Ответ должен *объяснять что это и для чего предназначено*',
     '5. Верни ТОЛЬКО строку ответ без форматирования и дополнительного текста',
     '6. Структура: {\"question1\": \"answer1\", \"question2\": \"answer2\", ...}',
     '7. Длина вопроса и ответа не должна превышать 1000 символов',
@@ -209,7 +209,7 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
               }}>
-                ВВЕДИТЕ ДАННЫЕ РЫБ В ФОРМАТЕ JSON *
+                ВВЕДИТЕ ДАННЫЕ РЫБ В ФОРМАТЕ {"{\"question1\": \"answer1\", \"question2\": \"answer2\", ...}"} *
               </label>
               <textarea
                 value={jsonInput}
@@ -232,7 +232,7 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
                 spellCheck="false"
                 required
               />
-              <div style={{
+              {/* <div style={{
                 marginTop: '8px',
                 fontSize: '12px',
                 color: '#7f8c8d',
@@ -242,7 +242,7 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
                 <div style={{ marginTop: '4px', fontSize: '11px', color: '#95a5a6' }}>
                   Чтобы использовать кавычки, добавьте экранирование: \"
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Сообщение об ошибке */}

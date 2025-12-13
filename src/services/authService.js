@@ -5,7 +5,6 @@ export const authService = {
   initializeUser: async () => {
     try {
       const url = `${API_CONFIG.BASE_URL}/`;
-      console.log('🔄 Making POST request to:', url);
       
       const response = await fetch(url, {
         credentials: API_CONFIG.withCredentials ? 'include' : 'omit',

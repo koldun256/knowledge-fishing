@@ -2,19 +2,26 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 
+import { feedbackService } from '../services/feedbackService';
+
 export default function FeedbackModal({ isOpen, onClose, onSubmit }) {
   const [formData, setFormData] = useState({
-    messageType: 'Проблема',
-    login: '',
-    message: ''
+    type: 'Проблема',
+    text: ''
   });
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const handleClose = useCallback(() => {
     setFormData({
-      messageType: 'Проблема',
-      login: '',
-      message: ''
+      type: 'Проблема',
+      text: ''
     });
+    setError(null);
+    setSuccess(false);
+    setIsSubmitting(false);
     onClose();
   }, [onClose]);
 
@@ -29,7 +36,9 @@ export default function FeedbackModal({ isOpen, onClose, onSubmit }) {
       ...prev,
       [e.target.name]: e.target.value
     }));
-  }, []);
+    // Сбрасываем ошибку при изменении формы
+    if (error) setError(null);
+  }, [error]);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -45,25 +54,57 @@ export default function FeedbackModal({ isOpen, onClose, onSubmit }) {
   useEffect(() => {
     if (isOpen) {
       setFormData({
-        messageType: 'Проблема',
-        login: '',
-        message: ''
+        type: 'Проблема',
+        text: ''
       });
+      setError(null);
+      setSuccess(false);
+      setIsSubmitting(false);
     }
   }, [isOpen]);
   
-  if (!isOpen) return null;
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.message.trim()) {
-      alert('Пожалуйста, напишите ваше сообщение');
+    
+    // Валидация
+    if (!formData.text.trim()) {
+      setError('Пожалуйста, напишите ваше сообщение');
       return;
     }
     
-    onSubmit(formData);
-    handleClose();
+    setIsSubmitting(true);
+    setError(null);
+    
+    try {
+      // Отправляем данные через feedbackService
+      await feedbackService.SendFeedback({
+        type: formData.type,
+        text: formData.text
+      });
+      
+      // Успешная отправка
+      setSuccess(true);
+      
+      // Если передан onSubmit callback - вызываем его
+      if (onSubmit) {
+        onSubmit(formData);
+      }
+      
+      // Автоматически закрываем модалку через 2 секунды
+      setTimeout(() => {
+        handleClose();
+      }, 2000);
+      
+    } catch (err) {
+      // Обработка ошибки
+      setError(err.text || 'Произошла ошибка при отправке. Попробуйте еще раз.');
+      console.error('Feedback submission error:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+  
+  if (!isOpen) return null;
 
   return ReactDOM.createPortal(
     <div style={{
@@ -95,6 +136,7 @@ export default function FeedbackModal({ isOpen, onClose, onSubmit }) {
         {/* Крестик закрытия в правом верхнем углу */}
         <button
           onClick={handleClose}
+          disabled={isSubmitting}
           style={{
             position: 'absolute',
             top: '16px',
@@ -102,8 +144,8 @@ export default function FeedbackModal({ isOpen, onClose, onSubmit }) {
             background: 'none',
             border: 'none',
             fontSize: '24px',
-            cursor: 'pointer',
-            color: '#666',
+            cursor: isSubmitting ? 'not-allowed' : 'pointer',
+            color: isSubmitting ? '#ccc' : '#666',
             width: '32px',
             height: '32px',
             display: 'flex',
@@ -114,12 +156,16 @@ export default function FeedbackModal({ isOpen, onClose, onSubmit }) {
             zIndex: 10
           }}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#f5f5f5';
-            e.target.style.color = '#333';
+            if (!isSubmitting) {
+              e.target.style.backgroundColor = '#f5f5f5';
+              e.target.style.color = '#333';
+            }
           }}
           onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-            e.target.style.color = '#666';
+            if (!isSubmitting) {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = '#666';
+            }
           }}
         >
           ×
@@ -130,12 +176,12 @@ export default function FeedbackModal({ isOpen, onClose, onSubmit }) {
           margin: '0 0 20px 0', 
           fontSize: '28px', 
           fontWeight: '800',
-          color: '#013b45ff',
+          color: success ? '#2ecc71' : '#013b45ff',
           textAlign: 'center',
           paddingRight: '40px',
           flexShrink: 0
         }}>
-          Обратная связь
+          {success ? 'Спасибо за отзыв!' : 'Обратная связь'}
         </h2>
         
         {/* Основной контент - прокручиваемый с правильным отступом */}
@@ -148,149 +194,239 @@ export default function FeedbackModal({ isOpen, onClose, onSubmit }) {
           paddingRight: '20px',
           marginRight: '-20px'
         }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-            {/* Поле Тип сообщения */}
-            <div style={{ marginBottom: '20px', flexShrink: 0 }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontWeight: '600',
-                fontSize: '18px',
-                color: '#34495e',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                ТИП СООБЩЕНИЯ
-              </label>
-              <select
-                name="messageType"
-                value={formData.messageType}
-                onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '2px solid #bdc3c7',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  boxSizing: 'border-box',
-                  backgroundColor: 'white',
-                  transition: 'border-color 0.3s ease',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="Проблема">Проблема</option>
-                <option value="Предложение">Предложение</option>
-                <option value="Отзыв">Отзыв</option>
-              </select>
-            </div>
-
-            {/* Поле Логин */}
-            <div style={{ marginBottom: '20px', flexShrink: 0 }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontWeight: '600',
-                fontSize: '18px',
-                color: '#34495e',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                ЛОГИН (ПО ЖЕЛАНИЮ)
-                <span style={{
-                  fontSize: '14px',
-                  fontWeight: 'normal',
-                  textTransform: 'none',
-                  marginLeft: '8px',
-                  color: '#7f8c8d'
-                }}>
-                  Пожалуйста, укажите, если описываете проблему
-                </span>
-              </label>
-              <input
-                type="text"
-                name="login"
-                value={formData.login}
-                onChange={handleChange}
-                placeholder="Ваш логин"
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '2px solid #bdc3c7',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  boxSizing: 'border-box',
-                  transition: 'border-color 0.3s ease'
-                }}
-              />
-            </div>
-
-            {/* Поле Сообщение */}
-            <div style={{ marginBottom: '20px', flexShrink: 0 }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontWeight: '600',
-                fontSize: '18px',
-                color: '#34495e',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                НАПИШИТЕ ВАШЕ СООБЩЕНИЕ *
-              </label>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                placeholder="Опишите вашу проблему, предложение или оставьте отзыв..."
-                rows={5}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '2px solid #bdc3c7',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  boxSizing: 'border-box',
-                  transition: 'border-color 0.3s ease',
-                  resize: 'vertical',
-                  minHeight: '120px'
-                }}
-                required
-              />
-            </div>
-
-            {/* Кнопка отправки */}
+          {success ? (
+            // Сообщение об успешной отправке
             <div style={{
+              textAlign: 'center',
+              padding: '20px 0',
+              flex: 1,
               display: 'flex',
-              justifyContent: 'flex-end',
-              marginBottom: '20px',
-              flexShrink: 0
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center'
             }}>
-              <button
-                type="submit"
-                style={{
-                  padding: '12px 24px',
-                  border: 'none',
-                  borderRadius: '8px',
-                  backgroundColor: '#3498db',
-                  color: 'white',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#2980b9';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#3498db';
-                }}
-              >
-                ОТПРАВИТЬ
-              </button>
+              <div style={{
+                fontSize: '72px',
+                color: '#2ecc71',
+                marginBottom: '20px'
+              }}>
+                ✓
+              </div>
+              <p style={{
+                fontSize: '18px',
+                color: '#34495e',
+                marginBottom: '10px'
+              }}>
+                Ваше сообщение успешно отправлено!
+              </p>
+              <p style={{
+                fontSize: '14px',
+                color: '#7f8c8d'
+              }}>
+                Окно закроется автоматически через 2 секунды...
+              </p>
             </div>
-          </form>
+          ) : (
+            // Форма обратной связи
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+              {/* Сообщение об ошибке */}
+              {error && (
+                <div style={{
+                  marginBottom: '20px',
+                  padding: '12px',
+                  backgroundColor: '#ffebee',
+                  border: '1px solid #ffcdd2',
+                  borderRadius: '8px',
+                  color: '#c62828',
+                  fontSize: '14px',
+                  flexShrink: 0
+                }}>
+                  {error}
+                </div>
+              )}
+              
+              {/* Поле Тип сообщения */}
+              <div style={{ marginBottom: '20px', flexShrink: 0 }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontWeight: '600',
+                  fontSize: '18px',
+                  color: '#34495e',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  ТИП СООБЩЕНИЯ
+                </label>
+                <select
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                  disabled={isSubmitting}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: error ? '2px solid #ff6b6b' : '2px solid #bdc3c7',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    boxSizing: 'border-box',
+                    backgroundColor: isSubmitting ? '#f9f9f9' : 'white',
+                    transition: 'border-color 0.3s ease',
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                    opacity: isSubmitting ? 0.7 : 1
+                  }}
+                >
+                  <option value="Проблема">Проблема</option>
+                  <option value="Предложение">Предложение</option>
+                  <option value="Отзыв">Отзыв</option>
+                </select>
+              </div>
+
+              {/* Поле Логин
+              <div style={{ marginBottom: '20px', flexShrink: 0 }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontWeight: '600',
+                  fontSize: '18px',
+                  color: '#34495e',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  ЛОГИН (ПО ЖЕЛАНИЮ)
+                  <span style={{
+                    fontSize: '14px',
+                    fontWeight: 'normal',
+                    textTransform: 'none',
+                    marginLeft: '8px',
+                    color: '#7f8c8d'
+                  }}>
+                    Пожалуйста, укажите, если описываете проблему
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  name="login"
+                  value={formData.login}
+                  onChange={handleChange}
+                  placeholder="Ваш логин"
+                  disabled={isSubmitting}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: error ? '2px solid #ff6b6b' : '2px solid #bdc3c7',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    boxSizing: 'border-box',
+                    backgroundColor: isSubmitting ? '#f9f9f9' : 'white',
+                    transition: 'border-color 0.3s ease',
+                    opacity: isSubmitting ? 0.7 : 1
+                  }}
+                />
+              </div> */}
+
+              {/* Поле Сообщение */}
+              <div style={{ marginBottom: '20px', flexShrink: 0 }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontWeight: '600',
+                  fontSize: '18px',
+                  color: '#34495e',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  НАПИШИТЕ ВАШЕ СООБЩЕНИЕ *
+                </label>
+                <textarea
+                  name="text"
+                  value={formData.text}
+                  onChange={handleChange}
+                  placeholder="Опишите вашу проблему, предложение или оставьте отзыв..."
+                  rows={5}
+                  disabled={isSubmitting}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: error ? '2px solid #ff6b6b' : '2px solid #bdc3c7',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.3s ease',
+                    resize: 'vertical',
+                    minHeight: '120px',
+                    backgroundColor: isSubmitting ? '#f9f9f9' : 'white',
+                    opacity: isSubmitting ? 0.7 : 1
+                  }}
+                  required
+                />
+              </div>
+
+              {/* Кнопка отправки */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginBottom: '20px',
+                flexShrink: 0
+              }}>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  style={{
+                    padding: '12px 24px',
+                    border: 'none',
+                    borderRadius: '8px',
+                    backgroundColor: isSubmitting ? '#95a5a6' : '#3498db',
+                    color: 'white',
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    transition: 'all 0.3s ease',
+                    minWidth: '120px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSubmitting) {
+                      e.target.style.backgroundColor = '#2980b9';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSubmitting) {
+                      e.target.style.backgroundColor = '#3498db';
+                    }
+                  }}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span style={{
+                        display: 'inline-block',
+                        width: '16px',
+                        height: '16px',
+                        border: '2px solid rgba(255,255,255,0.3)',
+                        borderTop: '2px solid white',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite',
+                        marginRight: '8px'
+                      }} />
+                      ОТПРАВКА...
+                    </>
+                  ) : 'ОТПРАВИТЬ'}
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
+      
+      {/* CSS для анимации спиннера */}
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>,
     document.body
   );

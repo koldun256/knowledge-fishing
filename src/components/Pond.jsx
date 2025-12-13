@@ -46,10 +46,20 @@ function PondInner() {
   const [isCreateFishModalOpen, setIsCreateFishModalOpen] = useState(false);
   const [isCreateFishesModalOpen, setIsCreateFishesModalOpen] = useState(false); // Новое состояние
   
+  // Состояние блокировки кнопок во время рыбалки
+  const [buttonsDisabled, setButtonsDisabled] = useState(false);
+  
   // Состояния для адаптивного дизайна
   const [showBackAsArrow, setShowBackAsArrow] = useState(false);
   const [showMenuButton, setShowMenuButton] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Следим за фазой рыбалки и блокируем кнопки когда рыбалка активна
+  useEffect(() => {
+    // Если рыбалка не в фазе 'idle' или открыт диалог, блокируем кнопки
+    const shouldDisable = fishing.phase !== 'idle' || dialog.open;
+    setButtonsDisabled(shouldDisable);
+  }, [fishing.phase, dialog.open]);
 
   // Брейкпоинты для адаптивного дизайна
   const BREAKPOINTS = {
@@ -198,7 +208,8 @@ function PondInner() {
 
   const startFishing = async () => {
     try {
-      if (fishing.phase !== 'idle' || dialog.open) return;
+      // Проверяем, можно ли начать рыбалку
+      if (fishing.phase !== 'idle' || dialog.open || buttonsDisabled) return;
 
       const nextFish = await pondService.getNextFish(pondId);
 
@@ -218,6 +229,8 @@ function PondInner() {
   // Обработчики для меню
   const handleMenuAction = (action) => {
     setIsMenuOpen(false);
+    if (buttonsDisabled) return; // Не выполняем действия если кнопки заблокированы
+    
     switch (action) {
       case 'addFish':
         setIsCreateFishModalOpen(true);
@@ -272,7 +285,7 @@ function PondInner() {
   );
   if (!pond) return <div className="p-8 text-center text-red-500">Пруд не найден</div>;
 
-  const canStart = fishing.phase === 'idle' && !dialog.open;
+  const canStart = fishing.phase === 'idle' && !dialog.open && !buttonsDisabled;
 
   return (
     <>
@@ -288,27 +301,46 @@ function PondInner() {
         {!showMenuButton ? (
           <div className="flex items-center gap-2">
             <button
-              onClick={() => navigate('/')}
-              className={`text-slate-800 px-4 py-2 rounded-lg transition-all ${
-                showBackAsArrow ? 'bg-green-0 w-10 h-10 flex items-center justify-center' : 'bg-white/95 hover:bg-white shadow-lg border border-gray-300'
-              }`}
+              onClick={() => !buttonsDisabled && navigate('/')}
+              disabled={buttonsDisabled}
+              className={`
+                rounded-lg transition-all
+                ${buttonsDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+                ${showBackAsArrow 
+                  ? 'text-slate-800 flex items-center justify-center bg-green-100 hover:bg-green-200' 
+                  : 'px-4 py-2 bg-white/95 hover:bg-white shadow-lg border border-gray-300 text-slate-800'
+                }
+              `}
             >
-              {showBackAsArrow ? '←' : '← Назад к прудам'}
+              {showBackAsArrow ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" 
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              ) : '← Назад к прудам'}
             </button>
             
             {!showBackAsArrow ? (
               // Большой экран: все кнопки полностью
               <>
                 <button
-                  onClick={() => setIsCreateFishModalOpen(true)}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
+                  onClick={() => !buttonsDisabled && setIsCreateFishModalOpen(true)}
+                  disabled={buttonsDisabled}
+                  className={`
+                    bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg transition-all
+                    ${buttonsDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+                  `}
                 >
                   🐟 Добавить рыбу
                 </button>
                 
                 <button
-                  onClick={() => setIsCreateFishesModalOpen(true)}
-                  className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
+                  onClick={() => !buttonsDisabled && setIsCreateFishesModalOpen(true)}
+                  disabled={buttonsDisabled}
+                  className={`
+                    bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg shadow-lg transition-all
+                    ${buttonsDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+                  `}
                 >
                   🐟🐟 Добавить рыб
                 </button>
@@ -317,15 +349,23 @@ function PondInner() {
               // Средний экран: стрелка + обычные кнопки
               <>
                 <button
-                  onClick={() => setIsCreateFishModalOpen(true)}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
+                  onClick={() => !buttonsDisabled && setIsCreateFishModalOpen(true)}
+                  disabled={buttonsDisabled}
+                  className={`
+                    bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg transition-all
+                    ${buttonsDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+                  `}
                 >
                   🐟 Добавить рыбу
                 </button>
                 
                 <button
-                  onClick={() => setIsCreateFishesModalOpen(true)}
-                  className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
+                  onClick={() => !buttonsDisabled && setIsCreateFishesModalOpen(true)}
+                  disabled={buttonsDisabled}
+                  className={`
+                    bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg shadow-lg transition-all
+                    ${buttonsDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+                  `}
                 >
                   🐟🐟 Добавить рыб
                 </button>
@@ -335,10 +375,17 @@ function PondInner() {
         ) : (
           // Маленький экран: только стрелка слева
           <button
-            onClick={() => navigate('/')}
-            className=" text-slate-800 w-10 h-10 flex items-center justify-center rounded-lg transition-all"
+            onClick={() => !buttonsDisabled && navigate('/')}
+            disabled={buttonsDisabled}
+            className={`
+              text-slate-800 w-10 h-10 flex items-center justify-center rounded-lg transition-all
+              ${buttonsDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+            `}
           >
-            ←
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" 
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
           </button>
         )}
       </div>
@@ -350,7 +397,11 @@ function PondInner() {
           canStart && (
             <button
               onClick={startFishing}
-              className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg shadow-lg transition-all"
+              disabled={buttonsDisabled}
+              className={`
+                bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg shadow-lg transition-all
+                ${buttonsDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+              `}
             >
               🎣 Начать рыбалку
             </button>
@@ -358,8 +409,12 @@ function PondInner() {
         ) : (
           // Маленький экран: кнопка меню в правом верхнем углу
           <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="bg-green-600 hover:bg-green-700 text-white w-10 h-10 flex items-center justify-center rounded-lg shadow-lg transition-all"
+            onClick={() => !buttonsDisabled && setIsMenuOpen(!isMenuOpen)}
+            disabled={buttonsDisabled}
+            className={`
+              bg-green-600 hover:bg-green-700 text-white w-10 h-10 flex items-center justify-center rounded-lg shadow-lg transition-all
+              ${buttonsDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+            `}
           >
             ☰
           </button>
@@ -391,14 +446,22 @@ function PondInner() {
             <div className="p-4 space-y-3">
               <button
                 onClick={() => handleMenuAction('addFish')}
-                className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg shadow transition-all text-left"
+                disabled={buttonsDisabled}
+                className={`
+                  w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg shadow transition-all text-left
+                  ${buttonsDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+                `}
               >
                 🐟 Добавить рыбу
               </button>
               
               <button
                 onClick={() => handleMenuAction('addFishes')}
-                className="w-full bg-green-700 hover:bg-green-800 text-white px-4 py-3 rounded-lg shadow transition-all text-left"
+                disabled={buttonsDisabled}
+                className={`
+                  w-full bg-green-700 hover:bg-green-800 text-white px-4 py-3 rounded-lg shadow transition-all text-left
+                  ${buttonsDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+                `}
               >
                 🐟🐟 Добавить рыб
               </button>
@@ -406,7 +469,11 @@ function PondInner() {
               {canStart && (
                 <button
                   onClick={() => handleMenuAction('startFishing')}
-                  className="w-full bg-blue-700 hover:bg-blue-800 text-white px-4 py-3 rounded-lg shadow transition-all text-left"
+                  disabled={buttonsDisabled}
+                  className={`
+                    w-full bg-blue-700 hover:bg-blue-800 text-white px-4 py-3 rounded-lg shadow transition-all text-left
+                    ${buttonsDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+                  `}
                 >
                   🎣 Начать рыбалку
                 </button>

@@ -595,7 +595,7 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                 onClick={handleDelete}
                 disabled={loading}
                 style={{
-                  padding: '12px 24px',
+                  padding: '12px 12px',
                   border: 'none',
                   borderRadius: '8px',
                   backgroundColor: loading ? '#95a5a6' : '#e74c3c',
@@ -615,7 +615,7 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                 type="submit"
                 disabled={loading || !formData.name.trim() || !formData.topic}
                 style={{
-                  padding: '12px 24px',
+                  padding: '12px 12px',
                   border: 'none',
                   borderRadius: '8px',
                   backgroundColor: loading ? '#95a5a6' : '#3498db',
