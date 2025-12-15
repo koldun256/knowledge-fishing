@@ -35,7 +35,14 @@ export const pondService = {
     const response = await fetch(`${API_CONFIG.BASE_URL}/ponds/${id}/start-fishing`, {
       credentials: API_CONFIG.withCredentials ? 'include' : 'omit'
     });
-    if (!response.ok) throw new Error('Failed to get next fish');
+    if (!response.ok) {
+      const error = new Error(`HTTP ${response.status}: Failed to get next fish`);
+      error.status = response.status;
+      throw error;
+      // if (response.status == 400) throw new Error('No one ready fish');
+      // else if (response.status == 500) throw new Error('Server is no available, sorry(');
+      // else throw new Error('Failed to get next fish');
+    } 
     return response.json();
   },
 
