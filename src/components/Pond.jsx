@@ -221,8 +221,50 @@ function PondInner() {
         hookX: null,
         hookY: null,
       }));
-    } catch (e) {
-      console.error('Ошибка начала рыбалки:', e);
+    } catch (err) {
+      console.error('Error:', err);
+    
+      if (err.status === 400) {
+        alert('Клева нет!\nРыбы еще не проголодались. Если вы хотите порыбачить именно сейчас, уменьшите интервал времени в настройках пруда (на странице отображения прудов)\nПодробнее можете посмотреть по кнопке с вопросиком на странице отображения прудов в разделе Интервалы времени');
+        return;
+      }
+      
+      alert(`Ошибка: ${err.message}`);
+    //   if (err.status === 400) {
+    //     setFishing(prev => ({
+    //       ...prev,
+    //       phase: 'idle', // Остаемся в режиме ожидания
+    //       dialog: {
+    //         open: true,
+    //         title: 'Нет готовых рыб',
+    //         message: 'В настоящее время нет голодных рыб, готовых клевать. Попробуйте позже!',
+    //         options: [
+    //           {
+    //             text: 'Ок',
+    //             action: () => setFishing(prev => ({ ...prev, dialog: { open: false } }))
+    //           }
+    //         ]
+    //       }
+    //     }));
+    //     return;
+    //   }
+
+    //   console.error('Ошибка начала рыбалки:', err);
+    //   // Можно также показать ошибку пользователю
+    //   setFishing(prev => ({
+    //     ...prev,
+    //     dialog: {
+    //       open: true,
+    //       title: 'Ошибка',
+    //       message: 'Не удалось начать рыбалку. Попробуйте еще раз.',
+    //       options: [
+    //         {
+    //           text: 'Ок',
+    //           action: () => setFishing(prev => ({ ...prev, dialog: { open: false } }))
+    //         }
+    //       ]
+    //     }
+    //   }));
     }
   };
 
