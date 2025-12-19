@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Layout from './components/common/Layout';
 import Pond from './components/Pond';
 import PondList from './pages/PondList'
+import Admin from './pages/Admin'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
         <Routes>
           <Route path="/" element={<PondList />} />
           <Route path="/pond/:pondId" element={<Pond />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </div>
     </Router>

@@ -17,6 +17,8 @@ export default function FishingDialog() {
   const [submitting, setSubmitting] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
   const fish = dialog?.fish || null;
+  // Если это информационное сообщение (нет рыбы)
+  const isInfoDialog = dialog.open && !fish && dialog.message;
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -115,7 +117,111 @@ export default function FishingDialog() {
     setShowAnswer(prev => !prev);
   };
 
-  if (!dialog.open || !fish) return null;
+  if (!dialog.open) return null;
+  
+  // Если это информационное сообщение
+  if (isInfoDialog) {
+    return ReactDOM.createPortal(
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 10000,
+        padding: '16px'
+      }} onClick={() => setDialog({ open: false, fish: null })}>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '24px',
+          borderRadius: '12px',
+          width: '90%',
+          maxWidth: '400px',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+          position: 'relative'
+        }}>
+          <h3 style={{
+            marginTop: 0,
+            marginBottom: '16px',
+            fontSize: '20px',
+            fontWeight: '600',
+            color: '#2d3436'
+          }}>
+            {dialog.title || 'Сообщение'}
+          </h3>
+          
+          <p style={{
+            marginBottom: '24px',
+            fontSize: '16px',
+            lineHeight: '1.5',
+            color: '#636e72'
+          }}>
+            {dialog.message}
+          </p>
+          
+          <div style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '8px'
+          }}>
+            {dialog.options?.map((option, index) => (
+              <button
+                key={index}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  option.action?.();
+                }}
+                style={{
+                  padding: '8px 16px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  backgroundColor: '#3498db',
+                  color: 'white',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#2980b9'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#3498db'}
+              >
+                {option.text || 'Ок'}
+              </button>
+            )) || (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDialog({ open: false, fish: null });
+                }}
+                style={{
+                  padding: '8px 16px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  backgroundColor: '#3498db',
+                  color: 'white',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#2980b9'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#3498db'}
+              >
+                Ок
+              </button>
+            )}
+          </div>
+        </div>
+      </div>,
+      document.body
+    );
+  }
+
+  if (!fish) return null;
 
   return ReactDOM.createPortal(
     <div style={{
