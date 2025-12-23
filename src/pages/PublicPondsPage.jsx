@@ -115,7 +115,7 @@ export default function PublicPondsPage() {
           {
             id: 1,
             name: 'Программирование на Python',
-            description: 'Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.',
+            description: 'Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.',
             topic: 'programming',
             author: { username: 'Иван Иванов' },
             cnt_fishes: 150,
@@ -381,7 +381,7 @@ export default function PublicPondsPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-green-grass p-4 md:p-8 flex flex-col" style={{color: '#00a028ff'}}>
+      <div className="min-h-screen bg-green-grass p-4 md:p-8 flex flex-col" style={{color: '#DAFFD5'}}>
         <div className="mx-auto w-full max-w-7xl flex-grow">
           {/* Шапка */}
           <header className="flex justify-between items-center mb-6 md:mb-8">
@@ -390,8 +390,8 @@ export default function PublicPondsPage() {
                 maxWidth: 'calc(100vw - 180px)',
                 minWidth: 150
               }}>
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-black">Публичные пруды</h1>
-              <p className="text-gray-700 text-sm md:text-base mt-1">
+              <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-black">Публичные пруды</h1>
+              <p className="text-gray-700 text md:text-base mt-1">
                 Найдите интересные пруды и скопируйте их к себе
               </p>
             </div>
@@ -555,7 +555,7 @@ export default function PublicPondsPage() {
           </div> */}
 
           {/* Список прудов */}
-          <div className="space-y-6 md:space-y-8">
+          <div className="space-y-0">
             {filteredPonds.length === 0 ? (
               <div className="bg-white bg-opacity-90 rounded-2xl p-8 text-center shadow-lg">
                 <div className="text-gray-400 text-6xl mb-4">🐟</div>
@@ -565,30 +565,33 @@ export default function PublicPondsPage() {
                 </p>
               </div>
             ) : (
-              filteredPonds.map((pond) => (
-                <div 
-                  key={pond.id}
-                  className="bg-white bg-opacity-90 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl"
-                >
-                  <div className="flex flex-col lg:flex-row">
-                    {/* Левая часть - ТОЛЬКО картинка пруда */}
-                    <div className="lg:w-1/3 p-4 md:p-6">
-                      <div className="relative h-full">
-                        <img 
-                          src={getPondImage(pond.id)} 
-                          alt={pond.name}
-                          className="w-full h-full min-h-[250px] object-cover rounded-xl"
-                        />
-                        <div 
+              filteredPonds.map((pond, index) => {
+                const isEven = index % 2 === 1; // Четные (0, 2, 4...) - false, нечетные (1, 3, 5...) - true
+                
+                return (
+                  <div 
+                    key={pond.id}
+                    className="bg-white bg-opacity-90 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl"
+                  >
+                    <div className={`flex flex-col items-center lg:flex-row ${isEven ? 'lg:flex-row-reverse' : ''} bg-another-green mb-10 rounded-2xl`}>
+                      {/* Часть с картинкой пруда */}
+                      <div className="lg:w-1/3 rounded-2xl">
+                        <div className="relative h-full">
+                          <img 
+                            src={getPondImage(pond.id)} 
+                            alt={pond.name}
+                            className="w-full h-full min-h-[250px] object-cover rounded-xl"
+                          />
+                          <div 
                             className="absolute inset-0 flex flex-col items-center justify-center"
                             style={{
-                            margin: '23%',
-                            pointerEvents: 'none'
+                              margin: '23%',
+                              pointerEvents: 'none'
                             }}
-                        >
+                          >
                             <h3 
-                            className="text-black text-2xl font-bold text-center w-full mb-2"
-                            style={{
+                              className="text-black text-2xl font-bold text-center w-full mb-2"
+                              style={{
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 display: '-webkit-box',
@@ -597,71 +600,69 @@ export default function PublicPondsPage() {
                                 lineHeight: '1.2',
                                 maxHeight: '2.4em',
                                 wordBreak: 'break-word'
-                            }}
-                            title={pond.name}
+                              }}
+                              title={pond.name}
                             >
-                            {pond.name}
+                              {pond.name}
                             </h3>
                             <div className="text-black text-base font-medium text-center w-full px-2 leading-tight">
-                            {pond.cnt_ready_fishes !== undefined && pond.cnt_fishes !== undefined ? (
+                              {pond.cnt_ready_fishes !== undefined && pond.cnt_fishes !== undefined ? (
                                 <div className="flex flex-col items-center">
-                                <span className="whitespace-nowrap">
+                                  <span className="whitespace-nowrap">
                                     {pond.cnt_fishes} {getFishWord(pond.cnt_fishes)}
-                                </span>
+                                  </span>
                                 </div>
-                            ) : (
+                              ) : (
                                 <span className="text-gray-500 text-sm">Информация о рыбах недоступна</span>
-                            )}
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Правая часть - Вся информация и кнопки */}
-                    <div className="lg:w-2/3 p-4 md:p-6 flex flex-col">
-                      <div className="mb-4">
-                        <h4 className="text-xl md:text-2xl font-bold text-gray-800 mb-3">Описание пруда</h4>
-                        <p className="text-black leading-relaxed text-base md:text-lg">
-                          {pond.description || 'Автор не добавил описание к этому пруду.'}
-                        </p>
-                      </div>
-                      
-                      <div className="mt-auto">
-                        {/* Информация о пруде */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                          <div className="bg-blue-50 rounded-xl p-4">
-                            <div className="space-y-3">
-                              <div className="flex items-center justify-between">
-                                <span className="text-gray-600">Автор:</span>
-                                <span className="font-semibold text-gray-800">{pond.author?.username || 'Неизвестный автор'}</span>
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <span className="text-gray-600">Категория:</span>
-                                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                                  {pond.topic || 'Без категории'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* <div className="bg-green-50 rounded-xl p-4">
-                            <div className="space-y-3">
-                              <div className="flex items-center justify-between">
-                                <span className="text-gray-600">Обновлен:</span>
-                                <span className="font-medium text-gray-700">{formatDate(pond.updated_at)}</span>
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <span className="text-gray-600">Просмотров:</span>
-                                <span className="font-medium text-gray-700">{pond.views_count?.toLocaleString() || 0}</span>
-                              </div>
-                              {pond.is_updatable && (
-                                <div className="flex items-center justify-between">
-                                  <span className="text-gray-600">Обновления:</span>
-                                  <span className="text-green-600 font-medium">✓ Доступны</span>
-                                </div>
                               )}
                             </div>
-                          </div> */}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Часть с информацией и кнопками */}
+                      <div className="lg:w-2/3 flex flex-col pl-8 pr-8 pu-8 pd-8">
+                        <div className="mb-4">
+                          <h4 className="text-2xl md:text-4xl font-bold text-black mb-3">{pond.name}</h4>
+                          <p className="text-black leading-relaxed text-lg md:text-xl text-justify">
+                            {pond.description 
+                              ? (pond.description.length > 400 
+                                  ? `${pond.description.substring(0, 400)}...` 
+                                  : pond.description)
+                              : 'Автор не добавил описание к этому пруду.'
+                            }
+                          </p>
+                        </div>
+                        
+                        {/* Информация о пруде */}
+                        <div className="mb-6">
+                          <div className="flex-wrap items-center gap-6 md:gap-10 rounded-xl">
+                            <div className="flex items-center">
+                              <span className="text-gray-800 font-medium mr-2">Автор:</span>
+                              <span className="font-semibold text-gray-800">
+                                {pond.author?.username || 'Неизвестный автор'}
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center">
+                              <span className="text-gray-800 font-medium mr-2">Категория:</span>
+                              <span className="text-gray-800 font-semibold">
+                                {pond.topic || 'Без категории'}
+                              </span>
+                            </div>
+                            
+                            {/* <div className="flex items-center">
+                              <span className="text-gray-600 font-medium mr-2">Обновлен:</span>
+                              <span className="font-medium text-gray-700">{formatDate(pond.updated_at)}</span>
+                            </div>
+                            
+                            {pond.is_updatable && (
+                              <div className="flex items-center">
+                                <span className="text-gray-600 font-medium mr-2">Обновления:</span>
+                                <span className="text-green-600 font-medium">✓ Доступны</span>
+                              </div>
+                            )} */}
+                          </div>
                         </div>
                         
                         {/* Кнопки действий */}
@@ -669,7 +670,7 @@ export default function PublicPondsPage() {
                           <button
                             onClick={() => handleCopyPond(pond.id, false)}
                             disabled={loading}
-                            className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-4 md:py-4 md:px-6 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                            className="bg-sea-blue rounded-xl flex-1 text-white font-semibold py-3 px-4 md:py-4 md:px-6 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -680,33 +681,23 @@ export default function PublicPondsPage() {
                           <button
                             onClick={() => handleCopyPond(pond.id, true)}
                             disabled={loading}
-                            className={`flex-1 font-semibold py-3 px-4 md:py-4 md:px-6 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl flex items-center justify-center gap-2 ${
-                              'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white'
-                            } disabled:opacity-70 disabled:cursor-not-allowed`}
+                            className={`bg-sea-blue rounded-xl flex-1 font-semibold py-3 px-4 md:py-4 md:px-6 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed`}
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                             </svg>
-                            Скопировать с обновлением
+                            Скопировать и отслеживать обновления
                           </button>
                         </div>
-                        
-                        {/* <div className="mt-4 flex items-center justify-center text-sm text-gray-500">
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          После копирования пруд появится в вашей коллекции
-                        </div> */}
                       </div>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
-          
-          {/* Пагинация (если нужно) */}
-          {filteredPonds.length > 0 && (
+
+          {/* {filteredPonds.length > 0 && (
             <div className="mt-8 flex justify-center">
               <div className="flex items-center space-x-2">
                 <button className="w-10 h-10 flex items-center justify-center bg-white bg-opacity-80 rounded-lg shadow hover:bg-opacity-100 transition-colors">
@@ -722,7 +713,7 @@ export default function PublicPondsPage() {
                 </button>
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Футер с кнопкой обратной связи */}

@@ -10,6 +10,8 @@ module.exports = {
         'pond-blue': '#00B5E6',
         'pond-yellow': '#EFD409',
         'white-green': '#DAFFD5',
+        'another-green': '#369929ff',
+        'sea-blue': '#1d66cdff'
       },
     },
   },
