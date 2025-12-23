@@ -7,7 +7,8 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     name: '',
     description: '',
     topic: 'programming',
-    intervals: ['0:1:0', '1:0:0', '7:0:0', '30:0:0']
+    intervals: ['0:1:0', '1:0:0', '7:0:0', '30:0:0'],
+    is_public: false  // Добавлено: по умолчанию пруд непубличный
   });
   const [loading, setLoading] = useState(false);
   const [showNewCategory, setShowNewCategory] = useState(false);
@@ -120,7 +121,8 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
         name: pond.name || '',
         description: pond.description || '',
         topic: pond.topic || 'programming',
-        intervals: intervals
+        intervals: intervals,
+        is_public: pond.public
       });
       setShowNewCategory(false);
       setNewCategory('');
@@ -204,6 +206,14 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     });
     setShowIntervals(false);
     onClose();
+  };
+
+  // Добавлено: обработчик изменения публичности
+  const handlePublicChange = (e) => {
+    setFormData(prev => ({
+      ...prev,
+      is_public: e.target.checked
+    }));
   };
 
   // Функция для форматирования интервала в читаемый вид
@@ -579,6 +589,99 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                   })}
                 </div>
               )}
+            </div>
+
+            {/* Публичность пруда - НОВЫЙ РАЗДЕЛ */}
+            <div style={{ 
+              marginBottom: '20px', 
+              flexShrink: 0,
+              borderTop: '0px solid #eee',
+              paddingTop: '10px'
+            }}>
+              
+              <label 
+                htmlFor="is_public"
+                style={{
+                  display: 'block',
+                  cursor: 'pointer',
+                  userSelect: 'none'
+                }}
+              >
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '0px',
+                  backgroundColor: '#ffffffff',
+                  borderRadius: '8px',
+                  border: '1px solid #ffffffff'
+                }}>
+                  <div style={{ position: 'relative', flexShrink: 0 }}>
+                    <input
+                      type="checkbox"
+                      id="is_public"
+                      name="is_public"
+                      checked={formData.is_public}
+                      onChange={handlePublicChange}
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        cursor: 'pointer',
+                        opacity: 0,
+                        position: 'absolute',
+                        zIndex: 1
+                      }}
+                    />
+                    <div style={{
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '4px',
+                      border: '2px solid',
+                      borderColor: formData.is_public ? '#27ae60' : '#95a5a6',
+                      backgroundColor: formData.is_public ? '#27ae60' : 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease'
+                    }}>
+                      {formData.is_public && (
+                        <svg 
+                          width="14" 
+                          height="14" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="white" 
+                          strokeWidth="3"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div style={{
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      color: '#2c3e50',
+                      display: 'block',
+                      marginBottom: '4px'
+                    }}>
+                      {'Публичный пруд'}
+                    </div>
+                    <p style={{
+                      fontSize: '14px',
+                      color: '#7f8c8d',
+                      margin: 0,
+                      lineHeight: '1.4'
+                    }}>
+                      {formData.is_public 
+                        ? 'Теперь пользователи смогут скопировать ваш пруд себе и изучать информацию, добавленную вами' 
+                        : 'Сейчас пруд будет виден только вам. Вы можете поделиться доступом с другими пользователями позже.'}
+                    </p>
+                  </div>
+                </div>
+              </label>
             </div>
 
             {/* Кнопки */}

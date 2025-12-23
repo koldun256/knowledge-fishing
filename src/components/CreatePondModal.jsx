@@ -7,7 +7,8 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
     name: '',
     description: '',
     topic: 'programming',
-    intervals: ['0:1:0', '1:0:0', '7:0:0', '30:0:0']
+    intervals: ['0:1:0', '1:0:0', '7:0:0', '30:0:0'],
+    is_public: false  // Добавлено: по умолчанию пруд непубличный
   });
   const [loading, setLoading] = useState(false);
   const [showNewCategory, setShowNewCategory] = useState(false);
@@ -19,7 +20,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
     'history',
     'languages'
   ]);
-  const [showIntervals, setShowIntervals] = useState(false); // Новое состояние для отображения интервалов
+  const [showIntervals, setShowIntervals] = useState(false);
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -44,11 +45,12 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
         name: '',
         description: '',
         topic: 'programming',
-        intervals: ['0:1:0', '1:0:0', '7:0:0', '30:0:0']
+        intervals: ['0:1:0', '1:0:0', '7:0:0', '30:0:0'],
+        is_public: false  // Сброс к непубличному при открытии
       });
       setShowNewCategory(false);
       setNewCategory('');
-      setShowIntervals(false); // Скрываем интервалы при открытии
+      setShowIntervals(false);
     }
   }, [isOpen]);
 
@@ -133,7 +135,8 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
       
       const pondData = {
         ...formData,
-        intervals: intervalObjects
+        intervals: intervalObjects,
+        is_public: formData.is_public  // Передаем значение публичности
       };
       
       await onCreate(pondData);
@@ -152,12 +155,21 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
     }));
   };
 
+  // Добавлено: обработчик изменения публичности
+  const handlePublicChange = (e) => {
+    setFormData(prev => ({
+      ...prev,
+      is_public: e.target.checked
+    }));
+  };
+
   const handleClose = () => {
     setFormData({
       name: '',
       description: '',
       topic: 'programming',
-      intervals: ['0:1:0', '1:0:0', '7:0:0', '30:0:0']
+      intervals: ['0:1:0', '1:0:0', '7:0:0', '30:0:0'],
+      is_public: false  // Сброс к непубличному при закрытии
     });
     setShowIntervals(false);
     onClose();
@@ -193,14 +205,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
     return 'минут';
   };
 
-  // Получение списка интервалов в читаемом формате
-  const getIntervalsList = () => {
-    return formData.intervals.map((interval, index) => {
-      const readable = formatIntervalToReadable(interval);
-      return `${index + 1}-е повторение: ${readable}`;
-    }).join(', ');
-  };
-
   // Стили для маски ввода
   const maskedInputStyle = {
     display: 'flex',
@@ -218,11 +222,11 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
     outline: 'none',
     background: 'transparent',
     width: 'auto',
-    minWidth: '20px', // Минимальная ширина
-    maxWidth: '30px', // Максимальная ширина
+    minWidth: '20px',
+    maxWidth: '30px',
     textAlign: 'center',
     fontSize: '14px',
-    padding: '2px 2px', // Уменьшил padding по бокам
+    padding: '2px 2px',
     borderRadius: '3px',
     transition: 'background-color 0.2s ease',
     WebkitAppearance: 'none',
@@ -254,12 +258,10 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
       margin: 0;
     }
     
-    /* Убираем стрелки в Firefox */
     input[type="number"] {
       -moz-appearance: textfield;
     }
     
-    /* Убираем стрелки в Edge */
     input[type="number"]::-webkit-outer-spin-button,
     input[type="number"]::-webkit-inner-spin-button {
       -webkit-appearance: none;
@@ -280,7 +282,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
       zIndex: 10000,
       padding: '16px'
     }} onClick={handleBackdropClick}>
-      {/* Добавляем глобальные стили для удаления стрелок */}
       <style>{webkitSpinButtonStyles}</style>
       
       <div style={{
@@ -296,7 +297,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
         flexDirection: 'column',
         position: 'relative'
       }}>
-        {/* Крестик закрытия в правом верхнем углу */}
         <button
           onClick={handleClose}
           style={{
@@ -329,7 +329,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
           ×
         </button>
         
-        {/* Заголовок - фиксированный */}
         <h2 style={{ 
           margin: '0 0 20px 0', 
           fontSize: '28px', 
@@ -342,7 +341,6 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
           Создать новый пруд
         </h2>
         
-        {/* Основной контент - прокручиваемый с правильным отступом */}
         <div style={{
           flex: 1,
           overflow: 'auto',
@@ -391,7 +389,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: '4px' // Уменьшил еще больше
+                marginBottom: '4px'
               }}>
                 <label style={{
                   display: 'block',
@@ -402,14 +400,13 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                   letterSpacing: '0.5px',
                   cursor: 'pointer',
                   userSelect: 'none',
-                  marginBottom: '0', // Явно убираем margin снизу
-                  lineHeight: '1.2' // Уменьшаем высоту строки
+                  marginBottom: '0',
+                  lineHeight: '1.2'
                 }}
                 onClick={() => setShowIntervals(!showIntervals)}>
                   ИНТЕРВАЛЫ ПОВТОРЕНИЯ
                 </label>
                 
-                {/* Треугольничек для раскрытия/скрытия */}
                 <button
                   type="button"
                   onClick={() => setShowIntervals(!showIntervals)}
@@ -417,7 +414,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
-                    padding: '2px', // Минимальный padding
+                    padding: '2px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -481,7 +478,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                       <div key={index} style={{ marginBottom: '12px' }}>
                         <label style={{
                           display: 'block',
-                          marginBottom: '4px', // Уменьшил отступ
+                          marginBottom: '4px',
                           fontWeight: '500',
                           fontSize: '14px',
                           color: '#2c3e50',
@@ -491,7 +488,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                         
                         <div style={{
                           ...maskedInputStyle,
-                          padding: '8px 10px' // Уменьшил padding
+                          padding: '8px 10px'
                         }}>
                           {/* Дни */}
                           <input
@@ -501,7 +498,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                             min="0"
                             style={{
                               ...numberInputStyle,
-                              fontSize: '14px' // Уменьшил шрифт
+                              fontSize: '14px'
                             }}
                             onMouseEnter={(e) => Object.assign(e.target.style, numberInputHoverStyle)}
                             onMouseLeave={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent' })}
@@ -557,7 +554,100 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
               )}
             </div>
 
-            {/* Описание пруда
+            {/* Публичность пруда - НОВЫЙ РАЗДЕЛ */}
+            <div style={{ 
+              marginBottom: '20px', 
+              flexShrink: 0,
+              borderTop: '0px solid #eee',
+              paddingTop: '10px'
+            }}>
+              
+              <label 
+                htmlFor="is_public"
+                style={{
+                  display: 'block',
+                  cursor: 'pointer',
+                  userSelect: 'none'
+                }}
+              >
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '0px',
+                  backgroundColor: '#ffffffff',
+                  borderRadius: '8px',
+                  border: '1px solid #ffffffff'
+                }}>
+                  <div style={{ position: 'relative', flexShrink: 0 }}>
+                    <input
+                      type="checkbox"
+                      id="is_public"
+                      name="is_public"
+                      checked={formData.is_public}
+                      onChange={handlePublicChange}
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        cursor: 'pointer',
+                        opacity: 0,
+                        position: 'absolute',
+                        zIndex: 1
+                      }}
+                    />
+                    <div style={{
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '4px',
+                      border: '2px solid',
+                      borderColor: formData.is_public ? '#27ae60' : '#95a5a6',
+                      backgroundColor: formData.is_public ? '#27ae60' : 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease'
+                    }}>
+                      {formData.is_public && (
+                        <svg 
+                          width="14" 
+                          height="14" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="white" 
+                          strokeWidth="3"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div style={{
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      color: '#2c3e50',
+                      display: 'block',
+                      marginBottom: '4px'
+                    }}>
+                      {'Публичный пруд'}
+                    </div>
+                    <p style={{
+                      fontSize: '14px',
+                      color: '#7f8c8d',
+                      margin: 0,
+                      lineHeight: '1.4'
+                    }}>
+                      {formData.is_public 
+                        ? 'Теперь пользователи смогут скопировать ваш пруд себе и изучать информацию, добавленную вами' 
+                        : 'Сейчас пруд будет виден только вам. Вы можете поделиться доступом с другими пользователями позже.'}
+                    </p>
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            {/* Описание пруда (закомментировано)
             <div style={{ marginBottom: '20px', flexShrink: 0 }}>
               <label style={{
                 display: 'block',
@@ -590,7 +680,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
               />
             </div> */}
 
-            {/* Категория
+            {/* Категория (закомментировано)
             <div style={{ marginBottom: '20px', flexShrink: 0 }}>
               <label style={{
                 display: 'block',

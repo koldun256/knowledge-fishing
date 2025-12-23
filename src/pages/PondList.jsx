@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { pondService } from '../services/pondService';
 import { authService } from '../services/authService';
-import CreatePondModal from '../components/CreatePondModal';
+import PondTypeSelectionModal from '../components/PondTypeSelectionModal'
 import EditPondModal from '../components/EditPondModal';
 import AuthModal from '../components/AuthModal';
 import InfoModal from '../components/InfoModal';
@@ -15,7 +15,7 @@ export default function PondsList() {
   const [loading, setLoading] = useState(true);
   const [userInitialized, setUserInitialized] = useState(false);
   const [error, setError] = useState(null);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isTypeSelectionModalOpen, setIsTypeSelectionModalOpen] = useState(false);
   const [editingPond, setEditingPond] = useState(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
@@ -217,6 +217,16 @@ export default function PondsList() {
     } catch (error) {
       console.error('Error in handleCreatePond:', error);
       throw error;
+    }
+  };
+
+  const handleAddPondByLink = async (pondData) => {
+    try {
+      // Обработка добавления пруда по ссылке
+      console.log('Пруд добавлен по ссылке:', pondData);
+      // Обновление списка прудов
+    } catch (error) {
+      console.error('Ошибка добавления пруда:', error);
     }
   };
 
@@ -608,7 +618,7 @@ export default function PondsList() {
             ))}
             
             <button 
-              onClick={() => setIsCreateModalOpen(true)}
+              onClick={() => setIsTypeSelectionModalOpen(true)}
               className="block relative focus:outline-none group"
             >
               <img 
@@ -635,10 +645,11 @@ export default function PondsList() {
         </div>
       </div>
 
-      <CreatePondModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
+      <PondTypeSelectionModal
+        isOpen={isTypeSelectionModalOpen}
+        onClose={() => setIsTypeSelectionModalOpen(false)}
         onCreate={handleCreatePond}
+        onAddByLink={handleAddPondByLink}
       />
 
       <EditPondModal
