@@ -13,6 +13,10 @@ module.exports = {
         'another-green': '#369929ff',
         'sea-blue': '#1d66cdff'
       },
+      screens: {
+        'xs': '500px',
+        'mdlg': '900px'
+      }
     },
   },
   plugins: [],
