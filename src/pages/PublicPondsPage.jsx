@@ -1,6 +1,7 @@
 // src/pages/PublicPondsPage.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authService } from '../services/authService';
 import { pondService } from '../services/pondService';
 import AuthModal from '../components/AuthModal';
 import InfoModal from '../components/InfoModal';
@@ -23,7 +24,7 @@ export default function PublicPondsPage() {
   const [showLogoutDropdown, setShowLogoutDropdown] = useState(false);
   
   const [infoButtonPosition, setInfoButtonPosition] = useState(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 710);
   
   const dropdownRef = useRef(null);
 
@@ -56,7 +57,7 @@ export default function PublicPondsPage() {
   // Обработчик изменения размера окна
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 600);
+      setIsMobile(window.innerWidth < 710);
     };
 
     handleResize();
@@ -262,21 +263,31 @@ export default function PublicPondsPage() {
 
   const handleLogin = async (loginData) => {
     try {
-      const result = await pondService.login(loginData);
+      console.log('Login attempt with data:', loginData);
+      const result = await authService.login(loginData);
+      console.log('Login successful:', result);
+      
       if (result) {
+        // Убедимся, что сохраняем правильную структуру
         const userData = {
           id: result.id || result.userId,
           login: result.login || result.username,
           username: result.username || result.login,
           email: result.email,
-          token: result.token,
+          token: result.token, // если есть токен
+          // другие поля по необходимости
         };
         
         setUser(userData);
         localStorage.setItem('currentUser', JSON.stringify(userData));
+        
+        // // Проверяем, нужно ли показать приветственное окно для нового пользователя
+        // const hasSeenWelcomeModal = localStorage.getItem('hasSeenWelcomeModal');
+        // if (!hasSeenWelcomeModal) {
+        //   setIsFirstVisit(true);
+        // }
       }
       
-      setIsAuthModalOpen(false);
       return result;
       
     } catch (error) {
@@ -287,8 +298,11 @@ export default function PublicPondsPage() {
 
   const handleRegister = async (registerData) => {
     try {
-      const result = await pondService.register(registerData);
+      console.log('Registration attempt with data:', registerData);
+      const result = await authService.register(registerData);
+      console.log('Registration successful:', result);
       
+      // После регистрации обычно происходит автоматический вход
       if (result) {
         const userData = {
           id: result.id || result.userId,
@@ -300,23 +314,32 @@ export default function PublicPondsPage() {
         
         setUser(userData);
         localStorage.setItem('currentUser', JSON.stringify(userData));
+        
+        // // Для новых зарегистрированных пользователей показываем приветственное окно
+        // setIsFirstVisit(true);
+        // localStorage.removeItem('hasSeenWelcomeModal'); // Сбрасываем флаг для нового пользователя
       }
       
-      setIsAuthModalOpen(false);
-      return { success: true, message: 'Регистрация выполнена успешно!' };
+      return { 
+        success: true, 
+        message: 'Регистрация выполнена успешно! Вы можете войти в систему.' 
+      };
       
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
     }
   };
-
+  
   const handleLogout = async () => {
     try {
-      await pondService.logout();
+      await authService.logout();
       setUser(null);
-      localStorage.removeItem('currentUser');
+      localStorage.removeItem('currentUser'); // Удаляем из localStorage
       setShowLogoutDropdown(false);
+
+      document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      
       console.log('Logout successful');
     } catch (error) {
       console.error('Logout error:', error);
@@ -433,16 +456,16 @@ export default function PublicPondsPage() {
               {user ? (
                 <div className="relative" ref={dropdownRef}>
                   {isMobile ? (
-                    <button
-                      className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"
-                      onClick={handleUserClick}
-                      title={`${user.login || user.username || user.email || 'Пользователь'}`}
-                    >
-                      <img 
-                        src={`${process.env.PUBLIC_URL}/assets/signed-in-small.png`} 
-                        alt="Нажмите для выхода"
-                        className="w-12 h-12 md:w-14 md:h-14"
-                      />
+                    <button		
+                      className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"		
+                      onClick={handleUserClick}		
+                      title={`${user.login || user.username || user.email || 'Пользователь'}`}		
+                    >		
+                      <img 		
+                        src={`${process.env.PUBLIC_URL}/assets/signed-in-small.png`} 		
+                        alt="Нажмите для выхода"		
+                        className="w-12 h-12 md:w-14 md:h-14"		
+                      />		
                     </button>
                   ) : (
                     <button
@@ -483,14 +506,18 @@ export default function PublicPondsPage() {
                 </div>
               ) : (
                 <button 
-                  className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full transition-all duration-200 hover:scale-110 shadow-md"
+                  className="flex items-center justify-center w-35 h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full transition-all duration-200 hover:scale-110 shadow-md"
                   onClick={() => setIsAuthModalOpen(true)}
                   title="Вход/Регистрация"
                 >
                   <img 
-                    src={`${process.env.PUBLIC_URL}/assets/sign-in-small.png`} 
+                    src={
+                      isMobile 
+                        ? `${process.env.PUBLIC_URL}/assets/sign-in-small.png` 
+                        : `${process.env.PUBLIC_URL}/assets/sign-in.png`
+                    } 
                     alt="Вход/Регистрация"
-                    className="w-12 h-12 md:w-14 md:h-14"
+                    className={isMobile ? "w-12 h-12" : "w-35 h-14"}
                   />
                 </button>
               )}

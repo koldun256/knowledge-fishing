@@ -28,7 +28,7 @@ export default function PondsList() {
   const dropdownRef = useRef(null);
   
   // Добавлено: состояние для отслеживания ширины экрана
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 710);
 
   const infoData = [
     {
@@ -60,7 +60,7 @@ export default function PondsList() {
   // Добавлено: обработчик изменения размера окна
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 600);
+      setIsMobile(window.innerWidth < 710);
     };
 
     // Устанавливаем начальное значение
