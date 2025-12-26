@@ -70,4 +70,22 @@ export const pondService = {
     if (!response.ok) throw new Error('Failed to delete pond');
     return response.json();
   },
+
+  getPublicPonds: async (page = 1, cnt = 10, theme = "", query = "") => {
+    const params = new URLSearchParams();
+    params.append('page', page);
+    params.append('per_page', cnt);
+    if (theme !== "") {
+      params.append('theme', theme);
+    }
+    if (query !== "") {
+      params.append('query', query);
+    }
+
+    const response = await fetch(`${API_CONFIG.BASE_URL}/public_ponds?${params.toString()}`, {
+      credentials: API_CONFIG.withCredentials ? 'include' : 'omit'
+    });
+    if (!response.ok) throw new Error('Failed to fetch public ponds');
+    return response.json();
+  }
 };
