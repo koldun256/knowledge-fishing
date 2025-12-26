@@ -242,7 +242,7 @@ export default function PublicPondsPage() {
     });
   };
 
-  const handleCopyPond = async (pondId, withUpdates = false) => {
+  const handleCopyPond = async (pondId, withUpdates = true) => {
     if (!user) {
       setIsAuthModalOpen(true);
       return;
@@ -250,7 +250,7 @@ export default function PublicPondsPage() {
 
     try {
       setLoading(true);
-      await pondService.copyPond(pondId, withUpdates);
+      await pondService.copyPondById(pondId, withUpdates);
       alert(`Пруд успешно скопирован ${withUpdates ? 'с обновлениями' : ''}!`);
       navigate('/'); // Возвращаемся на главную
     } catch (error) {
@@ -658,7 +658,7 @@ export default function PublicPondsPage() {
                         {/* Кнопки действий */}
                         <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                           <button
-                            onClick={() => handleCopyPond(pond.id, false)}
+                            onClick={() => handleCopyPond(pond.id, true)}
                             disabled={loading}
                             className="bg-sea-blue min-h-12 sm:min-h-14 leading-tight rounded-xl flex-1 text-white font-semibold py-1 px-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                           >
@@ -669,7 +669,7 @@ export default function PublicPondsPage() {
                           </button>
                           
                           <button
-                            onClick={() => handleCopyPond(pond.id, true)}
+                            onClick={() => handleCopyPond(pond.id, false)}
                             disabled={loading}
                             className={`bg-sea-blue min-h-12 sm:min-h-14 leading-tight rounded-xl flex-1 text-white font-semibold py-1 px-2 pl-3 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed`}
                           >
