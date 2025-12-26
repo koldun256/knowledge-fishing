@@ -252,7 +252,7 @@ export default function PublicPondsPage() {
       setLoading(true);
       await pondService.copyPondById(pondId, withUpdates);
       alert(`Пруд успешно скопирован ${withUpdates ? 'с обновлениями' : ''}!`);
-      navigate('/'); // Возвращаемся на главную
+      // navigate('/'); // Возвращаемся на главную
     } catch (error) {
       console.error('Error copying pond:', error);
       alert('Не удалось скопировать пруд');
