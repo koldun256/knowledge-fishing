@@ -40,7 +40,7 @@ export default function PondTypeSelectionModal({ isOpen, onClose, onCreate, onAd
     if (type === 'public') {
       // Закрываем модалку и переходим на страницу публичных прудов
       handleClose();
-      navigate('/public_ponds');
+      navigate('/public-ponds');
     } else {
       setModalType(type);
       setCurrentStep(type);

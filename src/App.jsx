@@ -30,7 +30,7 @@ function App() {
           <Route path="/" element={<PondList />} />
           <Route path="/pond/:pondId" element={<Pond />} />
           <Route path="/admin" element={<Admin />} />
-          <Route path="/public_ponds" element={<PublicPondsPage />} />
+          <Route path="/public-ponds" element={<PublicPondsPage />} />
         </Routes>
       </div>
     </Router>
