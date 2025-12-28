@@ -628,10 +628,19 @@ export default function PublicPondsPage() {
                         <div className="mb-3 xs:mb-6 md:mb-3 lg:mb-6">
                           <div className="flex-wrap items-center gap-0 lg:gap-8 rounded-xl">
                             <div className="flex items-center">
-                              <span className="text-gray-800 font-medium mr-2">Автор:</span>
-                              <span className="font-semibold text-gray-800">
-                                {pond.user_login || pond.author?.username || 'Неизвестный автор'}
-                              </span>
+                              <span className="text-gray-800 font-medium mr-2 shrink-0">Автор:</span>
+                              <div className="relative group">
+                                <span 
+                                  className="font-semibold text-gray-800 truncate block max-w-[150px] xs:max-w-[250px] sm:max-w-[300px] md:max-w-[400px]"
+                                >
+                                  {pond.user_login || pond.author?.username || 'Неизвестный Рыбак'}
+                                </span>
+                                {/* CSS тултип - заменит стандартный title */}
+                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 pointer-events-none">
+                                  {pond.user_login || pond.author?.username || 'Неизвестный автор'}
+                                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
+                                </div>
+                              </div>
                             </div>
                             
                             <div className="flex items-center">
