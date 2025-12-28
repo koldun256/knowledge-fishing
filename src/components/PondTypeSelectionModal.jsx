@@ -58,8 +58,8 @@ export default function PondTypeSelectionModal({ isOpen, onClose, onCreate, onAd
     handleClose();
   };
 
-  const handleLinkPondAdded = (pondData) => {
-    onAddByLink(pondData);
+  const handleLinkPondAdded = (pondId, trackUpdates) => {
+    onAddByLink(pondId, trackUpdates);
     handleClose();
   };
 
@@ -92,7 +92,7 @@ export default function PondTypeSelectionModal({ isOpen, onClose, onCreate, onAd
       props: { 
         isOpen: true,
         onClose: handleBackToSelection,
-        onAdd: handleLinkPondAdded
+        onAddByLink: handleLinkPondAdded
       },
       showBackButton: true
     }

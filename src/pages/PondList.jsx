@@ -8,6 +8,7 @@ import EditPondModal from '../components/EditPondModal';
 import AuthModal from '../components/AuthModal';
 import InfoModal from '../components/InfoModal';
 import FeedbackModal from '../components/FeedbackModal';
+import SharePondModal from '../components/SharePondModal'; // Добавлен импорт
 import '../index.css';
 
 export default function PondsList() {
@@ -20,6 +21,8 @@ export default function PondsList() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [isSharePondModalOpen, setIsSharePondModalOpen] = useState(false); // Добавлено состояние
+  const [selectedPondForSharing, setSelectedPondForSharing] = useState(null); // Добавлено состояние
   const [user, setUser] = useState(null);
   const [showLogoutDropdown, setShowLogoutDropdown] = useState(false);
   const [isFirstVisit, setIsFirstVisit] = useState(true);
@@ -220,11 +223,15 @@ export default function PondsList() {
     }
   };
 
-  const handleAddPondByLink = async (pondData) => {
+  const handleAddPondByLink = async (pondId, withUpdates) => {
+    console.log(pondId, withUpdates);
     try {
-      // Обработка добавления пруда по ссылке
-      console.log('Пруд добавлен по ссылке:', pondData);
-      // Обновление списка прудов
+      const newPond = await pondService.copyPondById(pondId, withUpdates);
+      
+      setPonds(prev => [...prev, newPond]);
+      console.log('Pond created and added to list:', newPond);
+      
+      return newPond;
     } catch (error) {
       console.error('Ошибка добавления пруда:', error);
     }
@@ -261,6 +268,20 @@ export default function PondsList() {
       console.error('Error in handleDeletePond:', error);
       throw error;
     }
+  };
+
+  // Добавлено: обработчик открытия модального окна "Поделиться"
+  const handleShareClick = (e, pond) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedPondForSharing(pond);
+    setIsSharePondModalOpen(true);
+  };
+
+  // Добавлено: обработчик закрытия модального окна "Поделиться"
+  const handleShareClose = () => {
+    setIsSharePondModalOpen(false);
+    setSelectedPondForSharing(null);
   };
 
   const handleLogin = async (loginData) => {
@@ -603,17 +624,44 @@ export default function PondsList() {
                   </div>
                 </Link>
 
-                <button
-                  onClick={(e) => handleSettingsClick(e, pond)}
-                  className="absolute top-4 right-4 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 transition-all duration-200 hover:scale-110 shadow-md settings-button"
-                  style={{ pointerEvents: 'auto' }}
-                >
-                  <img 
-                    src={`${process.env.PUBLIC_URL}/assets/settings-border.png`} 
-                    alt="Настройки пруда"
-                    className="w-6 h-6"
-                  />
-                </button>
+                {/* Контейнер для кнопок в правом верхнем углу */}
+                <div className="absolute top-4 right-4 flex flex-col gap-2" style={{ pointerEvents: 'auto' }}>
+                  {/* Кнопка настроек */}
+                  <button
+                    onClick={(e) => handleSettingsClick(e, pond)}
+                    className="bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 transition-all duration-200 hover:scale-110 shadow-md settings-button"
+                    title="Настройки пруда"
+                  >
+                    <img 
+                      src={`${process.env.PUBLIC_URL}/assets/settings-border.png`} 
+                      alt="Настройки пруда"
+                      className="w-6 h-6"
+                    />
+                  </button>
+                  
+                  {/* Кнопка поделиться */}
+                  <button
+                    onClick={(e) => handleShareClick(e, pond)}
+                    className="bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 transition-all duration-200 hover:scale-110 shadow-md share-button"
+                    title="Поделиться прудом"
+                  >
+                    {/* SVG иконка "Поделиться" */}
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      className="w-6 h-6 text-black"
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" 
+                      />
+                    </svg>
+                  </button>
+                </div>
               </div>
             ))}
             
@@ -680,6 +728,13 @@ export default function PondsList() {
         isOpen={isFeedbackModalOpen}
         onClose={() => setIsFeedbackModalOpen(false)}
         onSubmit={handleFeedbackSubmit}
+      />
+
+      {/* Модальное окно "Поделиться" */}
+      <SharePondModal
+        isOpen={isSharePondModalOpen}
+        onClose={handleShareClose}
+        pond={selectedPondForSharing}
       />
     </>
   );

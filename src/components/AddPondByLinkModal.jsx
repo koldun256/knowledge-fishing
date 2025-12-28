@@ -2,10 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
-export default function AddPondByLinkModal({ isOpen, onClose, onAdd }) {
+import { shareUrlPrefix } from './SharePondModal';
+
+export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
   const [link, setLink] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [trackUpdates, setTrackUpdates] = useState(true);
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -28,19 +31,15 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAdd }) {
     if (isOpen) {
       setLink('');
       setError('');
+      setTrackUpdates(true);
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const validateLink = (url) => {
-    // Базовая валидация URL
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
+  const validateUuid = (uuid) => {
+    const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return regex.test(uuid);
   };
 
   const handleSubmit = async (e) => {
@@ -51,8 +50,15 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAdd }) {
       return;
     }
 
-    if (!validateLink(link)) {
-      setError('Введите корректную ссылку');
+    console.log(shareUrlPrefix);
+    if (!link.startsWith(shareUrlPrefix)) {
+      setError(`ссылка должна начинаться с ${shareUrlPrefix}`);
+      return;
+    }
+
+    const pond_identificator = link.slice(shareUrlPrefix.length, link.length);
+    if (!validateUuid(pond_identificator)) {
+      setError(`Строка не имеет вид "${shareUrlPrefix}/корректный_id_пруда"`);
       return;
     }
 
@@ -60,21 +66,11 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAdd }) {
     setError('');
 
     try {
-      // Здесь будет API-запрос для добавления пруда по ссылке
-      // const response = await api.addPondByLink(link);
-      // onAdd(response.data);
-      
-      // Для демонстрации имитируем успешное добавление
-      setTimeout(() => {
-        onAdd({
-          id: Date.now(),
-          name: 'Пруд по ссылке',
-          link: link
-        });
-      }, 1000);
-      
-    } catch (err) {
-      setError(err.message || 'Ошибка при добавлении пруда');
+      console.log(pond_identificator, trackUpdates);
+      await onAddByLink(pond_identificator, trackUpdates);
+      handleClose();
+    } catch (error) {
+      console.error('Error creating pond:', error);
     } finally {
       setLoading(false);
     }
@@ -89,6 +85,7 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAdd }) {
     setLink('');
     setError('');
     setLoading(false);
+    setTrackUpdates(true);
     onClose();
   };
 
@@ -190,7 +187,7 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAdd }) {
                 type="url"
                 value={link}
                 onChange={handleChange}
-                placeholder="https://example.com/pond/..."
+                placeholder={`${shareUrlPrefix}pond_identificator`}
                 style={{
                   width: '100%',
                   padding: '14px',
@@ -236,6 +233,54 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAdd }) {
                   <li>Используйте ссылку из социальных сетей или мессенджеров</li>
                 </ul>
               </div>
+            </div>
+
+            {/* Окошко с галочкой для отслеживания обновлений */}
+            <div style={{ 
+              marginBottom: '20px',
+              flexShrink: 0,
+              padding: '16px',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '8px',
+              border: '1px solid #e0e0e0'
+            }}>
+              <label style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                cursor: 'pointer',
+                margin: 0
+              }}>
+                <input
+                  type="checkbox"
+                  checked={trackUpdates}
+                  onChange={(e) => setTrackUpdates(e.target.checked)}
+                  style={{
+                    marginRight: '12px',
+                    marginTop: '2px',
+                    width: '18px',
+                    height: '18px',
+                    cursor: 'pointer',
+                    accentColor: '#3498db'
+                  }}
+                />
+                <div>
+                  <div style={{
+                    fontWeight: '600',
+                    fontSize: '15px',
+                    color: '#2c3e50',
+                    marginBottom: '4px'
+                  }}>
+                    Отслеживать обновления
+                  </div>
+                  <div style={{
+                    fontSize: '13px',
+                    color: '#7f8c8d',
+                    lineHeight: '1.4'
+                  }}>
+                    Если автор изменит пруд, ваш пруд также поменяется
+                  </div>
+                </div>
+              </label>
             </div>
 
             {/* Информация о том, что будет скопировано */}

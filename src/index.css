@@ -171,3 +171,30 @@ code {
   transform: scale(0.9);
   transition: opacity 300ms, transform 300ms;
 }
+
+/* Анимация для модального окна */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Стили для кнопок */
+.share-button:hover svg {
+  transform: rotate(20deg);
+  transition: transform 0.3s ease;
+}
+
+.settings-button:hover img {
+  transform: rotate(90deg);
+  transition: transform 0.3s ease;
+}
