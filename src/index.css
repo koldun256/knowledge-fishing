@@ -71,7 +71,7 @@ code {
 }
 
 /* Убираем все рамки и фоны */
-.bg-white {
+.bg-transparent-my {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
@@ -88,7 +88,7 @@ code {
 }
 
 /* Убираем hover эффекты для карточки */
-.bg-white:hover {
+.bg-transparent-my:hover {
   border-color: transparent !important;
   box-shadow: none !important;
 }

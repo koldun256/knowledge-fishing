@@ -420,7 +420,7 @@ export default function PublicPondsPage() {
             <div className="flex-shrink-0">
               <button
                 onClick={() => navigate('/')}
-                className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full transition-all duration-200 hover:scale-110 shadow-md"
+                className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-transparent-my bg-opacity-80 hover:bg-opacity-100 rounded-full transition-all duration-200 hover:scale-110 shadow-md"
                 title="Вернуться к своим прудам"
               >
                 <svg 
@@ -457,7 +457,7 @@ export default function PublicPondsPage() {
                 <div className="relative" ref={dropdownRef}>
                   {isMobile ? (
                     <button		
-                      className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"		
+                      className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-transparent-my bg-opacity-80 hover:bg-opacity-100 rounded-full shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"		
                       onClick={handleUserClick}		
                       title={`${user.login || user.username || user.email || 'Пользователь'}`}		
                     >		
@@ -469,7 +469,7 @@ export default function PublicPondsPage() {
                     </button>
                   ) : (
                     <button
-                      className="flex items-center justify-center w-auto h-12 md:h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full px-4 md:px-6 shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"
+                      className="flex items-center justify-center w-auto h-12 md:h-14 bg-transparent-my bg-opacity-80 hover:bg-opacity-100 rounded-full px-4 md:px-6 shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"
                       onClick={handleUserClick}
                       title="Нажмите для выхода"
                     >
@@ -480,7 +480,7 @@ export default function PublicPondsPage() {
                   )}
                   
                   {showLogoutDropdown && (
-                    <div className="absolute right-0 mt-2 w-full min-w-[120px] bg-white rounded-lg shadow-xl z-50 overflow-hidden border border-gray-200">
+                    <div className="absolute right-0 mt-2 w-full min-w-[120px] bg-transparent-my rounded-lg shadow-xl z-50 overflow-hidden border border-gray-200">
                       <button
                         className="w-full px-4 py-3 text-left text-gray-800 hover:bg-gray-100 font-medium flex items-center transition-colors duration-150"
                         onClick={handleLogout}
@@ -506,7 +506,7 @@ export default function PublicPondsPage() {
                 </div>
               ) : (
                 <button 
-                  className="flex items-center justify-center w-35 h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full transition-all duration-200 hover:scale-110 shadow-md"
+                  className="flex items-center justify-center w-35 h-14 bg-transparent-my bg-opacity-80 hover:bg-opacity-100 rounded-full transition-all duration-200 hover:scale-110 shadow-md"
                   onClick={() => setIsAuthModalOpen(true)}
                   title="Вход/Регистрация"
                 >
@@ -523,7 +523,7 @@ export default function PublicPondsPage() {
               )}
               
               <button 
-                className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full transition-all duration-200 hover:scale-110 shadow-md info-button"
+                className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-transparent-my bg-opacity-80 hover:bg-opacity-100 rounded-full transition-all duration-200 hover:scale-110 shadow-md info-button"
                 onClick={handleInfoClick}
                 title="Информация о публичных прудах"
                 id="info-button"
@@ -540,7 +540,7 @@ export default function PublicPondsPage() {
           {/* Список прудов */}
           <div className="space-y-0">
             {filteredPonds.length === 0 ? (
-              <div className="bg-white bg-opacity-90 rounded-2xl p-8 text-center shadow-lg">
+              <div className="bg-transparent-my bg-opacity-90 rounded-2xl p-8 text-center shadow-lg">
                 <div className="text-gray-400 text-6xl mb-4">🐟</div>
                 <h3 className="text-xl font-semibold text-gray-700 mb-2">Пруды не найдены</h3>
                 <p className="text-gray-600">
@@ -554,7 +554,7 @@ export default function PublicPondsPage() {
                 return (
                   <div 
                     key={pond.id}
-                    className="bg-white bg-opacity-90 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl"
+                    className="bg-transparent-my bg-opacity-90 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl"
                   >
                     <div className={`flex flex-col items-center md:flex-row ${isEven ? 'md:flex-row-reverse' : ''} bg-another-green mb-6 xs:mb-8 md:mb-6 lg:mb-10 rounded-2xl`}>
                       {/* Часть с картинкой пруда */}
@@ -695,7 +695,7 @@ export default function PublicPondsPage() {
           <div className="flex justify-center">
             <button
               onClick={handleFeedbackClick}
-              className="flex items-center justify-center bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-800 font-semibold py-3 px-6 rounded-full shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
+              className="flex items-center justify-center bg-transparent-my bg-opacity-90 hover:bg-opacity-100 text-gray-800 font-semibold py-3 px-6 rounded-full shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />

@@ -4,7 +4,7 @@ const Layout = ({ children, onBack, showBackButton = false }) => {
   return (
     <div className="min-h-screen bg-gray-100">
       {showBackButton && (
-        <div className="bg-white shadow-sm">
+        <div className="bg-transparent-my shadow-sm">
           <div className="max-w-4xl mx-auto px-6 py-4">
             <button 
               onClick={onBack}

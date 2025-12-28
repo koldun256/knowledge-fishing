@@ -11,7 +11,9 @@ module.exports = {
         'pond-yellow': '#EFD409',
         'white-green': '#DAFFD5',
         'another-green': '#369929ff',
-        'sea-blue': '#1d66cdff'
+        'bright-green': '#46CF34',
+        'sea-blue': '#1d66cdff',
+        'dark-blue': '#0d438eff'
       },
       screens: {
         'xs': '500px',

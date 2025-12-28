@@ -494,7 +494,7 @@ export default function PondsList() {
                   {isMobile ? (
                     // На мобильных устройствах показываем иконку вместо текста
                     <button
-                      className="flex items-center justify-center w-14 h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"
+                      className="flex items-center justify-center w-14 h-14 bg-transparent-my bg-opacity-80 hover:bg-opacity-100 rounded-full shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"
                       onClick={handleUserClick}
                       title={`${user.login || user.username || user.email || 'Пользователь'}`}
                     >
@@ -509,7 +509,7 @@ export default function PondsList() {
                   ) : (
                     // На десктопах показываем полную версию с текстом
                     <button
-                      className="flex items-center justify-center w-auto h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full px-6 shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"
+                      className="flex items-center justify-center w-auto h-14 bg-transparent-my bg-opacity-80 hover:bg-opacity-100 rounded-full px-6 shadow-md transition-all duration-200 hover:scale-105 cursor-pointer"
                       onClick={handleUserClick}
                       title="Нажмите для выхода"
                     >
@@ -520,7 +520,7 @@ export default function PondsList() {
                   )}
                   
                   {showLogoutDropdown && (
-                    <div className="absolute right-0 mt-2 w-full min-w-[120px] bg-white rounded-lg shadow-xl z-50 overflow-hidden border border-gray-200">
+                    <div className="absolute right-0 mt-2 w-full min-w-[120px] bg-transparent-my rounded-lg shadow-xl z-50 overflow-hidden border border-gray-200">
                       <button
                         className="w-full px-4 py-3 text-left text-gray-800 hover:bg-gray-100 font-medium flex items-center transition-colors duration-150"
                         onClick={handleLogout}
@@ -546,7 +546,7 @@ export default function PondsList() {
                 </div>
               ) : (
                 <button 
-                  className="flex items-center justify-center w-35 h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full transition-all duration-200 hover:scale-110 shadow-md"
+                  className="flex items-center justify-center w-35 h-14 bg-transparent-my bg-opacity-80 hover:bg-opacity-100 rounded-full transition-all duration-200 hover:scale-110 shadow-md"
                   onClick={() => setIsAuthModalOpen(true)}
                   title="Вход/Регистрация"
                 >
@@ -563,7 +563,7 @@ export default function PondsList() {
               )}
               
               <button 
-                className="flex items-center justify-center w-14 h-14 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full transition-all duration-200 hover:scale-110 shadow-md info-button"
+                className="flex items-center justify-center w-14 h-14 bg-transparent-my bg-opacity-80 hover:bg-opacity-100 rounded-full transition-all duration-200 hover:scale-110 shadow-md info-button"
                 onClick={handleInfoClick}
                 title="Информация о проекте"
                 id="info-button"
@@ -629,7 +629,7 @@ export default function PondsList() {
                   {/* Кнопка настроек */}
                   <button
                     onClick={(e) => handleSettingsClick(e, pond)}
-                    className="bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 transition-all duration-200 hover:scale-110 shadow-md settings-button"
+                    className="bg-transparent-my bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 transition-all duration-200 hover:scale-110 shadow-md settings-button"
                     title="Настройки пруда"
                   >
                     <img 
@@ -642,7 +642,7 @@ export default function PondsList() {
                   {/* Кнопка поделиться */}
                   <button
                     onClick={(e) => handleShareClick(e, pond)}
-                    className="bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 transition-all duration-200 hover:scale-110 shadow-md share-button"
+                    className="bg-transparent-my bg-opacity-80 hover:bg-opacity-100 rounded-full p-1 transition-all duration-200 hover:scale-110 shadow-md share-button"
                     title="Поделиться прудом"
                   >
                     {/* SVG иконка "Поделиться" */}
@@ -682,7 +682,7 @@ export default function PondsList() {
           <div className="flex justify-center">
             <button
               onClick={handleFeedbackClick}
-              className="flex items-center justify-center bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-800 font-semibold py-3 px-6 rounded-full shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
+              className="flex items-center justify-center bg-transparent-my bg-opacity-90 hover:bg-opacity-100 text-gray-800 font-semibold py-3 px-6 rounded-full shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
             >
               <span className="text-lg">Обратная связь</span>
             </button>
