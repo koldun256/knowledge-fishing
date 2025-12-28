@@ -101,7 +101,7 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
       justifyContent: 'center',
       alignItems: 'center',
       zIndex: 10000,
-      padding: '16px'
+      padding: '0px'
     }} onClick={handleBackdropClick}>
       <div style={{
         backgroundColor: 'white',
@@ -171,7 +171,7 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
         }}>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
             {/* Поле для ввода ссылки */}
-            <div style={{ marginBottom: '24px', flexShrink: 0 }}>
+            <div style={{ marginBottom: '12px', flexShrink: 0 }}>
               <label style={{
                 display: 'block',
                 marginBottom: '12px',
@@ -228,9 +228,7 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
                   Как получить ссылку на пруд?
                 </p>
                 <ul style={{ margin: '0', paddingLeft: '20px' }}>
-                  <li>Попросите у владельца пруда ссылку для копирования</li>
-                  <li>Найдите пруд в каталоге публичных прудов</li>
-                  <li>Используйте ссылку из социальных сетей или мессенджеров</li>
+                  <li>Попросите у владельца пруда ссылку для копирования или найдите в интернете ссылку на публичный пруд</li>
                 </ul>
               </div>
             </div>
@@ -240,9 +238,9 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
               marginBottom: '20px',
               flexShrink: 0,
               padding: '16px',
-              backgroundColor: '#f8f9fa',
+              backgroundColor: '#ffffffff',
               borderRadius: '8px',
-              border: '1px solid #e0e0e0'
+              border: '0px solid #e0e0e0'
             }}>
               <label style={{
                 display: 'flex',
@@ -256,9 +254,9 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
                   onChange={(e) => setTrackUpdates(e.target.checked)}
                   style={{
                     marginRight: '12px',
-                    marginTop: '2px',
-                    width: '18px',
-                    height: '18px',
+                    marginTop: '12px',
+                    width: '28px',
+                    height: '28px',
                     cursor: 'pointer',
                     accentColor: '#3498db'
                   }}
@@ -266,14 +264,14 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
                 <div>
                   <div style={{
                     fontWeight: '600',
-                    fontSize: '15px',
+                    fontSize: '18px',
                     color: '#2c3e50',
                     marginBottom: '4px'
                   }}>
                     Отслеживать обновления
                   </div>
                   <div style={{
-                    fontSize: '13px',
+                    fontSize: '14px',
                     color: '#7f8c8d',
                     lineHeight: '1.4'
                   }}>
@@ -283,7 +281,7 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
               </label>
             </div>
 
-            {/* Информация о том, что будет скопировано */}
+            {/* Информация о том, что будет скопировано
             <div style={{ 
               marginBottom: '20px',
               flexShrink: 0,
@@ -313,7 +311,7 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
                 <li>Структура слоев</li>
                 <li>Настройки пруда</li>
               </ul>
-            </div>
+            </div> */}
 
             {/* Кнопки действий */}
             <div style={{
