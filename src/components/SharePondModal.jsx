@@ -91,31 +91,31 @@ export default function SharePondModal({ isOpen, onClose, pond }) {
   };
 
   const handleShareTelegram = () => {
-    const text = encodeURIComponent(`Посмотрите мой пруд "${pond.name}" в Knowledge Fishing!\n\n${pondInfo}`);
-    window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${text}`, '_blank');
+    const text = encodeURIComponent(`Вы можете скопировать мой пруд в Knowledge Fishing, указав при создании пруда ссылку:\n${shareUrl}`);
+    window.open(`https://t.me/share/url?url=🥸&text=${text}`, '_blank');
   };
 
   const handleShareVK = () => {
-    const text = encodeURIComponent(`Пруд "${pond.name}" в Knowledge Fishing`);
-    window.open(`https://vk.com/share.php?url=${encodeURIComponent(shareUrl)}&title=${text}&comment=${encodeURIComponent(pondInfo)}`, '_blank');
+    const text = encodeURIComponent(`Вы можете скопировать мой пруд в Knowledge Fishing, указав при создании пруда ссылку:\n`);
+    window.open(`https://vk.com/share.php?url=${encodeURIComponent(shareUrl)}&title=${text}&comment=${text}`, '_blank');
   };
 
   const handleShareWhatsApp = () => {
-    const text = encodeURIComponent(`Посмотрите мой пруд "${pond.name}" в Knowledge Fishing!\n\n${pondInfo}`);
-    window.open(`https://wa.me/?text=${text}`, '_blank');
+    const text = encodeURIComponent(`Вы можете скопировать мой пруд в Knowledge Fishing, указав при создании пруда ссылку:\n${shareUrl}`);
+  	window.open(`https://wa.me/?text=urlencodedtext`, '_blank');
   };
 
   const handleShareYandexMail = () => {
     const subject = encodeURIComponent(`Пруд "${pond.name}" в Knowledge Fishing`);
-    const body = encodeURIComponent(`Привет!\n\nПосмотрите мой пруд "${pond.name}" в Knowledge Fishing:\n\n${pondInfo}\n\n`);
+    const body = encodeURIComponent(`Вы можете скопировать мой пруд в Knowledge Fishing, указав при создании пруда ссылку:\n${shareUrl}`);
     window.open(`https://mail.yandex.ru/compose?to=&subject=${subject}&body=${body}`, '_blank');
   };
 
-  const handleShareMax = () => {
-    const subject = encodeURIComponent(`Пруд "${pond.name}" в Knowledge Fishing`);
-    const body = encodeURIComponent(`Привет!\n\nПосмотрите мой пруд "${pond.name}" в Knowledge Fishing:\n\n${pondInfo}\n\n`);
-    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
-  };
+  // const handleShareMax = () => {
+  //   const subject = encodeURIComponent(`Пруд "${pond.name}" в Knowledge Fishing`);
+  //   const text = encodeURIComponent(`Вы можете скопировать мой пруд в Knowledge Fishing, указав при создании пруда ссылку:\n ${pond.name}`);
+  //   window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+  // };
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -261,7 +261,7 @@ export default function SharePondModal({ isOpen, onClose, pond }) {
 									/>
                 </button>
 
-                {/* Mail.ru (Макс) */}
+                {/* Mail.ru (Макс)
                 <button
                   onClick={handleShareMax}
                   title="Поделиться в MAX"
@@ -272,7 +272,7 @@ export default function SharePondModal({ isOpen, onClose, pond }) {
 										alt="Поделиться в Telegram"
 										className="transition-transform duration-200 rounded-xl"
 									/>
-                </button>
+                </button> */}
 
                 {/* Яндекс Почта */}
                 <button
