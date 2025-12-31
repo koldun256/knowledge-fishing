@@ -16,9 +16,7 @@ export default function SharePondModal({ isOpen, onClose, pond }) {
 
   useEffect(() => {
     if (pond) {
-      const baseUrl = window.location.origin;
-      const shareId = `${pond.id}`;
-      const url = `${shareUrlPrefix}${shareId}`;
+      const url = pond.public_url_suffix ? `${shareUrlPrefix}${pond.public_url_suffix}` : `${shareUrlPrefix}${pond.id}`;
       setShareUrl(url);
       
       const infoText = `Пруд "${pond.name}" в Knowledge Fishing\n` +
