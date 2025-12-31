@@ -436,6 +436,7 @@ export default function PondsList() {
   ];
 
   const getPondImage = (pondId) => {
+    console.log(pondId);
     const index = parseInt(pondId[0], 16) % pondImages.length;
     return `${process.env.PUBLIC_URL}/assets/${pondImages[index]}`;
   };
@@ -582,7 +583,7 @@ export default function PondsList() {
               <div key={pond.id} className="relative">
                 <Link to={`/pond/${pond.id}`} className="block group">
                   <img 
-                    src={getPondImage(pond.id)} 
+                    src={getPondImage((pond.pond_type !== 1 && pond.pond_type !== 2) ? pond.id : pond.copied_from_id)} 
                     alt={pond.name}
                     className="w-full h-auto transition-transform group-hover:scale-105"
                   />
