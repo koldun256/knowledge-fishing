@@ -645,8 +645,15 @@ export default function PublicPondsPage() {
                             
                             <div className="flex items-center">
                               <span className="text-gray-800 font-medium mr-2">Категория:</span>
-                              <span className="text-gray-800 font-semibold">
+                              <span className="font-semibold text-gray-800 truncate block max-w-[150px] xs:max-w-[250px] sm:max-w-[300px] md:max-w-[400px]">
                                 {pond.topic || 'Без категории'}
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center">
+                              <span className="text-gray-800 font-medium mr-2">Скопирован</span>
+                              <span className="font-semibold text-gray-800 truncate block max-w-[150px] xs:max-w-[250px] sm:max-w-[300px] md:max-w-[400px]">
+                                {pond.cnt_copied} раз
                               </span>
                             </div>
                             
