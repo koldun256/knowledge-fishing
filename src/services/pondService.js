@@ -18,6 +18,22 @@ export const pondService = {
     return response.json();
   },
 
+  getPondCardById: async (id) => {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/ponds/card/${id}`, {
+      credentials: API_CONFIG.withCredentials ? 'include' : 'omit'
+    });
+    if (!response.ok) throw new Error('Failed to fetch pond');
+    return response.json();
+  },
+
+  getPondCardByPublicUrl: async (id) => {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/ponds/card/${id}`, {
+      credentials: API_CONFIG.withCredentials ? 'include' : 'omit'
+    });
+    if (!response.ok) throw new Error('Failed to fetch pond');
+    return response.json();
+  },
+
   createPond: async (pondData) => {
     const response = await fetch(`${API_CONFIG.BASE_URL}/ponds`, {
       method: 'POST',

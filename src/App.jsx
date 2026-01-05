@@ -32,7 +32,8 @@ function App() {
           <Route path="/pond/:pondId" element={<Pond />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/public-ponds" element={<PublicPondsPage />} />
-          <Route path="/:pondId" element={<SinglePondPage />} />
+          <Route path="/pond-card/:firstParam/:secondParam?" element={<SinglePondPage />} />
+          {/* <Route path="/pond-card/:pondId" element={<SinglePondPage />} /> */}
         </Routes>
       </div>
     </Router>

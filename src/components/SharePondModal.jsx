@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { API_CONFIG } from '../config/api';
 import { Link } from 'react-router-dom';
 
-export const shareUrlPrefix = `${API_CONFIG.BASE_URL}/`;
+export const shareUrlPrefix = `${API_CONFIG.BASE_URL}/pond-card/`;
 
 export default function SharePondModal({ isOpen, onClose, pond }) {
   const [shareUrl, setShareUrl] = useState('');
