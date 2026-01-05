@@ -58,8 +58,8 @@ export default function PondTypeSelectionModal({ isOpen, onClose, onCreate, onAd
     handleClose();
   };
 
-  const handleLinkPondAdded = (pondId, trackUpdates) => {
-    onAddByLink(pondId, trackUpdates);
+  const handleLinkPondAdded = (pondId, trackUpdates, type) => {
+    onAddByLink(pondId, trackUpdates, type);
     handleClose();
   };
 

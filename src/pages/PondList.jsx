@@ -223,10 +223,11 @@ export default function PondsList() {
     }
   };
 
-  const handleAddPondByLink = async (pondId, withUpdates) => {
-    console.log(pondId, withUpdates);
+  const handleAddPondByLink = async (pondIdentificator, withUpdates, type) => {
+    console.log(pondIdentificator, withUpdates, type);
     try {
-      const newPond = await pondService.copyPondById(pondId, withUpdates);
+      const newPond = (type === 'uuid') ? await pondService.copyPondById(pondIdentificator, withUpdates)
+                                        : await pondService.copyPondByPublicUrl(pondIdentificator, withUpdates);
       
       setPonds(prev => [...prev, newPond]);
       console.log('Pond created and added to list:', newPond);

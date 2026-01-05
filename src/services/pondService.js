@@ -89,14 +89,27 @@ export const pondService = {
     return response.json();
   },
 
-  copyPondById: async (id, with_update) => {
+  copyPondById: async (identificator, with_update) => {
     const response = await fetch(`${API_CONFIG.BASE_URL}/copy_pond_by_id`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       credentials: API_CONFIG.withCredentials ? 'include' : 'omit',
-      body: JSON.stringify({id, with_update})
+      body: JSON.stringify({identificator, with_update})
+    });
+    if (!response.ok) throw new Error('Failed to create pond');
+    return response.json();
+  },
+
+  copyPondByPublicUrl: async (identificator, with_update) => {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/copy_pond_by_public_url`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: API_CONFIG.withCredentials ? 'include' : 'omit',
+      body: JSON.stringify({identificator, with_update})
     });
     if (!response.ok) throw new Error('Failed to create pond');
     return response.json();

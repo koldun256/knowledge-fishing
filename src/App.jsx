@@ -5,6 +5,7 @@ import PondList from './pages/PondList'
 import PublicPondsPage from './pages/PublicPondsPage'
 import Admin from './pages/Admin'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import SinglePondPage from './pages/SinglePondPage';
 
 function App() {
   const [currentPondId, setCurrentPondId] = useState(1);
@@ -31,6 +32,7 @@ function App() {
           <Route path="/pond/:pondId" element={<Pond />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/public-ponds" element={<PublicPondsPage />} />
+          <Route path="/:pondId" element={<SinglePondPage />} />
         </Routes>
       </div>
     </Router>

@@ -42,6 +42,30 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
     return regex.test(uuid);
   };
 
+  const validateUsernamePondName = (path) => {
+    // Проверяем формат: username/pond-name
+    // Разрешаем буквы, цифры, дефисы и подчеркивания в имени пользователя и имени пруда
+    const regex = /^[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+$/;
+    return regex.test(path);
+  };
+
+  const extractPondIdentifier = (url) => {
+    // Убираем префикс и начальные/конечные слеши
+    let path = url.replace(shareUrlPrefix, '').replace(/^\/+|\/+$/g, '');
+    
+    // Проверяем, является ли путь UUID
+    if (validateUuid(path)) {
+      return { type: 'uuid', identifier: path };
+    }
+    
+    // Проверяем, является ли путь форматом username/pond-name
+    if (validateUsernamePondName(path)) {
+      return { type: 'username_pondname', identifier: path };
+    }
+    
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -50,15 +74,14 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
       return;
     }
 
-    console.log(shareUrlPrefix);
     if (!link.startsWith(shareUrlPrefix)) {
-      setError(`ссылка должна начинаться с ${shareUrlPrefix}`);
+      setError(`Ссылка должна начинаться с ${shareUrlPrefix}`);
       return;
     }
 
-    const pond_identificator = link.slice(shareUrlPrefix.length, link.length);
-    if (!validateUuid(pond_identificator)) {
-      setError(`Строка не имеет вид "${shareUrlPrefix}/корректный_id_пруда"`);
+    const pondInfo = extractPondIdentifier(link);
+    if (!pondInfo) {
+      setError(`Ссылка должна быть в одном из форматов:\n1. ${shareUrlPrefix}/корректный_id_пруда\n2. ${shareUrlPrefix}/имя_пользователя/имя_пруда`);
       return;
     }
 
@@ -66,11 +89,12 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
     setError('');
 
     try {
-      console.log(pond_identificator, trackUpdates);
-      await onAddByLink(pond_identificator, trackUpdates);
+      console.log(pondInfo.identifier, trackUpdates);
+      await onAddByLink(pondInfo.identifier, trackUpdates, pondInfo.type);
       handleClose();
     } catch (error) {
       console.error('Error creating pond:', error);
+      setError('Не удалось добавить пруд. Проверьте ссылку и попробуйте снова.');
     } finally {
       setLoading(false);
     }
