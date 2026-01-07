@@ -486,7 +486,7 @@ export default function SinglePondPage() {
           </header>
 
           {/* Карточка пруда */}
-          <div className="bg-transparent-my bg-opacity-90 rounded-2xl shadow-xl mb-8">
+          <div className="bg-transparent-my bg-opacity-90 rounded-2xl shadow-xl mb-4 lg:mb-6">
             <div className="flex flex-col items-center md:flex-row bg-another-green rounded-2xl">
               {/* Часть с картинкой пруда */}
               <div className="md:w-1/3 rounded-2xl">
@@ -615,11 +615,11 @@ export default function SinglePondPage() {
                     disabled={loading}
                     className="bg-sea-blue min-h-12 sm:min-h-14 leading-tight rounded-xl flex-1 text-white font-semibold py-1 px-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {/* <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                             d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" 
                       />
-                    </svg>
+                    </svg> */}
                     Скопировать без отслеживания обновлений
                   </button>
                 </div>
@@ -628,8 +628,8 @@ export default function SinglePondPage() {
           </div>
 
           {/* Секция с рыбами */}
-          <div className="bg-transparent-my bg-opacity-90 rounded-2xl shadow-xl p-5 xs:p-6 md:p-8">
-            <h2 className="text-2xl xs:text-3xl md:text-4xl font-bold text-black mb-6 text-center">
+          <div className="bg-transparent-my bg-opacity-90 rounded-2xl shadow-xl p-2 lg:p-0 xl:p-4">
+            <h2 className="text-xl xs:text-2xl lg:text-3xl font-bold text-black mb-4 text-center">
               Рыбы в пруду ({pond.fishes.length})
             </h2>
             
@@ -642,11 +642,11 @@ export default function SinglePondPage() {
                 </p>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 {pond.fishes.map((fish, index) => (
-                  <div 
+                  <div
                     key={fish.id}
-                    className="bg-another-green rounded-xl p-5 xs:p-6 shadow-lg transition-all duration-300 hover:shadow-xl"
+                    className="bg-another-green rounded-xl p-2 sm:p-4 2xl:p-6 shadow-lg transition-all duration-300 hover:shadow-xl"
                   >
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 xs:w-12 xs:h-12 rounded-full bg-sea-blue text-white font-bold text-lg xs:text-xl">
@@ -654,42 +654,59 @@ export default function SinglePondPage() {
                       </div>
                       
                       <div className="flex-1">
-                        <div className="mb-4">
-                          <h4 className="text-lg xs:text-xl md:text-2xl font-semibold text-black mb-2">
+                        <div className="mb-2">
+                          <h4 className="text-base sm:text-lg font-semibold text-black mb-0 ">
                             Вопрос:
                           </h4>
-                          <p className="text-gray-800 text-base xs:text-lg md:text-xl">
+                          <p className="text-gray-800 text-base sm:text-lg">
                             {fish.question}
                           </p>
                         </div>
                         
                         <div>
-                          <h4 className="text-lg xs:text-xl md:text-2xl font-semibold text-black mb-2">
+                          <h4 className="text-base sm:text-lg font-semibold text-black mb-0">
                             Ответ:
                           </h4>
-                          <p className="text-gray-800 text-base xs:text-lg md:text-xl">
+                          <p className="text-gray-800 text-base sm:text-lg">
                             {fish.answer}
                           </p>
                         </div>
-                        
-                        {fish.quality && (
-                          <div className="mt-4 flex items-center">
-                            <span className="text-gray-800 font-medium mr-2">Качество:</span>
-                            <span className={`font-semibold ${
-                              fish.quality === 'good' ? 'text-green-600' :
-                              fish.quality === 'medium' ? 'text-yellow-600' :
-                              fish.quality === 'easy' ? 'text-blue-600' : 'text-gray-600'
-                            }`}>
-                              {fish.quality === 'good' ? 'Хорошая' :
-                               fish.quality === 'medium' ? 'Средняя' :
-                               fish.quality === 'easy' ? 'Легкая' : fish.quality}
-                            </span>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
                 ))}
+                {/* {pond.fishes.map((fish, index) => (
+                  <div 
+                    key={fish.id}
+                    className="bg-another-green rounded-xl p-2 sm:p-4 xl:p-6 shadow-lg transition-all duration-300 hover:shadow-xl"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 xs:w-12 xs:h-12 rounded-full bg-sea-blue text-white font-bold text-lg xs:text-xl lg:w-14 lg:h-14 lg:text-2xl">
+                        {index + 1}
+                      </div>
+                      
+                      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 lg:gap-8">
+                        <div className="lg:col-span-1 mb-2">
+                          <h4 className="text-base sm:text-lg font-semibold text-black mb-0">
+                            Вопрос:
+                          </h4>
+                          <p className="text-gray-800 text-base sm:text-lg">
+                            {fish.question}
+                          </p>
+                        </div>
+                        
+                        <div className="lg:col-span-1">
+                          <h4 className="text-base sm:text-lg font-semibold text-black mb-0">
+                            Ответ:
+                          </h4>
+                          <p className="text-gray-800 text-base sm:text-lg">
+                            {fish.answer}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))} */}
               </div>
             )}
           </div>
