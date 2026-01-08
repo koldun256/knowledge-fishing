@@ -18,6 +18,12 @@ export default function PublicPondsPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [categories, setCategories] = useState([]);
   
+  // Пагинация
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalPonds, setTotalPonds] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
@@ -27,16 +33,13 @@ export default function PublicPondsPage() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 710);
   
   const dropdownRef = useRef(null);
+  const itemsPerPageOptions = [5, 10, 15, 20, 25];
 
   const infoData = [
     {
       title: "Публичные пруды",
       text: "\\tЗдесь вы можете найти интересные пруды, созданные другими пользователями.\\n\\tКаждый публичный пруд можно скопировать к себе и изучать информацию, которую добавил его создатель."
     },
-    // {
-    //   title: "Как использовать",
-    //   text: "\\t1. Найдите интересный пруд через поиск или категории\\n\\t2. Нажмите \"Скопировать\" - пруд добавится в вашу коллекцию. Если автор добавит туда рыб, то они добавятся и в ваш пруд.\\n\\t3. Если вы не хотите получать обновления, добавляемые автором, выбирайте \"Скопировать без отслеживаия обновлений\""
-    // },
     {
       title: "Виды копирования",
       text: "\\t• СКОПИРОВАТЬ - получить текущую версию пруда, а также получать новых рыб, когда автор добавляет их в публичный пруд\\n\\t• СКОПИРОВАТЬ БЗ ОТСЛЕЖИВАНИЯ ОБНОВЛЕНИЙ - тогда вы получите только текущую копию пруда\\n\\t"
@@ -94,124 +97,45 @@ export default function PublicPondsPage() {
     restoreUserFromStorage();
   }, []);
 
-  // Загрузка публичных прудов
-  useEffect(() => {
-    const loadPublicPonds = async () => {
-      try {
-        setLoading(true);
-        // Загрузка публичных прудов с сервера
-        const response = await pondService.getPublicPonds();
-        
-        // Теперь response содержит объекты с полями pond и user_login
-        const pondsData = response.map(item => ({
-          ...item.pond,  // Копируем все поля из pond
-          user_login: item.user_login,  // Добавляем логин пользователя
-          // Добавляем поле author для совместимости со старым кодом
-          author: { username: item.user_login }
-        }));
-        setPonds(pondsData);
-        
-        // Извлечение уникальных категорий
-        const uniqueCategories = [...new Set(pondsData.map(p => p.topic).filter(Boolean))];
-        setCategories(uniqueCategories);
-        
-      } catch (error) {
-        console.error('Error loading public ponds:', error);
-        setError('Не удалось загрузить публичные пруды');
-        
-        // Демо-данные для тестирования
-        const demoPonds = [
-          {
-            id: 1,
-            name: 'Программирование на Python',
-            description: 'Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.Основы Python, ООП, веб-разработка на Django и Flask. Идеально подходит для начинающих программистов.',
-            topic: 'programming',
-            author: { username: 'Иван Иванов' },
-            cnt_fishes: 150,
-            cnt_ready_fishes: 45,
-            is_updatable: true,
-            updated_at: '2024-01-15',
-            views_count: 1234,
-            created_at: '2023-12-01'
-          },
-          {
-            id: 2,
-            name: 'История искусств',
-            description: 'От наскальной живописи до современного искусства. Все основные периоды и стили.',
-            topic: 'art',
-            author: { username: 'Анна Петрова' },
-            cnt_fishes: 89,
-            cnt_ready_fishes: 23,
-            is_updatable: false,
-            updated_at: '2024-01-10',
-            views_count: 890,
-            created_at: '2023-11-20'
-          },
-          {
-            id: 3,
-            name: 'Английские идиомы и фразовые глаголы',
-            description: 'Популярные идиомы, фразовые глаголы и устойчивые выражения для повседневного общения.',
-            topic: 'languages',
-            author: { username: 'John Smith' },
-            cnt_fishes: 210,
-            cnt_ready_fishes: 67,
-            is_updatable: true,
-            updated_at: '2024-01-20',
-            views_count: 1567,
-            created_at: '2023-12-15'
-          },
-          {
-            id: 4,
-            name: 'Медицинские термины на латыни',
-            description: 'Основные медицинские термины, анатомия, фармакология. Для студентов медицинских вузов.',
-            topic: 'medicine',
-            author: { username: 'Доктор Сидоров' },
-            cnt_fishes: 300,
-            cnt_ready_fishes: 120,
-            is_updatable: true,
-            updated_at: '2024-01-18',
-            views_count: 2100,
-            created_at: '2023-11-01'
-          },
-          {
-            id: 5,
-            name: 'Финансовая грамотность',
-            description: 'Инвестиции, бюджетирование, налоги и личные финансы. Основы финансовой независимости.',
-            topic: 'finance',
-            author: { username: 'Алексей Финансов' },
-            cnt_fishes: 120,
-            cnt_ready_fishes: 35,
-            is_updatable: false,
-            updated_at: '2024-01-05',
-            views_count: 745,
-            created_at: '2023-12-10'
-          },
-          {
-            id: 6,
-            name: 'Квантовая физика для начинающих',
-            description: 'Основы квантовой механики, теория относительности. Сложные концепции простым языком.',
-            topic: 'science',
-            author: { username: 'Профессор Квантов' },
-            cnt_fishes: 180,
-            cnt_ready_fishes: 42,
-            is_updatable: true,
-            updated_at: '2024-01-22',
-            views_count: 1345,
-            created_at: '2023-12-25'
-          }
-        ];
-        
-        setPonds(demoPonds);
-        const demoCategories = [...new Set(demoPonds.map(p => p.topic).filter(Boolean))];
-        setCategories(demoCategories);
-        
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Загрузка публичных прудов с пагинацией
+  const loadPublicPonds = async (page, perPage, theme = "", query = "") => {
+    try {
+      setLoading(true);
+      const response = await pondService.getPublicPonds(page, perPage, theme === 'all' ? "" : theme, query);
+      
+      // Предполагаем, что бэкенд возвращает структуру:
+      // { ponds: [...], total: number, page: number, per_page: number, total_pages: number }
+      const pondsData = response.ponds.map(item => ({
+        ...item.pond,
+        user_login: item.user_login,
+        author: { username: item.user_login }
+      }));
+      
+      setPonds(pondsData);
+      setTotalPonds(response.total_count || 0);
+      setTotalPages(response.total_pages || Math.ceil((response.total_count || 0) / perPage));
+      
+      // Извлечение уникальных категорий (если нужно загрузить все категории один раз)
+      // if (page === 1) {
+      //   const allCategoriesResponse = await pondService.getPublicPonds(1, 1000, "", "");
+      //   const allPonds = allCategoriesResponse.ponds || [];
+      //   const uniqueCategories = [...new Set(allPonds.map(item => item.pond.topic).filter(Boolean))];
+      //   setCategories(uniqueCategories);
+      // }
+    } catch (error) {
+      console.error('Error loading public ponds:', error);
+      setError('Не удалось загрузить публичные пруды');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    loadPublicPonds();
-  }, []);
+  // Загрузка прудов при изменении параметров
+  useEffect(() => {
+    const theme = selectedCategory === 'all' ? "" : selectedCategory;
+    const query = searchTerm.trim();
+    loadPublicPonds(currentPage, itemsPerPage, theme, query);
+  }, [currentPage, itemsPerPage, selectedCategory, searchTerm]);
 
   // Сохранение пользователя в localStorage
   useEffect(() => {
@@ -221,6 +145,79 @@ export default function PublicPondsPage() {
       localStorage.removeItem('currentUser');
     }
   }, [user]);
+
+  // Обработчик изменения страницы
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  };
+
+  // Обработчик изменения количества элементов на странице
+  const handleItemsPerPageChange = (e) => {
+    const newItemsPerPage = parseInt(e.target.value);
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
+  // Обработчик поиска
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    setCurrentPage(1);
+  };
+
+  // Обработчик изменения категории
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
+    setCurrentPage(1);
+  };
+
+  // Генерация номеров страниц для пагинации
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      const leftOffset = Math.floor(maxVisiblePages / 2);
+      let startPage = currentPage - leftOffset;
+      let endPage = currentPage + leftOffset;
+      
+      if (startPage < 1) {
+        startPage = 1;
+        endPage = maxVisiblePages;
+      }
+      
+      if (endPage > totalPages) {
+        endPage = totalPages;
+        startPage = totalPages - maxVisiblePages + 1;
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(i);
+      }
+      
+      // Добавляем первую страницу и многоточие
+      if (startPage > 1) {
+        if (startPage > 2) {
+          pageNumbers.unshift('...');
+        }
+        pageNumbers.unshift(1);
+      }
+      
+      // Добавляем последнюю страницу и многоточие
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          pageNumbers.push('...');
+        }
+        pageNumbers.push(totalPages);
+      }
+    }
+    
+    return pageNumbers;
+  };
 
   const getPondImage = (pondId) => {
     const index = parseInt(pondId[0], 16) % pondImages.length;
@@ -233,15 +230,6 @@ export default function PublicPondsPage() {
     return 'рыб';
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  };
-
   const handleCopyPond = async (pondId, withUpdates = true) => {
     if (!user) {
       setIsAuthModalOpen(true);
@@ -252,7 +240,6 @@ export default function PublicPondsPage() {
       setLoading(true);
       await pondService.copyPondById(pondId, withUpdates);
       alert(`Пруд успешно скопирован ${withUpdates ? 'с обновлениями' : ''}!`);
-      // navigate('/'); // Возвращаемся на главную
     } catch (error) {
       console.error('Error copying pond:', error);
       alert('Не удалось скопировать пруд');
@@ -268,24 +255,16 @@ export default function PublicPondsPage() {
       console.log('Login successful:', result);
       
       if (result) {
-        // Убедимся, что сохраняем правильную структуру
         const userData = {
           id: result.id || result.userId,
           login: result.login || result.username,
           username: result.username || result.login,
           email: result.email,
-          token: result.token, // если есть токен
-          // другие поля по необходимости
+          token: result.token,
         };
         
         setUser(userData);
         localStorage.setItem('currentUser', JSON.stringify(userData));
-        
-        // // Проверяем, нужно ли показать приветственное окно для нового пользователя
-        // const hasSeenWelcomeModal = localStorage.getItem('hasSeenWelcomeModal');
-        // if (!hasSeenWelcomeModal) {
-        //   setIsFirstVisit(true);
-        // }
       }
       
       return result;
@@ -302,7 +281,6 @@ export default function PublicPondsPage() {
       const result = await authService.register(registerData);
       console.log('Registration successful:', result);
       
-      // После регистрации обычно происходит автоматический вход
       if (result) {
         const userData = {
           id: result.id || result.userId,
@@ -314,10 +292,6 @@ export default function PublicPondsPage() {
         
         setUser(userData);
         localStorage.setItem('currentUser', JSON.stringify(userData));
-        
-        // // Для новых зарегистрированных пользователей показываем приветственное окно
-        // setIsFirstVisit(true);
-        // localStorage.removeItem('hasSeenWelcomeModal'); // Сбрасываем флаг для нового пользователя
       }
       
       return { 
@@ -335,11 +309,9 @@ export default function PublicPondsPage() {
     try {
       await authService.logout();
       setUser(null);
-      localStorage.removeItem('currentUser'); // Удаляем из localStorage
+      localStorage.removeItem('currentUser');
       setShowLogoutDropdown(false);
-
       document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      
       console.log('Logout successful');
     } catch (error) {
       console.error('Logout error:', error);
@@ -369,17 +341,6 @@ export default function PublicPondsPage() {
   const handleAuthSuccess = () => {
     setIsAuthModalOpen(false);
   };
-
-  // Фильтрация прудов
-  const filteredPonds = ponds.filter(pond => {
-    const matchesSearch = pond.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         pond.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         pond.user_login?.toLowerCase().includes(searchTerm.toLowerCase()); // Теперь используем user_login
-    
-    const matchesCategory = selectedCategory === 'all' || pond.topic === selectedCategory;
-    
-    return matchesSearch && matchesCategory;
-  });
 
   if (loading && ponds.length === 0) {
     return (
@@ -414,7 +375,7 @@ export default function PublicPondsPage() {
     <>
       <div className="min-h-screen bg-green-grass p-2 xs:p-4 lg:p-8 flex flex-col" style={{color: '#DAFFD5'}}>
         <div className="mx-auto w-full max-w-7xl flex-grow">
-          {/* Шапка - кнопка назад слева, заголовок по центру, кнопки справа */}
+          {/* Шапка - кнопка назад слева, поиск по центру, кнопки справа */}
           <header className="flex items-center justify-between mb-6 md:mb-8">
             {/* Левая часть: кнопка "Назад" */}
             <div className="flex-shrink-0">
@@ -440,16 +401,98 @@ export default function PublicPondsPage() {
               </button>
             </div>
 
-            {/* Центральная часть: заголовок "Публичные пруды" */}
             <div className="flex-1 text-center px-4" style={{
                 maxWidth: 'calc(100vw - 180px)',
                 minWidth: 150
               }}>
               <h1 className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-bold text-black">Публичные пруды</h1>
-              {/* <p className="text-gray-700 text md:text-base mt-1">
-                Найдите интересные пруды и скопируйте их к себе
-              </p> */}
             </div>
+            
+            {/* Центральная часть: строка поиска вместо заголовка
+            <div className="flex-1 px-4" style={{
+                maxWidth: 'calc(100vw - 180px)',
+                minWidth: 150
+              }}>
+              <div className="flex items-center gap-2">
+                <form onSubmit={handleSearchSubmit} className="flex-grow">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Поиск прудов по названию, описанию или автору..."
+                      className="w-full bg-white border-0 rounded-xl focus:outline-none py-2 px-4 text-base md:text-lg text-gray-800 placeholder-gray-600 transition-all duration-200 shadow-sm"
+                      style={{
+                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-transparent border-none p-1 cursor-pointer"
+                      style={{ color: '#4A5568' }}
+                    >
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className="h-5 w-5 md:h-6 md:w-6" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </form>
+                
+                <button
+                  onClick={() => {
+                    // Здесь можно добавить логику для открытия меню фильтров
+                    console.log('Open filters menu');
+                  }}
+                  className="flex items-center justify-center w-10 h-10 bg-white rounded-xl shadow-sm transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
+                  title="Фильтры"
+                  style={{
+                    flexShrink: 0
+                  }}
+                >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className="h-5 w-5 text-gray-700" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" 
+                    />
+                  </svg>
+                </button>
+                
+                <button
+                  onClick={() => {
+                    // Здесь можно добавить логику для открытия меню выбора количества
+                    console.log('Open items per page selector');
+                  }}
+                  className="flex items-center justify-center w-10 h-10 bg-white rounded-xl shadow-sm transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
+                  title={`${itemsPerPage} прудов на странице`}
+                  style={{
+                    flexShrink: 0
+                  }}
+                >
+                  <span className="text-base md:text-lg font-semibold text-gray-800">
+                    {itemsPerPage}
+                  </span>
+                </button>
+              </div>
+            </div> */}
             
             {/* Правая часть: кнопки аккаунта и информации */}
             <div className="flex items-center space-x-3 md:space-x-4">
@@ -537,9 +580,55 @@ export default function PublicPondsPage() {
             </div>
           </header>
 
+          {/* Фильтры под строкой поиска */}
+          {/* <div className="mb-6 md:mb-8">
+            <div className="flex flex-col md:flex-row gap-4 items-end">
+              <div className="w-full md:w-auto">
+                <label className="block text-gray-700 mb-2 font-medium">Категория:</label>
+                <select
+                  value={selectedCategory}
+                  onChange={handleCategoryChange}
+                  className="w-full md:w-48 bg-transparent-my bg-opacity-90 border border-gray-300 rounded-lg py-2 px-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">Все категории</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="w-full md:w-auto">
+                <label className="block text-gray-700 mb-2 font-medium">На странице:</label>
+                <select
+                  value={itemsPerPage}
+                  onChange={handleItemsPerPageChange}
+                  className="w-full md:w-32 bg-transparent-my bg-opacity-90 border border-gray-300 rounded-lg py-2 px-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {itemsPerPageOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="text-gray-700 mt-2">
+              <p>
+                Показано <span className="font-semibold">{ponds.length}</span> из{' '}
+                <span className="font-semibold">{totalPonds}</span> прудов
+                {searchTerm && (
+                  <span> по запросу "{searchTerm}"</span>
+                )}
+              </p>
+            </div>
+          </div> */}
+
           {/* Список прудов */}
           <div className="space-y-0">
-            {filteredPonds.length === 0 ? (
+            {ponds.length === 0 ? (
               <div className="bg-transparent-my bg-opacity-90 rounded-2xl p-8 text-center shadow-lg">
                 <div className="text-gray-400 text-6xl mb-4">🐟</div>
                 <h3 className="text-xl font-semibold text-gray-700 mb-2">Пруды не найдены</h3>
@@ -548,8 +637,8 @@ export default function PublicPondsPage() {
                 </p>
               </div>
             ) : (
-              filteredPonds.map((pond, index) => {
-                const isEven = index % 2 === 1; // Четные (0, 2, 4...) - false, нечетные (1, 3, 5...) - true
+              ponds.map((pond, index) => {
+                const isEven = index % 2 === 1;
                 
                 return (
                   <div 
@@ -613,7 +702,7 @@ export default function PublicPondsPage() {
                                   let maxLength;
                                   if (window.innerWidth < 768) maxLength = 300;
                                   else if (window.innerWidth < 1024) maxLength = 350;
-                                  else maxLength = 400; // xl и больше
+                                  else maxLength = 400;
                                   
                                   return pond.description.length > maxLength 
                                     ? `${pond.description.substring(0, maxLength)}...` 
@@ -635,7 +724,6 @@ export default function PublicPondsPage() {
                                 >
                                   {pond.user_login || pond.author?.username || 'Неизвестный Рыбак'}
                                 </span>
-                                {/* CSS тултип - заменит стандартный title */}
                                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 pointer-events-none">
                                   {pond.user_login || pond.author?.username || 'Неизвестный автор'}
                                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
@@ -656,25 +744,16 @@ export default function PublicPondsPage() {
                                 {pond.cnt_copied} раз
                               </span>
                             </div>
-                            
-                            {/* <div className="flex items-center">
-                              <span className="text-gray-600 font-medium mr-2">Обновлен:</span>
-                              <span className="font-medium text-gray-700">{formatDate(pond.updated_at)}</span>
-                            </div>
-                            
-                            {pond.is_updatable && (
-                              <div className="flex items-center">
-                                <span className="text-gray-600 font-medium mr-2">Обновления:</span>
-                                <span className="text-green-600 font-medium">✓ Доступны</span>
-                              </div>
-                            )} */}
                           </div>
                         </div>
                         
                         {/* Кнопки действий */}
                         <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                           <button
-                            onClick={() => handleCopyPond(pond.id, true)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleCopyPond(pond.id, true);
+                            }}
                             disabled={loading}
                             className="bg-sea-blue min-h-12 sm:min-h-14 leading-tight rounded-xl flex-1 text-white font-semibold py-1 px-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                           >
@@ -685,15 +764,13 @@ export default function PublicPondsPage() {
                           </button>
                           
                           <button
-                            onClick={() => handleCopyPond(pond.id, false)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleCopyPond(pond.id, false);
+                            }}
                             disabled={loading}
                             className={`bg-sea-blue min-h-12 sm:min-h-14 leading-tight rounded-xl flex-1 text-white font-semibold py-1 px-2 pl-3 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed`}
                           >
-                            {/* <svg className="w-5 h-5 md:hidden lg:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" 
-                              />
-                            </svg> */}
                             Скопировать без отслеживания обновлений
                           </button>
                         </div>
@@ -704,6 +781,88 @@ export default function PublicPondsPage() {
               })
             )}
           </div>
+
+          {/* Пагинация */}
+          {totalPages > 1 && (
+            <div className="mt-8 mb-6 flex flex-col items-center justify-center space-y-4">
+              <div className="flex items-center justify-center space-x-2">
+                {/* Кнопка "Назад" */}
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="flex items-center justify-center w-10 h-10 bg-transparent-my bg-opacity-80 hover:bg-opacity-100 rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                  title="Предыдущая страница"
+                >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className="w-5 h-5 text-gray-700"
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M15 19l-7-7 7-7" 
+                    />
+                  </svg>
+                </button>
+
+                {/* Номера страниц */}
+                {getPageNumbers().map((pageNumber, index) => (
+                  pageNumber === '...' ? (
+                    <span key={`ellipsis-${index}`} className="px-3 py-2 text-gray-500">
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={pageNumber}
+                      onClick={() => handlePageChange(pageNumber)}
+                      className={`w-10 h-10 flex items-center justify-center rounded-full transition-all duration-200 ${
+                        currentPage === pageNumber
+                          ? 'bg-sea-blue text-white font-bold scale-110'
+                          : 'bg-transparent-my bg-opacity-80 hover:bg-opacity-100 text-gray-800 hover:scale-105'
+                      }`}
+                    >
+                      {pageNumber}
+                    </button>
+                  )
+                ))}
+
+                {/* Кнопка "Вперед" */}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="flex items-center justify-center w-10 h-10 bg-transparent-my bg-opacity-80 hover:bg-opacity-100 rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                  title="Следующая страница"
+                >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className="w-5 h-5 text-gray-700"
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M9 5l7 7-7 7" 
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Информация о текущей странице */}
+              <div className="text-gray-700 text-center">
+                <p>
+                  Страница <span className="font-semibold">{currentPage}</span> из{' '}
+                  <span className="font-semibold">{totalPages}</span>
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Футер с кнопкой обратной связи */}

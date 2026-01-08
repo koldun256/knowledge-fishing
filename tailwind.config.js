@@ -13,7 +13,8 @@ module.exports = {
         'another-green': '#369929ff',
         'bright-green': '#46CF34',
         'sea-blue': '#1d66cdff',
-        'dark-blue': '#0d438eff'
+        'dark-blue': '#0d438eff',
+        'dark-gray': '#3d5b44ff'
       },
       screens: {
         'xs': '500px',
