@@ -109,85 +109,23 @@ export default function PondTypeSelectionModal({ isOpen, onClose, onCreate, onAd
 
   // Рендерим основное модальное окно выбора типа
   return ReactDOM.createPortal(
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 10000,
-      padding: '16px'
-    }} onClick={handleBackdropClick}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '32px',
-        borderRadius: '12px',
-        width: '90%',
-        maxWidth: '480px',
-        maxHeight: '90vh',
-        boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative'
-      }}>
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[10000] p-4"
+      onClick={handleBackdropClick}
+    >
+      <div className="bg-white p-8 rounded-xl w-[90%] max-w-[480px] max-h-[90vh] shadow-2xl overflow-hidden flex flex-col relative">
         <button
           onClick={handleClose}
-          style={{
-            position: 'absolute',
-            top: '16px',
-            right: '16px',
-            background: 'none',
-            border: 'none',
-            fontSize: '24px',
-            cursor: 'pointer',
-            color: '#666',
-            width: '32px',
-            height: '32px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '4px',
-            transition: 'all 0.3s ease',
-            zIndex: 10
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#f5f5f5';
-            e.target.style.color = '#333';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-            e.target.style.color = '#666';
-          }}
+          className="absolute top-4 right-4 bg-transparent border-none text-2xl cursor-pointer text-gray-600 w-8 h-8 flex items-center justify-center rounded transition-all duration-300 ease-in-out z-10 hover:bg-gray-100 hover:text-gray-800"
         >
           ×
         </button>
         
-        <h2 style={{ 
-          margin: '0 0 32px 0', 
-          fontSize: '28px', 
-          fontWeight: '800',
-          color: '#013b45ff',
-          textAlign: 'center',
-          paddingRight: '40px',
-          flexShrink: 0
-        }}>
+        <h2 className="m-0 mb-8 text-[28px] font-extrabold text-[#013b45] text-center pr-10 flex-shrink-0">
           Добавить пруд
         </h2>
         
-        <div style={{
-          flex: 1,
-          overflow: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
-          paddingRight: '20px',
-          marginRight: '-20px'
-        }}>
+        <div className="flex-1 overflow-auto flex flex-col min-h-0 pr-5 -mr-5">
           <CurrentStep {...currentProps} />
         </div>
       </div>
@@ -223,109 +161,47 @@ function StepSelect({ onSelect, onClose }) {
   ];
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '16px'
-    }}>
+    <div className="flex flex-col gap-4">
       {options.map((option) => (
         <button
           key={option.id}
           onClick={() => onSelect(option.id)}
+          className="flex items-start p-5 border-2 rounded-xl bg-white cursor-pointer transition-all duration-300 ease-in-out text-left w-full gap-4 hover:-translate-y-0.5 hover:shadow-md"
           style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            padding: '20px',
-            border: `2px solid ${option.color}20`,
-            borderRadius: '12px',
-            backgroundColor: 'white',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            textAlign: 'left',
-            width: '100%',
-            gap: '16px'
+            borderColor: `${option.color}20`,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = `${option.color}08`;
             e.currentTarget.style.borderColor = `${option.color}40`;
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'white';
             e.currentTarget.style.borderColor = `${option.color}20`;
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = 'none';
           }}
         >
-          <div style={{
-            fontSize: '32px',
-            lineHeight: 1,
-            flexShrink: 0
-          }}>
+          <div className="text-3xl leading-none flex-shrink-0">
             {option.icon}
           </div>
           
-          <div style={{ flex: 1 }}>
-            <h3 style={{
-              margin: '0 0 8px 0',
-              fontSize: '18px',
-              fontWeight: '700',
-              color: option.color
-            }}>
+          <div className="flex-1">
+            <h3 className="m-0 mb-2 text-lg font-bold" style={{ color: option.color }}>
               {option.title}
             </h3>
-            <p style={{
-              margin: 0,
-              fontSize: '14px',
-              color: '#7f8c8d',
-              lineHeight: 1.5
-            }}>
+            <p className="m-0 text-sm text-gray-600 leading-relaxed">
               {option.description}
             </p>
           </div>
           
-          <div style={{
-            alignSelf: 'center',
-            color: option.color,
-            fontSize: '20px',
-            flexShrink: 0
-          }}>
+          <div className="self-center" style={{ color: option.color }}>
             →
           </div>
         </button>
       ))}
       
-      <div style={{
-        marginTop: '8px',
-        paddingTop: '16px',
-        borderTop: '1px solid #eee',
-        display: 'flex',
-        justifyContent: 'center'
-      }}>
+      <div className="mt-2 pt-4 border-t border-gray-200 flex justify-center">
         <button
           onClick={onClose}
-          style={{
-            padding: '10px 24px',
-            border: '2px solid #bdc3c7',
-            borderRadius: '8px',
-            backgroundColor: 'transparent',
-            color: '#7f8c8d',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '600',
-            transition: 'all 0.3s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#f8f9fa';
-            e.target.style.borderColor = '#95a5a6';
-            e.target.style.color = '#34495e';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-            e.target.style.borderColor = '#bdc3c7';
-            e.target.style.color = '#7f8c8d';
-          }}
+          className="px-6 py-2.5 border-2 border-gray-300 rounded-lg bg-transparent text-gray-600 cursor-pointer text-sm font-semibold transition-all duration-300 ease-in-out hover:bg-gray-50 hover:border-gray-400 hover:text-gray-700"
         >
           Отмена
         </button>

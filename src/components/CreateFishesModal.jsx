@@ -108,107 +108,37 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
   // Пример JSON с специальными символами для демонстрации
   const exampleWithSpecialChars = `{
   "Что такое 'спиннинг'?": "Спиннинг - удилище для ловли хищной рыбы\\nОбычно используется с катушкой",
-  "Как выбрать леску?": "Леска бычает:\\n- Монофильная\\n- Плетеная\\n- Флюорокарбоновая",
+  "Как выбрать леску?": "Леска бывает:\\n- Монофильная\\n- Плетеная\\n- Флюорокарбоновая",
   "Что означает 'тест' удилища?": "Тест удилища - это рекомендуемый вес приманки.\\tНапример: 5-20 г"
 }`;
 
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 10000,
-      padding: '16px'
-    }} onClick={handleBackdropClick}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '24px',
-        borderRadius: '12px',
-        width: '90%',
-        maxWidth: '600px',
-        maxHeight: '90vh',
-        boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative'
-      }}>
+    <div 
+      className="fixed inset-0 bg-black/50 flex justify-center items-center z-[10000] p-4"
+      onClick={handleBackdropClick}
+    >
+      <div className="bg-white p-6 rounded-xl w-full max-w-[600px] max-h-[90vh] shadow-2xl overflow-hidden flex flex-col relative">
         {/* Крестик закрытия в правом верхнем углу */}
         <button
           onClick={handleClose}
-          style={{
-            position: 'absolute',
-            top: '16px',
-            right: '16px',
-            background: 'none',
-            border: 'none',
-            fontSize: '24px',
-            cursor: 'pointer',
-            color: '#666',
-            width: '32px',
-            height: '32px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '4px',
-            transition: 'all 0.3s ease',
-            zIndex: 10
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#f5f5f5';
-            e.target.style.color = '#333';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-            e.target.style.color = '#666';
-          }}
+          className="absolute top-4 right-4 bg-none border-none text-2xl cursor-pointer text-gray-600 w-8 h-8 flex items-center justify-center rounded transition-all duration-300 ease-in-out hover:bg-gray-100 hover:text-gray-800 z-10"
         >
           ×
         </button>
         
         {/* Заголовок - фиксированный */}
-        <h2 style={{ 
-          margin: '0 0 20px 0', 
-          fontSize: '28px', 
-          fontWeight: '800',
-          color: '#013b45ff',
-          textAlign: 'center',
-          paddingRight: '40px',
-          flexShrink: 0
-        }}>
+        <h2 className="m-0 mb-5 text-2xl font-extrabold text-[#013b45] text-center pr-10 flex-shrink-0">
           Добавить несколько рыб
         </h2>
         
         {/* Основной контент - прокручиваемый с правильным отступом */}
-        <div style={{
-          flex: 1,
-          overflow: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
-          paddingRight: '20px', // Отступ для скроллбара
-          marginRight: '-20px' // Компенсируем отступ чтобы контент был на своем месте
-        }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div className="flex-1 overflow-auto flex flex-col min-h-0 pr-5 -mr-5">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1">
             {/* Поле JSON - уменьшенное */}
-            <div style={{ marginBottom: '20px', flexShrink: 0 }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontWeight: '600',
-                fontSize: '18px',
-                color: '#34495e',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
+            <div className="mb-5 flex-shrink-0">
+              <label className="block mb-2 font-semibold text-lg text-gray-700 uppercase tracking-wider">
                 ВВЕДИТЕ ДАННЫЕ РЫБ В ФОРМАТЕ {"{\"question1\": \"answer1\", \"question2\": \"answer2\", ...}"} *
               </label>
               <textarea
@@ -216,151 +146,52 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
                 onChange={(e) => setJsonInput(e.target.value)}
                 placeholder={exampleJson}
                 rows={8}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '2px solid #bdc3c7',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box',
-                  transition: 'border-color 0.3s ease',
-                  fontFamily: 'monospace',
-                  resize: 'none',
-                  minHeight: '150px',
-                  overflow: 'auto'
-                }}
+                className="w-full p-3 border-2 border-gray-300 rounded-lg text-sm box-border transition-colors duration-300 font-mono resize-none min-h-[150px] overflow-auto"
                 spellCheck="false"
                 required
               />
-              {/* <div style={{
-                marginTop: '8px',
-                fontSize: '12px',
-                color: '#7f8c8d',
-                fontWeight: '600'
-              }}>
-                <strong>Формат: {"{\"question1\": \"answer1\", \"question2\": \"answer2\", ...}"}</strong>
-                <div style={{ marginTop: '4px', fontSize: '11px', color: '#95a5a6' }}>
-                  Чтобы использовать кавычки, добавьте экранирование: \"
-                </div>
-              </div> */}
             </div>
 
             {/* Сообщение об ошибке */}
             {error && (
-              <div style={{
-                marginBottom: '20px',
-                padding: '12px',
-                backgroundColor: '#fde8e8',
-                border: '2px solid #f56565',
-                borderRadius: '8px',
-                color: '#c53030',
-                fontSize: '14px',
-                flexShrink: 0
-              }}>
+              <div className="mb-5 p-3 bg-red-50 border-2 border-red-500 rounded-lg text-red-700 text-sm flex-shrink-0">
                 {error}
               </div>
             )}
 
             {/* Кнопка создания - ПЕРЕМЕЩЕНА ВВЕРХ */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              gap: '12px',
-              marginBottom: '20px',
-              flexShrink: 0
-            }}>
+            <div className="flex justify-end gap-3 mb-5 flex-shrink-0">
               <button
                 type="submit"
                 disabled={isLoading}
-                style={{
-                  padding: '12px 24px',
-                  border: 'none',
-                  borderRadius: '8px',
-                  backgroundColor: '#27ae60',
-                  color: 'white',
-                  cursor: isLoading ? 'not-allowed' : 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  transition: 'all 0.3s ease',
-                  opacity: isLoading ? 0.6 : 1
-                }}
+                className={`p-3 border-none rounded-lg text-white cursor-pointer text-base font-semibold transition-all duration-300 ease-in-out ${
+                  isLoading 
+                    ? 'bg-gray-400 cursor-not-allowed opacity-60' 
+                    : 'bg-green-500 hover:bg-green-600'
+                }`}
               >
                 {isLoading ? 'СОЗДАНИЕ...' : 'ДОБАВИТЬ РЫБ'}
               </button>
             </div>
 
             {/* Блок с запросом для ИИ - БЕЗ прокрутки */}
-            <div style={{
-              marginBottom: '20px',
-              padding: '16px',
-              backgroundColor: '#f8f9fa',
-              border: '1px solid #e9ecef',
-              borderRadius: '8px',
-              position: 'relative',
-              flexShrink: 0
-            }}>
+            <div className="mb-5 p-4 bg-gray-50 border border-gray-200 rounded-lg relative flex-shrink-0">
               {/* Пояснение отдельно */}
-              <div style={{
-                marginBottom: '12px',
-                fontSize: '14px',
-                color: '#495057',
-                fontWeight: '500'
-              }}>
+              <div className="mb-3 text-sm text-gray-700 font-medium">
                 Вы можете использовать ИИ для генерации вопросов и ответов. Вот пример запроса к ИИ (изменяемые параметры запроса находятся в первых четырех пунктах):
               </div>
               
               {/* Контейнер для промпта с относительным позиционированием */}
-              <div style={{
-                position: 'relative'
-              }}>
+              <div className="relative">
                 {/* Текст запроса с отступом для иконки */}
-                <div style={{
-                  fontSize: '14px',
-                  color: '#6c757d',
-                  lineHeight: '1.4',
-                  whiteSpace: 'pre-line',
-                  backgroundColor: '#fff',
-                  padding: '12px',
-                  borderRadius: '6px',
-                  border: '1px solid #dee2e6',
-                  fontFamily: 'monospace',
-                  fontSize: '13px',
-                  paddingRight: '40px' // Больше отступа справа для иконки
-                }}>
+                <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-line bg-white p-3 rounded border border-gray-300 font-mono text-[13px] pr-10">
                   {queryString}
                 </div>
                 
                 {/* Иконка для копирования в правом верхнем углу контейнера промпта */}
                 <div 
                   onClick={handleCopyToClipboard}
-                  style={{
-                    cursor: 'pointer',
-                    position: 'absolute',
-                    top: '8px', // Отступ сверху
-                    right: '8px', // Отступ справа
-                    width: '24px',
-                    height: '24px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: 'white',
-                    borderRadius: '4px',
-                    border: '1px solid #dee2e6',
-                    zIndex: 2,
-                    opacity: 0.7,
-                    transition: 'all 0.3s ease',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.opacity = '1';
-                    e.target.style.backgroundColor = '#f8f9fa';
-                    e.target.style.boxShadow = '0 2px 5px rgba(0,0,0,0.15)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.opacity = '0.7';
-                    e.target.style.backgroundColor = 'white';
-                    e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-                  }}
+                  className="cursor-pointer absolute top-2 right-2 w-6 h-6 flex items-center justify-center bg-white rounded border border-gray-300 z-10 opacity-70 transition-all duration-300 ease-in-out hover:opacity-100 hover:bg-gray-50 hover:shadow-md"
                   title="Копировать промпт"
                 >
                   {/* SVG иконка копирования */}
@@ -381,21 +212,7 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
 
               {/* Сообщение об успешном копировании */}
               {copySuccess && (
-                <div style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  padding: '8px 16px',
-                  backgroundColor: '#28a745',
-                  color: 'white',
-                  fontSize: '14px',
-                  borderRadius: '4px',
-                  whiteSpace: 'nowrap',
-                  zIndex: 100,
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-                  animation: 'fadeInOut 2s ease'
-                }}>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-2 bg-green-500 text-white text-sm rounded whitespace-nowrap z-50 shadow-lg animate-fadeInOut">
                   Скопировано!
                 </div>
               )}
@@ -408,10 +225,11 @@ const CreateFishesModal = ({ isOpen, onClose, onCreate, pondId }) => {
                   80% { opacity: 1; }
                   100% { opacity: 0; }
                 }
+                .animate-fadeInOut {
+                  animation: fadeInOut 2s ease;
+                }
               `}</style>
-
             </div>
-
           </form>
         </div>
       </div>

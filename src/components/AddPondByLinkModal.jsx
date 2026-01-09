@@ -114,97 +114,27 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
   };
 
   return ReactDOM.createPortal(
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 10000,
-      padding: '0px'
-    }} onClick={handleBackdropClick}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '24px',
-        borderRadius: '12px',
-        width: '90%',
-        maxWidth: '500px',
-        maxHeight: '90vh',
-        boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative'
-      }}>
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[10000] p-0"
+      onClick={handleBackdropClick}
+    >
+      <div className="bg-white p-6 rounded-xl w-[90%] max-w-[500px] max-h-[90vh] shadow-2xl overflow-hidden flex flex-col relative">
         <button
           onClick={handleClose}
-          style={{
-            position: 'absolute',
-            top: '16px',
-            right: '16px',
-            background: 'none',
-            border: 'none',
-            fontSize: '24px',
-            cursor: 'pointer',
-            color: '#666',
-            width: '32px',
-            height: '32px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '4px',
-            transition: 'all 0.3s ease',
-            zIndex: 10
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#f5f5f5';
-            e.target.style.color = '#333';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-            e.target.style.color = '#666';
-          }}
+          className="absolute top-4 right-4 bg-transparent border-none text-2xl cursor-pointer text-gray-600 w-8 h-8 flex items-center justify-center rounded transition-all duration-300 ease-in-out z-10 hover:bg-gray-100 hover:text-gray-800"
         >
           ×
         </button>
         
-        <h2 style={{ 
-          margin: '0 0 20px 0', 
-          fontSize: '28px', 
-          fontWeight: '800',
-          color: '#3498db',
-          textAlign: 'center',
-          paddingRight: '40px',
-          flexShrink: 0
-        }}>
+        <h2 className="m-0 mb-5 text-[28px] font-extrabold text-blue-500 text-center pr-10 flex-shrink-0">
           Добавить пруд по ссылке
         </h2>
         
-        <div style={{
-          flex: 1,
-          overflow: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
-          paddingRight: '20px',
-          marginRight: '-20px'
-        }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div className="flex-1 overflow-auto flex flex-col min-h-0 pr-5 -mr-5">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1">
             {/* Поле для ввода ссылки */}
-            <div style={{ marginBottom: '12px', flexShrink: 0 }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '12px',
-                fontWeight: '600',
-                fontSize: '18px',
-                color: '#34495e',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
+            <div className="mb-3 flex-shrink-0">
+              <label className="block mb-3 font-semibold text-lg text-gray-700 uppercase tracking-wider">
                 ССЫЛКА НА ПРУД *
               </label>
               <input
@@ -212,164 +142,55 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
                 value={link}
                 onChange={handleChange}
                 placeholder={`${shareUrlPrefix}pond_identificator`}
-                style={{
-                  width: '100%',
-                  padding: '14px',
-                  border: `2px solid ${error ? '#e74c3c' : '#bdc3c7'}`,
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  boxSizing: 'border-box',
-                  transition: 'border-color 0.3s ease',
-                  fontFamily: 'monospace'
-                }}
+                className={`w-full p-3.5 border-2 rounded-lg text-base box-border transition-colors duration-300 ease-in-out font-mono ${
+                  error ? 'border-red-500' : 'border-gray-300'
+                }`}
                 required
                 autoFocus
               />
               
               {error && (
-                <div style={{
-                  marginTop: '8px',
-                  padding: '10px',
-                  backgroundColor: '#fee',
-                  border: '1px solid #e74c3c',
-                  borderRadius: '6px',
-                  color: '#c0392b',
-                  fontSize: '14px'
-                }}>
+                <div className="mt-2 p-2.5 bg-red-50 border border-red-500 rounded-lg text-red-700 text-sm">
                   ⚠️ {error}
                 </div>
               )}
               
-              <div style={{
-                marginTop: '12px',
-                padding: '12px',
-                backgroundColor: '#f8f9fa',
-                borderRadius: '8px',
-                fontSize: '14px',
-                color: '#7f8c8d'
-              }}>
-                <p style={{ margin: '0 0 8px 0', fontWeight: '600' }}>
+              <div className="mt-3 p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
+                <p className="m-0 mb-2 font-semibold">
                   Как получить ссылку на пруд?
                 </p>
-                <ul style={{ margin: '0', paddingLeft: '20px' }}>
+                <ul className="m-0 pl-5">
                   <li>Попросите у владельца пруда ссылку для копирования или найдите в интернете ссылку на публичный пруд</li>
                 </ul>
               </div>
             </div>
 
             {/* Окошко с галочкой для отслеживания обновлений */}
-            <div style={{ 
-              marginBottom: '20px',
-              flexShrink: 0,
-              padding: '16px',
-              backgroundColor: '#ffffffff',
-              borderRadius: '8px',
-              border: '0px solid #e0e0e0'
-            }}>
-              <label style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                cursor: 'pointer',
-                margin: 0
-              }}>
+            <div className="mb-5 flex-shrink-0 p-4 bg-white rounded-lg border-0 border-gray-300">
+              <label className="flex items-start cursor-pointer m-0">
                 <input
                   type="checkbox"
                   checked={trackUpdates}
                   onChange={(e) => setTrackUpdates(e.target.checked)}
-                  style={{
-                    marginRight: '12px',
-                    marginTop: '12px',
-                    width: '28px',
-                    height: '28px',
-                    cursor: 'pointer',
-                    accentColor: '#3498db'
-                  }}
+                  className="mr-3 mt-3 w-7 h-7 cursor-pointer accent-blue-500"
                 />
                 <div>
-                  <div style={{
-                    fontWeight: '600',
-                    fontSize: '18px',
-                    color: '#2c3e50',
-                    marginBottom: '4px'
-                  }}>
+                  <div className="font-semibold text-lg text-gray-800 mb-1">
                     Отслеживать обновления
                   </div>
-                  <div style={{
-                    fontSize: '14px',
-                    color: '#7f8c8d',
-                    lineHeight: '1.4'
-                  }}>
+                  <div className="text-sm text-gray-600 leading-relaxed">
                     Если автор изменит пруд, ваш пруд также поменяется
                   </div>
                 </div>
               </label>
             </div>
 
-            {/* Информация о том, что будет скопировано
-            <div style={{ 
-              marginBottom: '20px',
-              flexShrink: 0,
-              padding: '16px',
-              backgroundColor: '#e3f2fd',
-              borderRadius: '8px',
-              border: '1px solid #bbdefb'
-            }}>
-              <h4 style={{
-                margin: '0 0 8px 0',
-                fontSize: '16px',
-                color: '#1565c0',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <span>📋</span> Что будет скопировано:
-              </h4>
-              <ul style={{
-                margin: '0',
-                paddingLeft: '24px',
-                fontSize: '14px',
-                color: '#0d47a1'
-              }}>
-                <li>Все карточки пруда</li>
-                <li>Интервалы повторения</li>
-                <li>Структура слоев</li>
-                <li>Настройки пруда</li>
-              </ul>
-            </div> */}
-
             {/* Кнопки действий */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginTop: 'auto',
-              paddingTop: '20px',
-              flexShrink: 0
-            }}>
+            <div className="flex justify-between mt-auto pt-5 flex-shrink-0">
               <button
                 type="button"
                 onClick={handleClose}
-                style={{
-                  padding: '12px 24px',
-                  border: '2px solid #bdc3c7',
-                  borderRadius: '8px',
-                  backgroundColor: 'transparent',
-                  color: '#7f8c8d',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  transition: 'all 0.3s ease',
-                  minWidth: '120px'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#f8f9fa';
-                  e.target.style.borderColor = '#95a5a6';
-                  e.target.style.color = '#34495e';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                  e.target.style.borderColor = '#bdc3c7';
-                  e.target.style.color = '#7f8c8d';
-                }}
+                className="px-6 py-3 border-2 border-gray-300 rounded-lg bg-transparent text-gray-600 cursor-pointer text-sm font-semibold transition-all duration-300 ease-in-out min-w-[120px] hover:bg-gray-50 hover:border-gray-400 hover:text-gray-700"
               >
                 Назад
               </button>
@@ -377,19 +198,9 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
               <button
                 type="submit"
                 disabled={loading || !link.trim()}
-                style={{
-                  padding: '12px 24px',
-                  border: 'none',
-                  borderRadius: '8px',
-                  backgroundColor: loading ? '#95a5a6' : '#3498db',
-                  color: 'white',
-                  cursor: (loading || !link.trim()) ? 'not-allowed' : 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  transition: 'all 0.3s ease',
-                  opacity: (loading || !link.trim()) ? 0.6 : 1,
-                  minWidth: '120px'
-                }}
+                className={`px-6 py-3 border-none rounded-lg text-white cursor-pointer text-sm font-semibold transition-all duration-300 ease-in-out min-w-[120px] ${
+                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500'
+                } ${(loading || !link.trim()) ? 'opacity-60' : 'opacity-100'}`}
               >
                 {loading ? 'ДОБАВЛЕНИЕ...' : 'ДОБАВИТЬ ПРУД'}
               </button>

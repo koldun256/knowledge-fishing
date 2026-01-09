@@ -313,50 +313,6 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     return 'минут';
   };
 
-  const maskedInputStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    padding: '10px 12px',
-    border: '2px solid #bdc3c7',
-    borderRadius: '6px',
-    backgroundColor: 'white',
-    transition: 'border-color 0.3s ease'
-  };
-
-  const numberInputStyle = {
-    border: 'none',
-    outline: 'none',
-    background: 'transparent',
-    width: 'auto',
-    minWidth: '20px',
-    maxWidth: '30px',
-    textAlign: 'center',
-    fontSize: '14px',
-    padding: '2px 2px',
-    borderRadius: '3px',
-    transition: 'background-color 0.2s ease',
-    WebkitAppearance: 'none',
-    MozAppearance: 'textfield',
-    appearance: 'textfield',
-    margin: 0
-  };
-
-  const numberInputHoverStyle = {
-    backgroundColor: '#f8f9fa'
-  };
-
-  const numberInputFocusStyle = {
-    backgroundColor: '#e3f2fd',
-    boxShadow: '0 0 0 2px rgba(33, 150, 243, 0.2)'
-  };
-
-  const labelStyle = {
-    fontSize: '12px',
-    color: '#7f8c8d',
-    whiteSpace: 'nowrap'
-  };
-
   const webkitSpinButtonStyles = `
     input[type="number"]::-webkit-outer-spin-button,
     input[type="number"]::-webkit-inner-spin-button {
@@ -375,99 +331,29 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
   `;
 
   return ReactDOM.createPortal(
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 10000,
-      padding: '16px'
-    }} onClick={handleBackdropClick}>
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[10000] p-4"
+      onClick={handleBackdropClick}
+    >
       <style>{webkitSpinButtonStyles}</style>
       
-      <div style={{
-        backgroundColor: 'white',
-        padding: '24px',
-        borderRadius: '12px',
-        width: '90%',
-        maxWidth: '500px',
-        maxHeight: '90vh',
-        boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative'
-      }}>
+      <div className="bg-white p-6 rounded-xl w-[90%] max-w-[500px] max-h-[90vh] shadow-2xl overflow-hidden flex flex-col relative">
         <button
           onClick={handleClose}
-          style={{
-            position: 'absolute',
-            top: '16px',
-            right: '16px',
-            background: 'none',
-            border: 'none',
-            fontSize: '24px',
-            cursor: 'pointer',
-            color: '#666',
-            width: '32px',
-            height: '32px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '4px',
-            transition: 'all 0.3s ease',
-            zIndex: 10
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#f5f5f5';
-            e.target.style.color = '#333';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-            e.target.style.color = '#666';
-          }}
+          className="absolute top-4 right-4 bg-transparent border-none text-2xl cursor-pointer text-gray-600 w-8 h-8 flex items-center justify-center rounded transition-all duration-300 ease-in-out z-10 hover:bg-gray-100 hover:text-gray-800"
         >
           ×
         </button>
         
-        <h2 style={{ 
-          margin: '0 0 20px 0', 
-          fontSize: '28px', 
-          fontWeight: '800',
-          color: '#013b45ff',
-          textAlign: 'center',
-          paddingRight: '40px',
-          flexShrink: 0
-        }}>
+        <h2 className="m-0 mb-5 text-[28px] font-extrabold text-[#013b45] text-center pr-10 flex-shrink-0">
           Редактировать пруд
         </h2>
         
-        <div style={{
-          flex: 1,
-          overflow: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
-          paddingRight: '20px',
-          marginRight: '-20px'
-        }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div className="flex-1 overflow-auto flex flex-col min-h-0 pr-5 -mr-5">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1">
             {/* Название пруда */}
-            <div style={{ marginBottom: '20px', flexShrink: 0 }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontWeight: '600',
-                fontSize: '18px',
-                color: '#34495e',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
+            <div className="mb-5 flex-shrink-0">
+              <label className="block mb-2 font-semibold text-lg text-gray-700 uppercase tracking-wider">
                 НАЗВАНИЕ ПРУДА *
               </label>
               <input
@@ -476,30 +362,14 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Например: JavaScript основы"
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '2px solid #bdc3c7',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  boxSizing: 'border-box',
-                  transition: 'border-color 0.3s ease'
-                }}
+                className="w-full p-3 border-2 border-gray-300 rounded-lg text-base box-border transition-colors duration-300 ease-in-out focus:border-blue-500 focus:outline-none"
                 required
               />
             </div>
 
             {/* Описание пруда */}
-            <div style={{ marginBottom: '20px', flexShrink: 0 }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontWeight: '600',
-                fontSize: '18px',
-                color: '#34495e',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
+            <div className="mb-5 flex-shrink-0">
+              <label className="block mb-2 font-semibold text-lg text-gray-700 uppercase tracking-wider">
                 Описание
               </label>
               <textarea
@@ -507,51 +377,21 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Дополнительная информация о пруде..."
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '2px solid #bdc3c7',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box',
-                  transition: 'border-color 0.3s ease',
-                  minHeight: '100px',
-                  resize: 'vertical',
-                  fontFamily: 'inherit'
-                }}
+                className="w-full p-3 border-2 border-gray-300 rounded-lg text-sm box-border transition-colors duration-300 ease-in-out min-h-[100px] resize-y font-inherit focus:border-blue-500 focus:outline-none"
               />
             </div>
 
             {/* Категория */}
-            <div style={{ marginBottom: '20px', flexShrink: 0 }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontWeight: '600',
-                fontSize: '18px',
-                color: '#34495e',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
+            <div className="mb-5 flex-shrink-0">
+              <label className="block mb-2 font-semibold text-lg text-gray-700 uppercase tracking-wider">
                 КАТЕГОРИЯ *
               </label>
-              <div style={{ position: 'relative' }}>
+              <div className="relative">
                 <select
                   name="topic"
                   value={formData.topic}
                   onChange={handleCategoryChange}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '2px solid #bdc3c7',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    boxSizing: 'border-box',
-                    transition: 'border-color 0.3s ease',
-                    backgroundColor: 'white',
-                    appearance: 'none',
-                    cursor: 'pointer'
-                  }}
+                  className="w-full p-3 border-2 border-gray-300 rounded-lg text-base box-border transition-colors duration-300 ease-in-out bg-white appearance-none cursor-pointer focus:border-blue-500 focus:outline-none"
                   required
                 >
                   {categories.map((cat) => (
@@ -561,49 +401,27 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                   ))}
                   <option value="new">+ Создать новую категорию</option>
                 </select>
-                <div style={{
-                  position: 'absolute',
-                  right: '12px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  pointerEvents: 'none'
-                }}>
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                   ▼
                 </div>
               </div>
 
               {showNewCategory && (
-                <div style={{ marginTop: '12px' }}>
+                <div className="mt-3">
                   <input
                     type="text"
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
                     placeholder="Введите название новой категории"
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      border: '2px solid #3498db',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box',
-                      marginBottom: '8px'
-                    }}
+                    className="w-full p-3 border-2 border-blue-500 rounded-lg text-sm box-border mb-2 focus:outline-none focus:border-blue-600"
                   />
                   <button
                     type="button"
                     onClick={handleAddNewCategory}
                     disabled={!newCategory.trim()}
-                    style={{
-                      padding: '8px 16px',
-                      border: 'none',
-                      borderRadius: '6px',
-                      backgroundColor: '#3498db',
-                      color: 'white',
-                      cursor: newCategory.trim() ? 'pointer' : 'not-allowed',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      opacity: newCategory.trim() ? 1 : 0.6
-                    }}
+                    className={`px-4 py-2 border-none rounded-lg text-white cursor-pointer text-sm font-medium ${
+                      newCategory.trim() ? 'bg-blue-500 hover:bg-blue-600' : 'bg-blue-300 cursor-not-allowed'
+                    } transition-colors duration-200`}
                   >
                     Добавить категорию
                   </button>
@@ -612,56 +430,26 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
             </div>
 
             {/* Публичность пруда */}
-            <div style={{ 
-              marginBottom: '20px', 
-              flexShrink: 0
-            }}>
+            <div className="mb-5 flex-shrink-0">
               <label 
                 htmlFor="is_public"
-                style={{
-                  display: 'block',
-                  cursor: 'pointer',
-                  userSelect: 'none'
-                }}
+                className="block cursor-pointer select-none"
               >
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  backgroundColor: '#f8f9fa',
-                  borderRadius: '8px',
-                  border: '1px solid #e9ecef',
-                  transition: 'border-color 0.3s ease'
-                }}>
-                  <div style={{ position: 'relative', flexShrink: 0 }}>
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-colors duration-300 ease-in-out hover:border-gray-300">
+                  <div className="relative flex-shrink-0">
                     <input
                       type="checkbox"
                       id="is_public"
                       name="is_public"
                       checked={formData.is_public}
                       onChange={handlePublicChange}
-                      style={{
-                        width: '24px',
-                        height: '24px',
-                        cursor: 'pointer',
-                        opacity: 0,
-                        position: 'absolute',
-                        zIndex: 1
-                      }}
+                      className="w-6 h-6 cursor-pointer opacity-0 absolute z-10"
                     />
-                    <div style={{
-                      width: '24px',
-                      height: '24px',
-                      borderRadius: '4px',
-                      border: '2px solid',
-                      borderColor: formData.is_public ? '#27ae60' : '#95a5a6',
-                      backgroundColor: formData.is_public ? '#27ae60' : 'white',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      transition: 'all 0.2s ease'
-                    }}>
+                    <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all duration-200 ease-in-out ${
+                      formData.is_public 
+                        ? 'border-green-500 bg-green-500' 
+                        : 'border-gray-400 bg-white'
+                    }`}>
                       {formData.is_public && (
                         <svg 
                           width="14" 
@@ -678,21 +466,10 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                   </div>
                   
                   <div>
-                    <div style={{
-                      fontSize: '18px',
-                      fontWeight: '600',
-                      color: '#2c3e50',
-                      display: 'block',
-                      marginBottom: '4px'
-                    }}>
+                    <div className="text-lg font-semibold text-gray-800 block mb-1">
                       Публичный пруд
                     </div>
-                    <p style={{
-                      fontSize: '14px',
-                      color: '#7f8c8d',
-                      margin: 0,
-                      lineHeight: '1.4'
-                    }}>
+                    <p className="text-sm text-gray-600 m-0 leading-relaxed">
                       {formData.is_public 
                         ? 'Теперь пользователи смогут скопировать ваш пруд себе и изучать информацию, добавленную вами' 
                         : 'Сейчас пруд будет виден только вам. Вы можете поделиться доступом с другими пользователями позже.'}
@@ -703,46 +480,21 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
             </div>
 
             {/* Интервалы времени для каждого слоя */}
-            <div style={{ marginBottom: '20px', flexShrink: 0 }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: '4px'
-              }}>
-                <label style={{
-                  display: 'block',
-                  fontWeight: '600',
-                  fontSize: '16px',
-                  color: '#34495e',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  cursor: 'pointer',
-                  userSelect: 'none',
-                  marginBottom: '0',
-                  lineHeight: '1.2'
-                }}
-                onClick={() => setShowIntervals(!showIntervals)}>
+            <div className="mb-5 flex-shrink-0">
+              <div className="flex items-center justify-between mb-1">
+                <label 
+                  className="block font-semibold text-base text-gray-700 uppercase tracking-wider cursor-pointer select-none mb-0 leading-tight"
+                  onClick={() => setShowIntervals(!showIntervals)}
+                >
                   ИНТЕРВАЛЫ ПОВТОРЕНИЯ
                 </label>
                 
                 <button
                   type="button"
                   onClick={() => setShowIntervals(!showIntervals)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '2px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'transform 0.3s ease',
-                    transform: showIntervals ? 'rotate(180deg)' : 'rotate(0deg)',
-                    color: '#34495e',
-                    marginTop: '-2px',
-                    marginBottom: '-2px'
-                  }}
+                  className={`bg-transparent border-none cursor-pointer p-0.5 flex items-center justify-center transition-transform duration-300 ease-in-out text-gray-700 -mt-0.5 -mb-0.5 ${
+                    showIntervals ? 'rotate-180' : 'rotate-0'
+                  }`}
                   aria-label={showIntervals ? 'Скрыть интервалы' : 'Показать интервалы'}
                 >
                   <svg 
@@ -759,18 +511,8 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
               </div>
 
               {!showIntervals ? (
-                <div style={{
-                  backgroundColor: '#f8f9fa',
-                  borderRadius: '8px',
-                  padding: '12px',
-                  marginTop: '8px'
-                }}>
-                  <p style={{
-                    margin: '0',
-                    fontSize: '14px',
-                    color: '#495057',
-                    lineHeight: '1.3'
-                  }}>
+                <div className="bg-gray-50 rounded-lg p-3 mt-2">
+                  <p className="m-0 text-sm text-gray-700 leading-relaxed">
                     Сейчас установлены: {formData.intervals.map((interval, index) => {
                       const readable = formatIntervalToReadable(interval);
                       return `${readable}`;
@@ -778,13 +520,8 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                   </p>
                 </div>
               ) : (
-                <div style={{ marginTop: '12px' }}>
-                  <p style={{
-                    marginBottom: '12px',
-                    fontSize: '14px',
-                    color: '#7f8c8d',
-                    lineHeight: '1.4'
-                  }}>
+                <div className="mt-3">
+                  <p className="mb-3 text-sm text-gray-600 leading-relaxed">
                     Укажите интервалы для каждого повторения:
                   </p>
                   
@@ -795,21 +532,12 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                     const isMinutesFocused = focusedInputs[`${index}-minutes`];
                     
                     return (
-                      <div key={index} style={{ marginBottom: '12px' }}>
-                        <label style={{
-                          display: 'block',
-                          marginBottom: '4px',
-                          fontWeight: '500',
-                          fontSize: '14px',
-                          color: '#2c3e50',
-                        }}>
+                      <div key={index} className="mb-3">
+                        <label className="block mb-1 font-medium text-sm text-gray-800">
                           {index + 1}-е повторение:
                         </label>
                         
-                        <div style={{
-                          ...maskedInputStyle,
-                          padding: '8px 10px'
-                        }}>
+                        <div className="flex items-center gap-1 p-2 border-2 border-gray-300 rounded bg-white transition-colors duration-300 ease-in-out">
                           <input
                             type="number"
                             value={isDaysFocused && parts.days === 0 ? '' : parts.days}
@@ -818,24 +546,11 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                             onBlur={() => handleInputBlur(index, 'days')}
                             min="0"
                             placeholder="0"
-                            style={{
-                              ...numberInputStyle,
-                              fontSize: '14px'
-                            }}
-                            onMouseEnter={(e) => Object.assign(e.target.style, numberInputHoverStyle)}
-                            onMouseLeave={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent' })}
-                            onFocus={(e) => {
-                              Object.assign(e.target.style, numberInputFocusStyle);
-                              handleInputFocus(index, 'days');
-                            }}
-                            onBlur={(e) => {
-                              Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' });
-                              handleInputBlur(index, 'days');
-                            }}
+                            className="border-none outline-none bg-transparent w-auto min-w-[20px] max-w-[30px] text-center text-sm p-0.5 rounded transition-colors duration-200 ease-in-out hover:bg-gray-50 focus:bg-blue-50 focus:shadow-[0_0_0_2px_rgba(33,150,243,0.2)] appearance-none"
                           />
-                          <span style={{ ...labelStyle, fontSize: '14px' }}>дней</span>
+                          <span className="text-xs text-gray-600 whitespace-nowrap text-sm">дней</span>
                           
-                          <span style={{ color: '#bdc3c7', margin: '0 3px' }}>,</span>
+                          <span className="text-gray-300 mx-0.5">,</span>
                           
                           <input
                             type="number"
@@ -846,24 +561,11 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                             min="0"
                             max="23"
                             placeholder="0"
-                            style={{
-                              ...numberInputStyle,
-                              fontSize: '14px'
-                            }}
-                            onMouseEnter={(e) => Object.assign(e.target.style, numberInputHoverStyle)}
-                            onMouseLeave={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent' })}
-                            onFocus={(e) => {
-                              Object.assign(e.target.style, numberInputFocusStyle);
-                              handleInputFocus(index, 'hours');
-                            }}
-                            onBlur={(e) => {
-                              Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' });
-                              handleInputBlur(index, 'hours');
-                            }}
+                            className="border-none outline-none bg-transparent w-auto min-w-[20px] max-w-[30px] text-center text-sm p-0.5 rounded transition-colors duration-200 ease-in-out hover:bg-gray-50 focus:bg-blue-50 focus:shadow-[0_0_0_2px_rgba(33,150,243,0.2)] appearance-none"
                           />
-                          <span style={{ ...labelStyle, fontSize: '14px' }}>часов</span>
+                          <span className="text-xs text-gray-600 whitespace-nowrap text-sm">часов</span>
                           
-                          <span style={{ color: '#bdc3c7', margin: '0 3px' }}>,</span>
+                          <span className="text-gray-300 mx-0.5">,</span>
                           
                           <input
                             type="number"
@@ -874,22 +576,9 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                             min="0"
                             max="59"
                             placeholder="0"
-                            style={{
-                              ...numberInputStyle,
-                              fontSize: '14px'
-                            }}
-                            onMouseEnter={(e) => Object.assign(e.target.style, numberInputHoverStyle)}
-                            onMouseLeave={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent' })}
-                            onFocus={(e) => {
-                              Object.assign(e.target.style, numberInputFocusStyle);
-                              handleInputFocus(index, 'minutes');
-                            }}
-                            onBlur={(e) => {
-                              Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' });
-                              handleInputBlur(index, 'minutes');
-                            }}
+                            className="border-none outline-none bg-transparent w-auto min-w-[20px] max-w-[30px] text-center text-sm p-0.5 rounded transition-colors duration-200 ease-in-out hover:bg-gray-50 focus:bg-blue-50 focus:shadow-[0_0_0_2px_rgba(33,150,243,0.2)] appearance-none"
                           />
-                          <span style={{ ...labelStyle, fontSize: '14px' }}>минут</span>
+                          <span className="text-xs text-gray-600 whitespace-nowrap text-sm">минут</span>
                         </div>
                       </div>
                     );
@@ -899,31 +588,14 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
             </div>
 
             {/* Кнопки */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: '12px',
-              marginBottom: '20px',
-              marginTop: '20px',
-              flexShrink: 0
-            }}>
+            <div className="flex justify-between gap-3 mb-5 mt-5 flex-shrink-0">
               <button
                 type="button"
                 onClick={handleDelete}
                 disabled={loading}
-                style={{
-                  padding: '12px 12px',
-                  border: 'none',
-                  borderRadius: '8px',
-                  backgroundColor: loading ? '#95a5a6' : '#e74c3c',
-                  color: 'white',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  transition: 'all 0.3s ease',
-                  opacity: loading ? 0.6 : 1,
-                  flex: 1
-                }}
+                className={`flex-1 px-3 py-3 border-none rounded-lg text-white cursor-pointer text-base font-semibold transition-all duration-300 ease-in-out ${
+                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'
+                } ${loading ? 'opacity-60' : 'opacity-100'}`}
               >
                 {loading ? 'УДАЛЕНИЕ...' : 'УДАЛИТЬ ПРУД'}
               </button>
@@ -931,19 +603,11 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
               <button
                 type="submit"
                 disabled={loading || !formData.name.trim() || !formData.topic}
-                style={{
-                  padding: '12px 12px',
-                  border: 'none',
-                  borderRadius: '8px',
-                  backgroundColor: loading ? '#95a5a6' : '#27ae60',
-                  color: 'white',
-                  cursor: (loading || !formData.name.trim() || !formData.topic) ? 'not-allowed' : 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  transition: 'all 0.3s ease',
-                  opacity: (loading || !formData.name.trim() || !formData.topic) ? 0.6 : 1,
-                  flex: 1
-                }}
+                className={`flex-1 px-3 py-3 border-none rounded-lg text-white cursor-pointer text-base font-semibold transition-all duration-300 ease-in-out ${
+                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'
+                } ${
+                  (loading || !formData.name.trim() || !formData.topic) ? 'opacity-60' : 'opacity-100'
+                }`}
               >
                 {loading ? 'СОХРАНЕНИЕ...' : 'СОХРАНИТЬ'}
               </button>

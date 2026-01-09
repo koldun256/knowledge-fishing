@@ -122,52 +122,20 @@ export default function FishingDialog() {
   // Если это информационное сообщение
   if (isInfoDialog) {
     return ReactDOM.createPortal(
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 10000,
-        padding: '16px'
-      }} onClick={() => setDialog({ open: false, fish: null })}>
-        <div style={{
-          backgroundColor: 'white',
-          padding: '24px',
-          borderRadius: '12px',
-          width: '90%',
-          maxWidth: '400px',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-          position: 'relative'
-        }}>
-          <h3 style={{
-            marginTop: 0,
-            marginBottom: '16px',
-            fontSize: '20px',
-            fontWeight: '600',
-            color: '#2d3436'
-          }}>
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[10000] p-4"
+        onClick={() => setDialog({ open: false, fish: null })}
+      >
+        <div className="bg-white p-6 rounded-xl w-[90%] max-w-[400px] shadow-2xl relative">
+          <h3 className="mt-0 mb-4 text-xl font-semibold text-gray-800">
             {dialog.title || 'Сообщение'}
           </h3>
           
-          <p style={{
-            marginBottom: '24px',
-            fontSize: '16px',
-            lineHeight: '1.5',
-            color: '#636e72'
-          }}>
+          <p className="mb-6 text-base leading-relaxed text-gray-600">
             {dialog.message}
           </p>
           
-          <div style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: '8px'
-          }}>
+          <div className="flex justify-end gap-2">
             {dialog.options?.map((option, index) => (
               <button
                 key={index}
@@ -175,19 +143,7 @@ export default function FishingDialog() {
                   e.stopPropagation();
                   option.action?.();
                 }}
-                style={{
-                  padding: '8px 16px',
-                  border: 'none',
-                  borderRadius: '6px',
-                  backgroundColor: '#3498db',
-                  color: 'white',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#2980b9'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#3498db'}
+                className="px-4 py-2 border-none rounded-lg bg-blue-500 text-white text-sm font-medium cursor-pointer transition-colors duration-200 hover:bg-blue-600"
               >
                 {option.text || 'Ок'}
               </button>
@@ -197,19 +153,7 @@ export default function FishingDialog() {
                   e.stopPropagation();
                   setDialog({ open: false, fish: null });
                 }}
-                style={{
-                  padding: '8px 16px',
-                  border: 'none',
-                  borderRadius: '6px',
-                  backgroundColor: '#3498db',
-                  color: 'white',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#2980b9'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#3498db'}
+                className="px-4 py-2 border-none rounded-lg bg-blue-500 text-white text-sm font-medium cursor-pointer transition-colors duration-200 hover:bg-blue-600"
               >
                 Ок
               </button>
@@ -224,193 +168,73 @@ export default function FishingDialog() {
   if (!fish) return null;
 
   return ReactDOM.createPortal(
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 10000,
-      padding: '16px'
-    }} onClick={handleBackdropClick}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '24px',
-        borderRadius: '12px',
-        width: '90%',
-        maxWidth: '500px',
-        maxHeight: '90vh',
-        boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative'
-      }}>
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[10000] p-4"
+      onClick={handleBackdropClick}
+    >
+      <div className="bg-white p-6 rounded-xl w-[90%] max-w-[500px] max-h-[90vh] shadow-2xl overflow-hidden flex flex-col relative">
         {/* Крестик закрытия в правом верхнем углу */}
         <button
           onClick={handleCancel}
           disabled={submitting}
-          style={{
-            position: 'absolute',
-            top: '16px',
-            right: '16px',
-            background: 'none',
-            border: 'none',
-            fontSize: '24px',
-            cursor: submitting ? 'not-allowed' : 'pointer',
-            color: '#666',
-            width: '32px',
-            height: '32px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '4px',
-            transition: 'all 0.3s ease',
-            zIndex: 10
-          }}
-          onMouseEnter={(e) => {
-            if (!submitting) {
-              e.target.style.backgroundColor = '#f5f5f5';
-              e.target.style.color = '#333';
-            }
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-            e.target.style.color = '#666';
-          }}
+          className={`absolute top-4 right-4 bg-transparent border-none text-2xl cursor-pointer w-8 h-8 flex items-center justify-center rounded transition-all duration-300 ease-in-out z-10 ${
+            submitting 
+              ? 'text-gray-300 cursor-not-allowed' 
+              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+          }`}
         >
           ×
         </button>
         
         {/* Основной контент - прокручиваемый с правильным отступом */}
-        <div style={{
-          flex: 1,
-          overflow: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
-          paddingRight: '20px',
-          marginRight: '-20px'
-        }}>
+        <div className="flex-1 overflow-auto flex flex-col min-h-0 pr-5 -mr-5">
           {/* Вопрос */}
-          <div style={{ marginBottom: '20px', flexShrink: 0 }}>
-            <div style={{
-              padding: '12px',
-              borderRadius: '8px',
-              fontSize: '16px',
-              backgroundColor: '#ffffffff',
-              minHeight: '60px',
-              lineHeight: '1.4'
-            }}
-            dangerouslySetInnerHTML={{ __html: formatStringForDisplay(fish.question) }}
+          <div className="mb-5 flex-shrink-0">
+            <div 
+              className="p-3 rounded-lg text-base bg-white min-h-[60px] leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: formatStringForDisplay(fish.question) }}
             />
           </div>
 
           {/* Ответ */}
-          <div style={{ marginBottom: '20px', flexShrink: 0 }}>
+          <div className="mb-5 flex-shrink-0">
             <div 
               onClick={toggleAnswer}
-              style={{
-                padding: '12px',
-                borderRadius: '8px',
-                fontSize: '16px',
-                backgroundColor: showAnswer ? '#ffffffff' : '#a2a8adff',
-                minHeight: '80px',
-                lineHeight: '1.4',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                position: 'relative',
-                overflow: 'hidden'
-              }}
+              className={`p-3 rounded-lg text-base min-h-[80px] leading-relaxed cursor-pointer transition-all duration-300 ease-in-out relative overflow-hidden ${
+                showAnswer ? 'bg-white' : 'bg-gray-400'
+              }`}
             >
               {showAnswer ? (
                 <div dangerouslySetInnerHTML={{ __html: formatStringForDisplay(fish.answer) }} />
               ) : (
-                <div style={{
-                  position: 'relative',
-                  height: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
+                <div className="relative h-full flex items-center justify-center">
                   {/* Реальный текст ответа с эффектом размытия */}
-                  <div style={{
-                    filter: 'blur(4px)',
-                    opacity: 0.7,
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    padding: '12px',
-                    pointerEvents: 'none'
-                  }}
-                  dangerouslySetInnerHTML={{ __html: formatStringForDisplay(fish.answer) }}
+                  <div 
+                    className="blur-sm opacity-70 absolute inset-0 p-3 pointer-events-none"
+                    dangerouslySetInnerHTML={{ __html: formatStringForDisplay(fish.answer) }}
                   />
-                  
-                  {/* Наложение с градиентом и текстом */}
-                  {/* <div style={{
-                    position: 'relative',
-                    zIndex: 2,
-                    background: '#f8f9fa',
-                    padding: '8px 16px',
-                    borderRadius: '20px',
-                    fontSize: '14px',
-                    fontStyle: 'italic',
-                    color: '#7f8c8d',
-                    border: '1px solid #e9ecef'
-                  }}>
-                    Нажмите, чтобы посмотреть ответ
-                  </div> */}
                 </div>
               )}
             </div>
           </div>
 
           {/* Оценка */}
-          <div style={{ marginBottom: '24px', flexShrink: 0 }}>
-            <div style={{
-              display: 'block',
-              marginBottom: '8px',
-              fontWeight: '600',
-              fontSize: '16px',
-              color: '#34495e',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>
+          <div className="mb-6 flex-shrink-0">
+            <div className="block mb-2 font-semibold text-base text-gray-700 uppercase tracking-wider">
               КУДА ПЕРЕМЕСТИТЬ РЫБУ?
             </div>
             
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 3fr',
-              gap: '8px',
-              marginBottom: '8px'
-            }}>
+            <div className="grid grid-cols-3 gap-2 mb-2">
               {/* Стрелка вверх (-1) */}
               <button
                 onClick={() => handleScoreSelect(-1)}
                 disabled={submitting}
-                style={{
-                  padding: '12px',
-                  border: '2px solid',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  cursor: submitting ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.3s ease',
-                  borderColor: score === -1 ? '#27ae60' : '#bdc3c7',
-                  backgroundColor: score === -1 ? '#27ae60' : 'white',
-                  color: score === -1 ? 'white' : '#34495e',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
                 aria-pressed={score === -1}
+                className={`p-3 border-2 rounded-lg text-base font-semibold cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center ${
+                  score === -1
+                    ? 'border-green-500 bg-green-500 text-white'
+                    : 'border-gray-300 bg-white text-gray-800 hover:border-green-500'
+                } ${submitting ? 'cursor-not-allowed opacity-70' : ''}`}
               >
                 ↑
               </button>
@@ -419,22 +243,12 @@ export default function FishingDialog() {
               <button
                 onClick={() => handleScoreSelect(0)}
                 disabled={submitting}
-                style={{
-                  padding: '12px',
-                  border: '2px solid',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  cursor: submitting ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.3s ease',
-                  borderColor: score === 0 ? '#27ae60' : '#bdc3c7',
-                  backgroundColor: score === 0 ? '#27ae60' : 'white',
-                  color: score === 0 ? 'white' : '#34495e',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
                 aria-pressed={score === 0}
+                className={`p-3 border-2 rounded-lg text-base font-semibold cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center ${
+                  score === 0
+                    ? 'border-green-500 bg-green-500 text-white'
+                    : 'border-gray-300 bg-white text-gray-800 hover:border-green-500'
+                } ${submitting ? 'cursor-not-allowed opacity-70' : ''}`}
               >
                 0
               </button>
@@ -443,32 +257,18 @@ export default function FishingDialog() {
               <button
                 onClick={() => handleScoreSelect(1)}
                 disabled={submitting}
-                style={{
-                  padding: '12px',
-                  border: '2px solid',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  cursor: submitting ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.3s ease',
-                  borderColor: score === 1 ? '#27ae60' : '#bdc3c7',
-                  backgroundColor: score === 1 ? '#27ae60' : '#27ae60',
-                  color: score === 1 ? 'white' : '#2d3436',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
                 aria-pressed={score === 1}
+                className={`p-3 border-2 rounded-lg text-base font-semibold cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center ${
+                  score === 1
+                    ? 'border-green-500 bg-green-500 text-white'
+                    : 'border-green-500 bg-green-500 text-gray-800 hover:bg-green-600'
+                } ${submitting ? 'cursor-not-allowed opacity-70' : ''}`}
               >
                 ↓
               </button>
             </div>
             
-            <p style={{
-              fontSize: '12px',
-              color: '#7f8c8d',
-              margin: 0
-            }}>
+            <p className="text-xs text-gray-600 m-0">
               Горячие клавиши: ↑/0/↓/Enter для выбора, O — показать/скрыть ответ, Esc — закрыть.
             </p>
           </div>

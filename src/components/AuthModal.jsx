@@ -137,117 +137,37 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }) {
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 10000,
-      padding: '16px'
-    }} onClick={handleBackdropClick}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '24px',
-        borderRadius: '12px',
-        width: '90%',
-        maxWidth: '400px',
-        maxHeight: '90vh',
-        boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative'
-      }}>
+    <div 
+      className="fixed inset-0 bg-black/50 flex justify-center items-center z-[10000] p-4"
+      onClick={handleBackdropClick}
+    >
+      <div className="bg-white p-6 rounded-xl w-full max-w-[400px] max-h-[90vh] shadow-2xl overflow-hidden flex flex-col relative">
         {/* Крестик закрытия в правом верхнем углу */}
         <button
           onClick={handleClose}
-          style={{
-            position: 'absolute',
-            top: '16px',
-            right: '16px',
-            background: 'none',
-            border: 'none',
-            fontSize: '24px',
-            cursor: 'pointer',
-            color: '#666',
-            width: '32px',
-            height: '32px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '4px',
-            transition: 'all 0.3s ease',
-            zIndex: 10
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#f5f5f5';
-            e.target.style.color = '#333';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-            e.target.style.color = '#666';
-          }}
+          className="absolute top-4 right-4 bg-none border-none text-2xl cursor-pointer text-gray-600 w-8 h-8 flex items-center justify-center rounded transition-all duration-300 ease-in-out hover:bg-gray-100 hover:text-gray-800 z-10"
         >
           ×
         </button>
         
         {/* Заголовок - фиксированный */}
-        <h2 style={{ 
-          margin: '0 0 20px 0', 
-          fontSize: '28px', 
-          fontWeight: '800',
-          color: '#013b45ff',
-          textAlign: 'center',
-          paddingRight: '40px',
-          flexShrink: 0
-        }}>
+        <h2 className="m-0 mb-5 text-2xl font-extrabold text-[#013b45] text-center pr-10 flex-shrink-0">
           {isSignUp ? 'Регистрация' : 'Вход'}
         </h2>
         
         {/* Основной контент */}
-        <div style={{
-          flex: 1,
-          overflow: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
-          paddingRight: '20px',
-          marginRight: '-20px'
-        }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div className="flex-1 overflow-auto flex flex-col min-h-0 pr-5 -mr-5">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1">
             {/* Блок с ошибкой */}
             {error && (
-              <div style={{
-                marginBottom: '20px',
-                padding: '12px',
-                backgroundColor: '#fee',
-                border: '1px solid #f66',
-                borderRadius: '8px',
-                color: '#c33',
-                fontSize: '14px',
-                textAlign: 'center',
-                flexShrink: 0
-              }}>
+              <div className="mb-5 p-3 bg-red-50 border border-red-400 rounded-lg text-red-700 text-sm text-center flex-shrink-0">
                 {error}
               </div>
             )}
 
             {/* Поле Логин */}
-            <div style={{ marginBottom: '20px', flexShrink: 0 }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontWeight: '600',
-                fontSize: '18px',
-                color: '#34495e',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
+            <div className="mb-5 flex-shrink-0">
+              <label className="block mb-2 font-semibold text-lg text-gray-700 uppercase tracking-wider">
                 ЛОГИН *
               </label>
               <input
@@ -257,34 +177,21 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }) {
                 onChange={handleChange}
                 placeholder="Введите логин"
                 disabled={isLoading}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: error && !formData.login.trim() ? '2px solid #f66' : '2px solid #bdc3c7',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  boxSizing: 'border-box',
-                  transition: 'border-color 0.3s ease',
-                  backgroundColor: isLoading ? '#f5f5f5' : 'white'
-                }}
+                className={`w-full p-3 border-2 rounded-lg text-base box-border transition-colors duration-300 ${
+                  error && !formData.login.trim() 
+                    ? 'border-red-400' 
+                    : 'border-gray-300'
+                } ${isLoading ? 'bg-gray-100' : 'bg-white'}`}
                 required
               />
             </div>
 
             {/* Поле Пароль с кнопкой показа */}
-            <div style={{ marginBottom: '20px', flexShrink: 0, position: 'relative' }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontWeight: '600',
-                fontSize: '18px',
-                color: '#34495e',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
+            <div className="mb-5 flex-shrink-0 relative">
+              <label className="block mb-2 font-semibold text-lg text-gray-700 uppercase tracking-wider">
                 ПАРОЛЬ *
               </label>
-              <div style={{ position: 'relative' }}>
+              <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
@@ -292,48 +199,20 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }) {
                   onChange={handleChange}
                   placeholder="Введите пароль"
                   disabled={isLoading}
-                  style={{
-                    width: '100%',
-                    padding: '12px 45px 12px 12px',
-                    border: error && !formData.password.trim() ? '2px solid #f66' : '2px solid #bdc3c7',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    boxSizing: 'border-box',
-                    transition: 'border-color 0.3s ease',
-                    backgroundColor: isLoading ? '#f5f5f5' : 'white'
-                  }}
+                  className={`w-full p-3 pr-11 border-2 rounded-lg text-base box-border transition-colors duration-300 ${
+                    error && !formData.password.trim() 
+                      ? 'border-red-400' 
+                      : 'border-gray-300'
+                  } ${isLoading ? 'bg-gray-100' : 'bg-white'}`}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
-                  style={{
-                    position: 'absolute',
-                    right: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: isLoading ? 'not-allowed' : 'pointer',
-                    color: isLoading ? '#999' : '#666',
-                    padding: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'color 0.3s ease',
-                    opacity: isLoading ? 0.7 : 1
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isLoading) {
-                      e.target.style.color = '#013b45ff';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isLoading) {
-                      e.target.style.color = '#666';
-                    }
-                  }}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer text-gray-600 p-1 flex items-center justify-center transition-colors duration-300 ${
+                    isLoading ? 'cursor-not-allowed opacity-70' : 'hover:text-[#013b45]'
+                  }`}
                 >
                   {showPassword ? (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -349,43 +228,19 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }) {
             </div>
 
             {/* Кнопки действий */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-              marginTop: 'auto',
-              flexShrink: 0
-            }}>
+            <div className="flex flex-col gap-3 mt-auto flex-shrink-0">
               {/* Основная кнопка (зеленая) */}
               <button
                 type="submit"
                 disabled={isLoading}
-                style={{
-                  padding: '12px 24px',
-                  border: 'none',
-                  borderRadius: '8px',
-                  backgroundColor: isLoading ? '#95a5a6' : '#27ae60',
-                  color: 'white',
-                  cursor: isLoading ? 'not-allowed' : 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  transition: 'all 0.3s ease',
-                  width: '100%',
-                  opacity: isLoading ? 0.8 : 1
-                }}
-                onMouseEnter={(e) => {
-                  if (!isLoading) {
-                    e.target.style.backgroundColor = '#219a52';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isLoading) {
-                    e.target.style.backgroundColor = '#27ae60';
-                  }
-                }}
+                className={`p-3 border-none rounded-lg text-white cursor-pointer text-base font-semibold transition-all duration-300 ease-in-out w-full ${
+                  isLoading 
+                    ? 'bg-gray-400 cursor-not-allowed opacity-80' 
+                    : 'bg-green-500 hover:bg-green-600'
+                }`}
               >
                 {isLoading ? (
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <span className="flex items-center justify-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mx-auto"></div>
                     {isSignUp ? 'РЕГИСТРАЦИЯ...' : 'ВХОД...'}
                   </span>
@@ -400,33 +255,11 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }) {
                   type="button"
                   onClick={toggleSignUp}
                   disabled={isLoading}
-                  style={{
-                    padding: '12px 24px',
-                    border: '2px solid #ffffffff',
-                    borderRadius: '8px',
-                    backgroundColor: 'white',
-                    color: '#34495e',
-                    cursor: isLoading ? 'not-allowed' : 'pointer',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    transition: 'all 0.3s ease',
-                    width: '100%',
-                    opacity: isLoading ? 0.6 : 1
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isLoading) {
-                      e.target.style.backgroundColor = '#f5f5f5';
-                      e.target.style.borderColor = '#ffffffff';
-                      e.target.style.color = '#013b45ff';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isLoading) {
-                      e.target.style.backgroundColor = 'white';
-                      e.target.style.borderColor = '#ffffffff';
-                      e.target.style.color = '#34495e';
-                    }
-                  }}
+                  className={`p-3 border-2 border-white rounded-lg bg-white text-gray-700 text-base font-semibold transition-all duration-300 ease-in-out w-full ${
+                    isLoading 
+                      ? 'cursor-not-allowed opacity-60' 
+                      : 'hover:bg-gray-100 hover:border-white hover:text-[#013b45]'
+                  }`}
                 >
                   ЗАРЕГИСТРИРОВАТЬСЯ
                 </button>
@@ -438,33 +271,11 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }) {
                   type="button"
                   onClick={toggleSignUp}
                   disabled={isLoading}
-                  style={{
-                    padding: '12px 24px',
-                    border: '2px solid #ffffffff',
-                    borderRadius: '8px',
-                    backgroundColor: 'white',
-                    color: '#34495e',
-                    cursor: isLoading ? 'not-allowed' : 'pointer',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    transition: 'all 0.3s ease',
-                    width: '100%',
-                    opacity: isLoading ? 0.6 : 1
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isLoading) {
-                      e.target.style.backgroundColor = '#f5f5f5';
-                      e.target.style.borderColor = '#ffffffff';
-                      e.target.style.color = '#013b45ff';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isLoading) {
-                      e.target.style.backgroundColor = 'white';
-                      e.target.style.borderColor = '#ffffffff';
-                      e.target.style.color = '#34495e';
-                    }
-                  }}
+                  className={`p-3 border-2 border-white rounded-lg bg-white text-gray-700 text-base font-semibold transition-all duration-300 ease-in-out w-full ${
+                    isLoading 
+                      ? 'cursor-not-allowed opacity-60' 
+                      : 'hover:bg-gray-100 hover:border-white hover:text-[#013b45]'
+                  }`}
                 >
                   ВОЙТИ
                 </button>

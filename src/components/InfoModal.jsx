@@ -224,96 +224,54 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
 
   return ReactDOM.createPortal(
     <>
-      <div style={backdropStyle} onClick={handleBackdropClick} />
+      <div 
+        style={backdropStyle} 
+        onClick={handleBackdropClick} 
+        className={`fixed inset-0 bg-black transition-opacity duration-300 ${
+          animationState === 'open' ? 'opacity-50' : 'opacity-0'
+        } z-[9999]`}
+      />
       
       <div 
-        style={modalStyle} 
+        style={modalStyle}
         ref={modalRef} 
         onClick={(e) => e.stopPropagation()}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        className={`fixed bg-white rounded-xl max-h-[90vh] overflow-hidden flex flex-col transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] z-[10000] touch-action-pan-y touch-action-pinch-zoom ${
+          isMobile ? 'p-3' : 'p-4'
+        }`}
       >
         {/* Крестик закрытия */}
         <button
           onClick={handleClose}
-          style={{
-            position: 'absolute',
-            top: isMobile ? '12px' : '16px',
-            right: isMobile ? '12px' : '16px',
-            background: 'none',
-            border: 'none',
-            fontSize: '24px',
-            cursor: 'pointer',
-            color: '#666',
-            width: '32px',
-            height: '32px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '4px',
-            transition: 'all 0.3s ease',
-            zIndex: 10,
-            opacity: animationState === 'open' ? 1 : 0,
-            transition: 'opacity 0.2s ease 0.1s'
-          }}
-          onMouseEnter={(e) => {
-            if (animationState === 'open') {
-              e.target.style.backgroundColor = '#f5f5f5';
-              e.target.style.color = '#333';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (animationState === 'open') {
-              e.target.style.backgroundColor = 'transparent';
-              e.target.style.color = '#666';
-            }
-          }}
+          className={`absolute ${isMobile ? 'top-3 right-3' : 'top-4 right-4'} bg-transparent border-none text-2xl cursor-pointer w-8 h-8 flex items-center justify-center rounded transition-all duration-300 ease-in-out z-10 ${
+            animationState === 'open' 
+              ? 'text-gray-600 hover:bg-gray-100 hover:text-gray-800 opacity-100' 
+              : 'opacity-0'
+          }`}
+          style={{ transition: 'opacity 0.2s ease 0.1s' }}
         >
           ×
         </button>
         
         {/* Основной контент */}
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          position: 'relative',
-          minHeight: '300px',
-          opacity: animationState === 'open' ? 1 : 0,
-          transition: 'opacity 0.2s ease 0.1s'
-        }}>
+        <div className={`flex-1 flex flex-col relative min-h-[300px] transition-opacity duration-200 ease-in-out ${
+          animationState === 'open' ? 'opacity-100' : 'opacity-0'
+        }`} style={{ transitionDelay: '0.1s' }}>
           {/* Левая стрелка */}
           <button
             onClick={handlePrev}
             disabled={!canGoPrev}
+            className={`absolute ${isMobile ? '-left-2' : 'left-1.5'} top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer z-10 p-1.5 flex items-center justify-center transition-all duration-300 ease-in-out ${
+              canGoPrev 
+                ? 'text-[#013b45] hover:text-[#027d8d] opacity-100' 
+                : 'text-gray-300 opacity-60 cursor-default'
+            }`}
             style={{
-              position: 'absolute',
-              left: isMobile ? '-7px' : '6px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              background: 'none',
-              border: 'none',
-              cursor: canGoPrev ? 'pointer' : 'default',
               fontSize: isMobile ? '40px' : '50px',
-              color: canGoPrev ? '#013b45ff' : '#cccccc',
-              transition: 'all 0.3s ease',
-              zIndex: 1,
-              padding: '6px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              opacity: canGoPrev ? 1 : 0.6
-            }}
-            onMouseEnter={(e) => {
-              if (canGoPrev && animationState === 'open') {
-                e.target.style.color = '#027d8d';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (canGoPrev && animationState === 'open') {
-                e.target.style.color = '#013b45ff';
-              }
+              left: isMobile ? '-7px' : '6px'
             }}
             aria-label="Предыдущий"
           >
@@ -324,33 +282,14 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
           <button
             onClick={handleNext}
             disabled={!canGoNext}
+            className={`absolute ${isMobile ? '-right-2' : 'right-1.5'} top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer z-10 p-1.5 flex items-center justify-center transition-all duration-300 ease-in-out ${
+              canGoNext 
+                ? 'text-[#013b45] hover:text-[#027d8d] opacity-100' 
+                : 'text-gray-300 opacity-60 cursor-default'
+            }`}
             style={{
-              position: 'absolute',
-              right: isMobile ? '-7px' : '6px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              background: 'none',
-              border: 'none',
-              cursor: canGoNext ? 'pointer' : 'default',
               fontSize: isMobile ? '40px' : '50px',
-              color: canGoNext ? '#013b45ff' : '#cccccc',
-              transition: 'all 0.3s ease',
-              zIndex: 1,
-              padding: '6px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              opacity: canGoNext ? 1 : 0.6
-            }}
-            onMouseEnter={(e) => {
-              if (canGoNext && animationState === 'open') {
-                e.target.style.color = '#027d8d';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (canGoNext && animationState === 'open') {
-                e.target.style.color = '#013b45ff';
-              }
+              right: isMobile ? '-7px' : '6px'
             }}
             aria-label="Следующий"
           >
@@ -359,137 +298,64 @@ export default function InfoModal({ isOpen, onClose, infoItems = [], triggerPosi
 
           {/* Контейнер для текста - с поддержкой свайпов */}
           <div 
-            style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              padding: isMobile ? '8px' : '10px',
-              borderRadius: '8px',
-              backgroundColor: '#ffffffff',
-              border: '2px solid #ffffffff',
-              overflow: 'auto',
-              margin: isMobile ? '0 15px' : '0 30px',
-              transition: 'margin 0.3s ease',
-              // Для лучшей поддержки свайпов
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
-              msUserSelect: 'none'
-            }}
+            className={`flex-1 flex flex-col ${isMobile ? 'p-2' : 'p-2.5'} rounded-lg bg-white border-2 border-white overflow-auto transition-margin duration-300 ease-in-out select-none ${
+              isMobile ? 'mx-4' : 'mx-7'
+            }`}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
-            <h2 style={{ 
-              margin: '0 0 20px 0', 
-              fontSize: isMobile ? '24px' : '28px', 
-              fontWeight: '800',
-              color: '#013b45ff',
-              textAlign: 'center',
-              paddingRight: '40px',
-              flexShrink: 0
-            }}>
+            <h2 className={`m-0 mb-5 font-extrabold text-[#013b45] text-center flex-shrink-0 ${
+              isMobile ? 'text-2xl pr-10' : 'text-[28px] pr-10'
+            }`}>
               {currentItem.title}
             </h2>
 
-            <div style={{
-              flex: 1,
-              fontSize: isMobile ? '16px' : '18px',
-              lineHeight: '1.6',
-              color: '#000000ff',
-              whiteSpace: 'pre-line',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'justify',
-              width: '100%'
-            }}>
+            <div className={`flex-1 flex items-center justify-center text-justify w-full ${
+              isMobile ? 'text-base' : 'text-lg'
+            }`}>
               <div 
-                style={{
-                  width: '100%',
-                  maxHeight: '100%',
-                  overflowY: 'auto',
-                  padding: '10px 0'
-                }}
+                className="w-full max-h-full overflow-y-auto py-2.5 leading-relaxed text-black whitespace-pre-line"
                 dangerouslySetInnerHTML={{ __html: formatStringForDisplay(currentItem.text) }}
               />
             </div>
           </div>
 
           {/* Индикаторы */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: '20px',
-            gap: '8px'
-          }}>
+          <div className="flex justify-center items-center mt-5 gap-2">
             {infoItems.map((_, index) => (
               <button
                 key={index}
                 onClick={() => animationState === 'open' && setCurrentIndex(index)}
+                className={`rounded-full border-none cursor-pointer transition-all duration-300 ease-in-out p-0 ${
+                  index === currentIndex ? 'bg-[#013b45]' : 'bg-gray-400'
+                }`}
                 style={{
                   width: isMobile ? '10px' : '12px',
-                  height: isMobile ? '10px' : '12px',
-                  borderRadius: '50%',
-                  border: 'none',
-                  backgroundColor: index === currentIndex ? '#013b45ff' : '#bdc3c7',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  padding: 0
+                  height: isMobile ? '10px' : '12px'
                 }}
                 aria-label={`Перейти к слайду ${index + 1}`}
               />
             ))}
           </div>
 
-          <div style={{
-            textAlign: 'center',
-            marginTop: '12px',
-            fontSize: isMobile ? '12px' : '14px',
-            color: '#7f8c8d',
-            fontWeight: '500'
-          }}>
+          <div className={`text-center mt-3 font-medium ${
+            isMobile ? 'text-xs text-gray-600' : 'text-sm text-gray-600'
+          }`}>
             {currentIndex + 1} / {infoItems.length}
           </div>
         </div>
 
         {/* Кнопка закрытия */}
         {isLastItem && (
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginTop: '24px',
-            flexShrink: 0,
-            opacity: animationState === 'open' ? 1 : 0,
-            transition: 'opacity 0.3s ease 0.1s'
-          }}>
+          <div className={`flex justify-center mt-6 flex-shrink-0 transition-opacity duration-300 ease-in-out ${
+            animationState === 'open' ? 'opacity-100' : 'opacity-0'
+          }`} style={{ transitionDelay: '0.1s' }}>
             <button
               onClick={handleClose}
-              style={{
-                padding: isMobile ? '10px 24px' : '12px 32px',
-                border: '2px solid #013b45ff',
-                borderRadius: '8px',
-                backgroundColor: 'white',
-                color: '#013b45ff',
-                cursor: 'pointer',
-                fontSize: isMobile ? '14px' : '16px',
-                fontWeight: '600',
-                transition: 'all 0.3s ease',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}
-              onMouseEnter={(e) => {
-                if (animationState === 'open') {
-                  e.target.style.backgroundColor = '#10b132ff';
-                  e.target.style.color = 'white';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (animationState === 'open') {
-                  e.target.style.backgroundColor = 'white';
-                  e.target.style.color = '#013b45ff';
-                }
-              }}
+              className={`px-8 py-3 border-2 border-[#013b45] rounded-lg bg-white text-[#013b45] cursor-pointer font-semibold transition-all duration-300 ease-in-out uppercase tracking-wider ${
+                isMobile ? 'text-sm py-2.5 px-6' : 'text-base'
+              } hover:bg-[#10b132] hover:text-white`}
             >
               За уловом!
             </button>
