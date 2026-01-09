@@ -25,6 +25,7 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     'Книги'
   ]);
   const [showIntervals, setShowIntervals] = useState(false);
+  const [focusedInputs, setFocusedInputs] = useState({});
 
   const timedeltaToString = (timedeltaObj) => {
     const totalMinutes = Math.floor(timedeltaObj.totalSeconds / 60);
@@ -65,7 +66,33 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
   };
 
   const handleIntervalPartChange = (index, field, value) => {
-    let numericValue = parseInt(value) || 0;
+    if (value !== '' && isNaN(value)) return;
+    
+    if (value === '') {
+      const currentInterval = formData.intervals[index];
+      const parts = parseIntervalToParts(currentInterval);
+      
+      const newParts = {
+        ...parts,
+        [field]: ''
+      };
+
+      const newInterval = formatIntervalFromParts(
+        newParts.days || 0,
+        newParts.hours || 0,
+        newParts.minutes || 0
+      );
+
+      const newIntervals = [...formData.intervals];
+      newIntervals[index] = newInterval;
+      setFormData(prev => ({
+        ...prev,
+        intervals: newIntervals
+      }));
+      return;
+    }
+    
+    let numericValue = parseInt(value, 10);
     
     if (field === 'hours' && numericValue > 23) numericValue = 23;
     if (field === 'minutes' && numericValue > 59) numericValue = 59;
@@ -91,6 +118,32 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
       ...prev,
       intervals: newIntervals
     }));
+  };
+
+  const handleInputFocus = (index, field) => {
+    setFocusedInputs(prev => ({
+      ...prev,
+      [`${index}-${field}`]: true
+    }));
+    
+    const currentInterval = formData.intervals[index];
+    const parts = parseIntervalToParts(currentInterval);
+    if (parts[field] === 0) {
+      handleIntervalPartChange(index, field, '');
+    }
+  };
+
+  const handleInputBlur = (index, field) => {
+    setFocusedInputs(prev => ({
+      ...prev,
+      [`${index}-${field}`]: false
+    }));
+    
+    const currentInterval = formData.intervals[index];
+    const parts = parseIntervalToParts(currentInterval);
+    if (parts[field] === '') {
+      handleIntervalPartChange(index, field, 0);
+    }
   };
 
   const handleBackdropClick = (e) => {
@@ -135,6 +188,7 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
       setShowNewCategory(false);
       setNewCategory('');
       setShowIntervals(false);
+      setFocusedInputs({});
     }
   }, [isOpen, pond]);
 
@@ -219,6 +273,7 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
       is_public: false
     });
     setShowIntervals(false);
+    setFocusedInputs({});
     onClose();
   };
 
@@ -734,7 +789,10 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                   </p>
                   
                   {formData.intervals.map((interval, index) => {
-                    const { days, hours, minutes } = parseIntervalToParts(interval);
+                    const parts = parseIntervalToParts(interval);
+                    const isDaysFocused = focusedInputs[`${index}-days`];
+                    const isHoursFocused = focusedInputs[`${index}-hours`];
+                    const isMinutesFocused = focusedInputs[`${index}-minutes`];
                     
                     return (
                       <div key={index} style={{ marginBottom: '12px' }}>
@@ -754,17 +812,26 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                         }}>
                           <input
                             type="number"
-                            value={days}
+                            value={isDaysFocused && parts.days === 0 ? '' : parts.days}
                             onChange={(e) => handleIntervalPartChange(index, 'days', e.target.value)}
+                            onFocus={() => handleInputFocus(index, 'days')}
+                            onBlur={() => handleInputBlur(index, 'days')}
                             min="0"
+                            placeholder="0"
                             style={{
                               ...numberInputStyle,
                               fontSize: '14px'
                             }}
                             onMouseEnter={(e) => Object.assign(e.target.style, numberInputHoverStyle)}
                             onMouseLeave={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent' })}
-                            onFocus={(e) => Object.assign(e.target.style, numberInputFocusStyle)}
-                            onBlur={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' })}
+                            onFocus={(e) => {
+                              Object.assign(e.target.style, numberInputFocusStyle);
+                              handleInputFocus(index, 'days');
+                            }}
+                            onBlur={(e) => {
+                              Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' });
+                              handleInputBlur(index, 'days');
+                            }}
                           />
                           <span style={{ ...labelStyle, fontSize: '14px' }}>дней</span>
                           
@@ -772,18 +839,27 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                           
                           <input
                             type="number"
-                            value={hours}
+                            value={isHoursFocused && parts.hours === 0 ? '' : parts.hours}
                             onChange={(e) => handleIntervalPartChange(index, 'hours', e.target.value)}
+                            onFocus={() => handleInputFocus(index, 'hours')}
+                            onBlur={() => handleInputBlur(index, 'hours')}
                             min="0"
                             max="23"
+                            placeholder="0"
                             style={{
                               ...numberInputStyle,
                               fontSize: '14px'
                             }}
                             onMouseEnter={(e) => Object.assign(e.target.style, numberInputHoverStyle)}
                             onMouseLeave={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent' })}
-                            onFocus={(e) => Object.assign(e.target.style, numberInputFocusStyle)}
-                            onBlur={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' })}
+                            onFocus={(e) => {
+                              Object.assign(e.target.style, numberInputFocusStyle);
+                              handleInputFocus(index, 'hours');
+                            }}
+                            onBlur={(e) => {
+                              Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' });
+                              handleInputBlur(index, 'hours');
+                            }}
                           />
                           <span style={{ ...labelStyle, fontSize: '14px' }}>часов</span>
                           
@@ -791,18 +867,27 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                           
                           <input
                             type="number"
-                            value={minutes}
+                            value={isMinutesFocused && parts.minutes === 0 ? '' : parts.minutes}
                             onChange={(e) => handleIntervalPartChange(index, 'minutes', e.target.value)}
+                            onFocus={() => handleInputFocus(index, 'minutes')}
+                            onBlur={() => handleInputBlur(index, 'minutes')}
                             min="0"
                             max="59"
+                            placeholder="0"
                             style={{
                               ...numberInputStyle,
                               fontSize: '14px'
                             }}
                             onMouseEnter={(e) => Object.assign(e.target.style, numberInputHoverStyle)}
                             onMouseLeave={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent' })}
-                            onFocus={(e) => Object.assign(e.target.style, numberInputFocusStyle)}
-                            onBlur={(e) => Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' })}
+                            onFocus={(e) => {
+                              Object.assign(e.target.style, numberInputFocusStyle);
+                              handleInputFocus(index, 'minutes');
+                            }}
+                            onBlur={(e) => {
+                              Object.assign(e.target.style, { backgroundColor: 'transparent', boxShadow: 'none' });
+                              handleInputBlur(index, 'minutes');
+                            }}
                           />
                           <span style={{ ...labelStyle, fontSize: '14px' }}>минут</span>
                         </div>
