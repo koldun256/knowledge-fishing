@@ -53,13 +53,16 @@ function PondInner() {
   const [showBackAsArrow, setShowBackAsArrow] = useState(false);
   const [showMenuButton, setShowMenuButton] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Флаг для отслеживания состояния запроса на рыбалку
+  const [isFishingRequestInProgress, setIsFishingRequestInProgress] = useState(false);
 
   // Следим за фазой рыбалки и блокируем кнопки когда рыбалка активна
   useEffect(() => {
     // Если рыбалка не в фазе 'idle' или открыт диалог, блокируем кнопки
-    const shouldDisable = fishing.phase !== 'idle' || dialog.open;
+    const shouldDisable = fishing.phase !== 'idle' || dialog.open || isFishingRequestInProgress;
     setButtonsDisabled(shouldDisable);
-  }, [fishing.phase, dialog.open]);
+  }, [fishing.phase, dialog.open, isFishingRequestInProgress]);
 
   // Брейкпоинты для адаптивного дизайна
   const BREAKPOINTS = {
@@ -209,7 +212,13 @@ function PondInner() {
   const startFishing = async () => {
     try {
       // Проверяем, можно ли начать рыбалку
-      if (fishing.phase !== 'idle' || dialog.open || buttonsDisabled) return;
+      if (fishing.phase !== 'idle' || dialog.open || buttonsDisabled || isFishingRequestInProgress) return;
+
+      // Устанавливаем флаг, что запрос выполняется
+      setIsFishingRequestInProgress(true);
+      
+      // Закрываем меню если оно открыто
+      setIsMenuOpen(false);
 
       const nextFish = await pondService.getNextFish(pondId);
 
@@ -221,8 +230,14 @@ function PondInner() {
         hookX: null,
         hookY: null,
       }));
+      
+      // Сбрасываем флаг после успешного начала рыбалки
+      setIsFishingRequestInProgress(false);
     } catch (err) {
       console.error('Error:', err);
+      
+      // Всегда сбрасываем флаг запроса при ошибке
+      setIsFishingRequestInProgress(false);
     
       if (err.status === 400) {
         alert('Клева нет!\nРыбы еще не проголодались. Если вы хотите порыбачить именно сейчас, уменьшите интервал времени в настройках пруда (на странице отображения прудов)\nПодробнее можете посмотреть по кнопке с вопросиком на странице отображения прудов в разделе Интервалы времени');
@@ -230,48 +245,16 @@ function PondInner() {
       }
       
       alert(`Ошибка: ${err.message}`);
-    //   if (err.status === 400) {
-    //     setFishing(prev => ({
-    //       ...prev,
-    //       phase: 'idle', // Остаемся в режиме ожидания
-    //       dialog: {
-    //         open: true,
-    //         title: 'Нет готовых рыб',
-    //         message: 'В настоящее время нет голодных рыб, готовых клевать. Попробуйте позже!',
-    //         options: [
-    //           {
-    //             text: 'Ок',
-    //             action: () => setFishing(prev => ({ ...prev, dialog: { open: false } }))
-    //           }
-    //         ]
-    //       }
-    //     }));
-    //     return;
-    //   }
-
-    //   console.error('Ошибка начала рыбалки:', err);
-    //   // Можно также показать ошибку пользователю
-    //   setFishing(prev => ({
-    //     ...prev,
-    //     dialog: {
-    //       open: true,
-    //       title: 'Ошибка',
-    //       message: 'Не удалось начать рыбалку. Попробуйте еще раз.',
-    //       options: [
-    //         {
-    //           text: 'Ок',
-    //           action: () => setFishing(prev => ({ ...prev, dialog: { open: false } }))
-    //         }
-    //       ]
-    //     }
-    //   }));
     }
   };
 
   // Обработчики для меню
   const handleMenuAction = (action) => {
+    // Всегда закрываем меню при выборе действия
     setIsMenuOpen(false);
-    if (buttonsDisabled) return; // Не выполняем действия если кнопки заблокированы
+    
+    // Не выполняем действия если кнопки заблокированы
+    if (buttonsDisabled) return;
     
     switch (action) {
       case 'addFish':
@@ -281,10 +264,18 @@ function PondInner() {
         setIsCreateFishesModalOpen(true);
         break;
       case 'startFishing':
+        // Вызываем startFishing напрямую
         startFishing();
         break;
       default:
         break;
+    }
+  };
+
+  // Функция для закрытия меню
+  const handleCloseMenu = () => {
+    if (!isFishingRequestInProgress) {
+      setIsMenuOpen(false);
     }
   };
 
@@ -327,7 +318,7 @@ function PondInner() {
   );
   if (!pond) return <div className="p-8 text-center text-red-500">Пруд не найден</div>;
 
-  const canStart = fishing.phase === 'idle' && !dialog.open && !buttonsDisabled;
+  const canStart = fishing.phase === 'idle' && !dialog.open && !buttonsDisabled && !isFishingRequestInProgress;
 
   return (
     <>
@@ -452,10 +443,10 @@ function PondInner() {
           // Маленький экран: кнопка меню в правом верхнем углу
           <button
             onClick={() => !buttonsDisabled && setIsMenuOpen(!isMenuOpen)}
-            disabled={buttonsDisabled}
+            disabled={buttonsDisabled || isFishingRequestInProgress}
             className={`
               bg-green-600 hover:bg-green-700 text-white w-10 h-10 flex items-center justify-center rounded-lg shadow-lg transition-all
-              ${buttonsDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+              ${buttonsDisabled || isFishingRequestInProgress ? 'opacity-50 cursor-not-allowed' : ''}
             `}
           >
             ☰
@@ -469,23 +460,36 @@ function PondInner() {
           {/* Затемнение фона */}
           <div 
             className="fixed inset-0 bg-black bg-opacity-50 z-[10000]"
-            onClick={() => setIsMenuOpen(false)}
+            onClick={handleCloseMenu}
           />
           
           {/* Меню */}
-          <div className="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-[10001] transform transition-transform">
+          <div 
+            className="fixed top-0 right-0 h-full w-64 shadow-lg z-[10001] transform transition-transform"
+            onClick={handleCloseMenu} // Добавляем здесь тоже
+          >
             {/* Заголовок меню с кнопкой закрытия */}
-            <div className="p-4 flex justify-end">
+            <div 
+              className="p-4 flex justify-end"
+              onClick={(e) => e.stopPropagation()} // Предотвращаем закрытие при клике на заголовок
+            >
               <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="bg-green-600 hover:bg-green-700 text-white w-10 h-10 flex items-center justify-center rounded-lg shadow-lg transition-all"
+                onClick={handleCloseMenu}
+                disabled={isFishingRequestInProgress}
+                className={`
+                  bg-green-600 hover:bg-green-700 text-white w-10 h-10 flex items-center justify-center rounded-lg shadow-lg transition-all
+                  ${isFishingRequestInProgress ? 'opacity-50 cursor-not-allowed' : ''}
+                `}
               >
-                ☰
+                ✕
               </button>
             </div>
             
             {/* Кнопки меню */}
-            <div className="p-4 space-y-3">
+            <div 
+              className="p-4 space-y-3"
+              onClick={(e) => e.stopPropagation()} // Предотвращаем закрытие при клике на кнопки
+            >
               <button
                 onClick={() => handleMenuAction('addFish')}
                 disabled={buttonsDisabled}
@@ -511,13 +515,13 @@ function PondInner() {
               {canStart && (
                 <button
                   onClick={() => handleMenuAction('startFishing')}
-                  disabled={buttonsDisabled}
+                  disabled={buttonsDisabled || isFishingRequestInProgress}
                   className={`
                     w-full bg-blue-700 hover:bg-blue-800 text-white px-4 py-3 rounded-lg shadow transition-all text-left
-                    ${buttonsDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+                    ${buttonsDisabled || isFishingRequestInProgress ? 'opacity-50 cursor-not-allowed' : ''}
                   `}
                 >
-                  🎣 Начать рыбалку
+                  {isFishingRequestInProgress ? '⏳ Загрузка...' : '🎣 Начать рыбалку'}
                 </button>
               )}
             </div>
