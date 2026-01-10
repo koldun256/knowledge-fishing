@@ -91,11 +91,13 @@ export function cleanJsonString(jsonString) {
 
 export const formatStringForDisplay = (jsonString) => {
   return jsonString
-    .replace(/\\n/g, '<br>')           // перевод строки
-    .replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') // табуляция
-    .replace(/\\r/g, '')               // возврат каретки (игнорируем)
-    .replace(/\\f/g, '')               // прогон страницы (игнорируем)
-    .replace(/\\b/g, '')               // backspace (игнорируем)
-    .replace(/\\\\/g, '\\')            // обратный слеш
-    .replace(/\\"/g, '"');             // двойные кавычки
+    .replace(/\\n/g, '<br>')
+    .replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+    .replace(/\\r/g, '')
+    .replace(/\\f/g, '')
+    .replace(/\\b/g, '')
+    .replace(/\\\\/g, '\\')
+    .replace(/\\"/g, '"')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // НЕ экранируем HTML символы, если хотим сохранить теги
 };
