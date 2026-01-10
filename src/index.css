@@ -198,3 +198,8 @@ code {
   transform: rotate(90deg);
   transition: transform 0.3s ease;
 }
+
+.text-with-spacing br {
+  display: block;
+  margin-bottom: 8px; /* Фиксированный отступ */
+}

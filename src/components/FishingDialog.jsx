@@ -191,7 +191,7 @@ export default function FishingDialog() {
           {/* Вопрос */}
           <div className="mb-5 flex-shrink-0">
             <div 
-              className="p-3 rounded-lg text-lg bg-white min-h-[60px] leading-relaxed"
+              className="p-3 rounded-lg text-lg bg-white min-h-[60px] leading-relaxed text-with-spacing"
               dangerouslySetInnerHTML={{ __html: formatStringForDisplay(fish.question) }}
             />
           </div>
@@ -200,7 +200,7 @@ export default function FishingDialog() {
           <div className="mb-5 flex-shrink-0">
             <div 
               onClick={toggleAnswer}
-              className={`p-3 rounded-lg text-lg min-h-[80px] leading-relaxed cursor-pointer transition-all duration-300 ease-in-out relative overflow-hidden ${
+              className={`p-3 rounded-lg text-lg min-h-[80px] leading-relaxed text-with-spacing cursor-pointer transition-all duration-300 ease-in-out relative overflow-hidden ${
                 showAnswer ? 'bg-white' : 'bg-gray-400'
               }`}
             >
