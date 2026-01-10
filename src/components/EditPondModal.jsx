@@ -377,14 +377,14 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Дополнительная информация о пруде..."
-                className="w-full p-3 border-2 border-gray-300 rounded-lg text-sm box-border transition-colors duration-300 ease-in-out min-h-[100px] resize-y font-inherit focus:border-blue-500 focus:outline-none"
+                className="w-full p-3 border-2 border-gray-300 rounded-lg text-base box-border transition-colors duration-300 ease-in-out min-h-[100px] resize-y font-inherit focus:border-blue-500 focus:outline-none"
               />
             </div>
 
             {/* Категория */}
             <div className="mb-5 flex-shrink-0">
               <label className="block mb-2 font-semibold text-lg text-gray-700 uppercase tracking-wider">
-                КАТЕГОРИЯ *
+                КАТЕГОРИЯ
               </label>
               <div className="relative">
                 <select
@@ -402,7 +402,16 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                   <option value="new">+ Создать новую категорию</option>
                 </select>
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                  ▼
+                  <svg 
+                    width="14" 
+                    height="14" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2"
+                  >
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
                 </div>
               </div>
 
@@ -413,13 +422,13 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
                     placeholder="Введите название новой категории"
-                    className="w-full p-3 border-2 border-blue-500 rounded-lg text-sm box-border mb-2 focus:outline-none focus:border-blue-600"
+                    className="w-full p-3 border-2 border-blue-500 rounded-lg text-base box-border mb-2 focus:outline-none focus:border-blue-600"
                   />
                   <button
                     type="button"
                     onClick={handleAddNewCategory}
                     disabled={!newCategory.trim()}
-                    className={`px-4 py-2 border-none rounded-lg text-white cursor-pointer text-sm font-medium ${
+                    className={`px-4 py-2 border-none rounded-lg text-white cursor-pointer text-base font-medium ${
                       newCategory.trim() ? 'bg-blue-500 hover:bg-blue-600' : 'bg-blue-300 cursor-not-allowed'
                     } transition-colors duration-200`}
                   >
@@ -483,7 +492,7 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
             <div className="mb-5 flex-shrink-0">
               <div className="flex items-center justify-between mb-1">
                 <label 
-                  className="block font-semibold text-base text-gray-700 uppercase tracking-wider cursor-pointer select-none mb-0 leading-tight"
+                  className="block font-semibold text-lg text-gray-700 uppercase tracking-wider cursor-pointer select-none mb-0 leading-tight"
                   onClick={() => setShowIntervals(!showIntervals)}
                 >
                   ИНТЕРВАЛЫ ПОВТОРЕНИЯ
@@ -533,7 +542,7 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                     
                     return (
                       <div key={index} className="mb-3">
-                        <label className="block mb-1 font-medium text-sm text-gray-800">
+                        <label className="block mb-1 font-medium text-base text-gray-800">
                           {index + 1}-е повторение:
                         </label>
                         

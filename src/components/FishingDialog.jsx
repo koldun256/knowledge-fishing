@@ -191,7 +191,7 @@ export default function FishingDialog() {
           {/* Вопрос */}
           <div className="mb-5 flex-shrink-0">
             <div 
-              className="p-3 rounded-lg text-base bg-white min-h-[60px] leading-relaxed"
+              className="p-3 rounded-lg text-lg bg-white min-h-[60px] leading-relaxed"
               dangerouslySetInnerHTML={{ __html: formatStringForDisplay(fish.question) }}
             />
           </div>
@@ -200,7 +200,7 @@ export default function FishingDialog() {
           <div className="mb-5 flex-shrink-0">
             <div 
               onClick={toggleAnswer}
-              className={`p-3 rounded-lg text-base min-h-[80px] leading-relaxed cursor-pointer transition-all duration-300 ease-in-out relative overflow-hidden ${
+              className={`p-3 rounded-lg text-lg min-h-[80px] leading-relaxed cursor-pointer transition-all duration-300 ease-in-out relative overflow-hidden ${
                 showAnswer ? 'bg-white' : 'bg-gray-400'
               }`}
             >
@@ -224,7 +224,7 @@ export default function FishingDialog() {
               КУДА ПЕРЕМЕСТИТЬ РЫБУ?
             </div>
             
-            <div className="grid grid-cols-3 gap-2 mb-2">
+            <div className="grid grid-cols-4 gap-2 mb-2">
               {/* Стрелка вверх (-1) */}
               <button
                 onClick={() => handleScoreSelect(-1)}
@@ -258,7 +258,7 @@ export default function FishingDialog() {
                 onClick={() => handleScoreSelect(1)}
                 disabled={submitting}
                 aria-pressed={score === 1}
-                className={`p-3 border-2 rounded-lg text-base font-semibold cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center ${
+                className={`col-span-2 p-3 border-2 rounded-lg text-base font-semibold cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center ${
                   score === 1
                     ? 'border-green-500 bg-green-500 text-white'
                     : 'border-green-500 bg-green-500 text-gray-800 hover:bg-green-600'
