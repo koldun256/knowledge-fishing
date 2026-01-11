@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 
 import { formatString } from '../helper/stringFormating'
 
-export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond }) {
+export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond, userPonds }) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -31,6 +31,27 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
   const [focusedInputs, setFocusedInputs] = useState({});
 
   const newCategoryInputRef = useRef(null);
+
+
+  const getUserCategories = () => {
+    if (!userPonds || userPonds.length === 0) return [];
+    
+    const userCategories = userPonds
+      .map(pond => pond.topic?.trim())
+      .filter(topic => topic && topic.length > 0) // Убираем пустые и null
+      .filter((topic, index, self) => 
+        self.indexOf(topic) === index // Убираем дубликаты
+      )
+      .sort(); // Сортируем по алфавиту
+    return userCategories;
+  };
+
+  // Объединение стандартных и пользовательских категорий
+  const getAllCategories = () => {
+    const userCategories = getUserCategories();
+    const allCategories = [...new Set(['Без категории', ...categories.slice(1), ...userCategories])];
+    return allCategories;
+  };
 
   const timedeltaToString = (timedeltaObj) => {
     const totalMinutes = Math.floor(timedeltaObj.totalSeconds / 60);
@@ -241,7 +262,7 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.topic) return;
+    if (!formData.name.trim()) return;
 
     setIsSaving(true);
     try {
@@ -420,7 +441,7 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
                   className="w-full p-3 border-2 border-gray-300 rounded-lg text-base box-border transition-colors duration-300 ease-in-out bg-white appearance-none cursor-pointer focus:border-blue-500 focus:outline-none"
                   required
                 >
-                  {categories.map((cat) => (
+                  {getAllCategories().map((cat) => (
                     <option key={cat} value={cat}>
                       {cat.charAt(0).toUpperCase() + cat.slice(1)}
                     </option>
@@ -639,11 +660,11 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
               
               <button
                 type="submit"
-                disabled={isSaving || !formData.name.trim() || !formData.topic}
+                disabled={isSaving || !formData.name.trim()}
                 className={`flex-1 px-3 py-3 border-none rounded-lg text-white cursor-pointer text-base font-semibold transition-all duration-300 ease-in-out ${
                   isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'
                 } ${
-                  (isSaving || !formData.name.trim() || !formData.topic) ? 'opacity-60' : 'opacity-100'
+                  (isSaving || !formData.name.trim()) ? 'opacity-60' : 'opacity-100'
                 }`}
               >
                 {isSaving ? 'СОХРАНЕНИЕ...' : 'СОХРАНИТЬ'}

@@ -709,6 +709,7 @@ export default function PondsList() {
         onSave={handleEditPond}
         onDelete={handleDeletePond}
         pond={editingPond}
+        userPonds={ponds}
       />
 
       <AuthModal
