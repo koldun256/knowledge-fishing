@@ -700,6 +700,7 @@ export default function PondsList() {
         onClose={() => setIsTypeSelectionModalOpen(false)}
         onCreate={handleCreatePond}
         onAddByLink={handleAddPondByLink}
+        userPonds={ponds}
       />
 
       <EditPondModal

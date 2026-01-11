@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { formatString } from '../helper/stringFormating';
 
-export default function CreatePondModal({ isOpen, onClose, onCreate }) {
+export default function CreatePondModal({ isOpen, onClose, onCreate, userPonds = [] }) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -30,6 +30,27 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
   const [focusedInputs, setFocusedInputs] = useState({});
 
   const newCategoryInputRef = useRef(null);
+
+
+  const getUserCategories = () => {
+    if (!userPonds || userPonds.length === 0) return [];
+    
+    const userCategories = userPonds
+      .map(pond => pond.topic?.trim())
+      .filter(topic => topic && topic.length > 0) // Убираем пустые и null
+      .filter((topic, index, self) => 
+        self.indexOf(topic) === index // Убираем дубликаты
+      )
+      .sort(); // Сортируем по алфавиту
+    return userCategories;
+  };
+
+  // Объединение стандартных и пользовательских категорий
+  const getAllCategories = () => {
+    const userCategories = getUserCategories();
+    const allCategories = [...new Set(['Без категории', ...categories.slice(1), ...userCategories])];
+    return allCategories;
+  };
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -388,7 +409,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
                       className="w-full p-3 border-2 border-gray-300 rounded-lg text-base box-border transition-colors duration-300 ease-in-out bg-white appearance-none cursor-pointer focus:border-blue-500 focus:outline-none"
                       required
                     >
-                      {categories.map((cat) => (
+                      {getAllCategories().map((cat) => (
                         <option key={cat} value={cat}>
                           {cat.charAt(0).toUpperCase() + cat.slice(1)}
                         </option>

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import CreatePondModal from './CreatePondModal';
 import AddPondByLinkModal from './AddPondByLinkModal';
 
-export default function PondTypeSelectionModal({ isOpen, onClose, onCreate, onAddByLink }) {
+export default function PondTypeSelectionModal({ isOpen, onClose, onCreate, onAddByLink, userPonds = [] }) {
   const [currentStep, setCurrentStep] = useState('select');
   const [modalType, setModalType] = useState(null);
   const navigate = useNavigate();
@@ -83,7 +83,8 @@ export default function PondTypeSelectionModal({ isOpen, onClose, onCreate, onAd
       props: { 
         isOpen: true,
         onClose: handleBackToSelection,
-        onCreate: handlePondCreated
+        onCreate: handlePondCreated,
+        userPonds: userPonds
       },
       showBackButton: true
     },
