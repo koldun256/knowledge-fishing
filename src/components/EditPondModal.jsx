@@ -1,5 +1,5 @@
 // src/components/EditPondModal.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 
 import { formatString } from '../helper/stringFormating'
@@ -29,6 +29,8 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
   ]);
   const [showIntervals, setShowIntervals] = useState(false);
   const [focusedInputs, setFocusedInputs] = useState({});
+
+  const newCategoryInputRef = useRef(null);
 
   const timedeltaToString = (timedeltaObj) => {
     const totalMinutes = Math.floor(timedeltaObj.totalSeconds / 60);
@@ -165,6 +167,21 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen]);
+
+  // Фокусируемся на поле ввода новой категории при его появлении
+  useEffect(() => {
+    if (showNewCategory && newCategoryInputRef.current) {
+      newCategoryInputRef.current.focus();
+    }
+  }, [showNewCategory]);
+
+  // Обработка нажатия Enter в поле новой категории
+  const handleNewCategoryKeyDown = (e) => {
+    if (e.key === 'Enter' && newCategory.trim()) {
+      e.preventDefault();
+      handleAddNewCategory();
+    }
+  };
 
   useEffect(() => {
     if (isOpen && pond) {
@@ -427,9 +444,11 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
               {showNewCategory && (
                 <div className="mt-3">
                   <input
+                    ref={newCategoryInputRef}
                     type="text"
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
+                    onKeyDown={handleNewCategoryKeyDown}
                     placeholder="Введите название новой категории"
                     className="w-full p-3 border-2 border-blue-500 rounded-lg text-base box-border mb-2 focus:outline-none focus:border-blue-600"
                   />
