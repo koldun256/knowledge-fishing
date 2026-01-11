@@ -90,7 +90,8 @@ export function cleanJsonString(jsonString) {
 }
 
 export const formatStringForDisplay = (jsonString) => {
-  return jsonString
+  // Сначала обрабатываем экранированные символы
+  let result = jsonString
     .replace(/\\n/g, '<br>')
     .replace(/\\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
     .replace(/\\r/g, '')
@@ -98,6 +99,25 @@ export const formatStringForDisplay = (jsonString) => {
     .replace(/\\b/g, '')
     .replace(/\\\\/g, '\\')
     .replace(/\\"/g, '"')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  // НЕ экранируем HTML символы, если хотим сохранить теги
+    
+    // Временно заменяем экранированные _ и ^ чтобы они не участвовали в форматировании
+    .replace(/\\_/g, '＄UNDERSCORE＄')
+    .replace(/\\\^/g, '＄CARET＄');
+  
+  // Теперь обрабатываем форматирование
+  // Важно: жирный первым, так как внутри могут быть индексы
+  result = result.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  
+  // Верхний индекс через ^
+  result = result.replace(/\^([^^]+)\^/g, '<sup>$1</sup>');
+  
+  // Нижний индекс через _
+  result = result.replace(/_([^_]+)_/g, '<sub>$1</sub>');
+  
+  // Возвращаем экранированные символы
+  result = result
+    .replace(/＄UNDERSCORE＄/g, '_')
+    .replace(/＄CARET＄/g, '^');
+  
+  return result;
 };
