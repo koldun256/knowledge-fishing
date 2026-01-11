@@ -51,7 +51,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
       setFormData({
         name: '',
         description: '',
-        topic: 'programming',
+        topic: '',
         intervals: ['0:1:0', '1:0:0', '7:0:0', '30:0:0'],
         is_public: false
       });
@@ -231,7 +231,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate }) {
     setFormData({
       name: '',
       description: '',
-      topic: 'programming',
+      topic: '',
       intervals: ['0:1:0', '1:0:0', '7:0:0', '30:0:0'],
       is_public: false
     });
