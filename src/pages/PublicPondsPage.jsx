@@ -646,7 +646,7 @@ export default function PublicPondsPage() {
                     key={pond.id}
                     className="bg-transparent-my bg-opacity-90 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl"
                   >
-                    <Link to={`/pond-card/${pond.id}`} className={`flex flex-col items-center md:flex-row ${isEven ? 'md:flex-row-reverse' : ''} bg-another-green mb-6 xs:mb-8 md:mb-6 lg:mb-10 rounded-2xl`}>
+                    <Link to={`/pond-card/${pond.id}`} className={`flex flex-col items-center md:flex-row ${isEven ? 'md:flex-row-reverse' : ''} bg-another-green mb-6 xs:mb-8 md:mb-6 lg:mb-10 rounded-2xl hover:scale-[1.01] active:scale-[0.99] transition-all duration-200`}>
                       {/* Часть с картинкой пруда */}
                       <div className="md:w-1/3 rounded-2xl">
                         <div className="relative h-full">
