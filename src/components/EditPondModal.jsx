@@ -12,7 +12,8 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     intervals: ['0:1:0', '1:0:0', '7:0:0', '30:0:0'],
     is_public: false
   });
-  const [loading, setLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [showNewCategory, setShowNewCategory] = useState(false);
   const [newCategory, setNewCategory] = useState('');
   const [categories, setCategories] = useState([
@@ -191,6 +192,8 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
       setNewCategory('');
       setShowIntervals(false);
       setFocusedInputs({});
+      setIsSaving(false);
+      setIsDeleting(false);
     }
   }, [isOpen, pond]);
 
@@ -223,7 +226,7 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     e.preventDefault();
     if (!formData.name.trim() || !formData.topic) return;
 
-    setLoading(true);
+    setIsSaving(true);
     try {
       const intervalObjects = formData.intervals.map(parseIntervalToTimedelta);
       
@@ -241,7 +244,7 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     } catch (error) {
       console.error('Error updating pond:', error);
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
@@ -249,14 +252,14 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     if (!pond) return;
 
     if (window.confirm(`Вы уверены, что хотите удалить пруд "${pond.name}"? Это действие нельзя отменить.`)) {
-      setLoading(true);
+      setIsDeleting(true);
       try {
         await onDelete(pond.id);
         handleClose();
       } catch (error) {
         console.error('Error deleting pond:', error);
       } finally {
-        setLoading(false);
+        setIsDeleting(false);
       }
     }
   };
@@ -278,6 +281,8 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
     });
     setShowIntervals(false);
     setFocusedInputs({});
+    setIsSaving(false);
+    setIsDeleting(false);
     onClose();
   };
 
@@ -605,24 +610,24 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
               <button
                 type="button"
                 onClick={handleDelete}
-                disabled={loading}
+                disabled={isDeleting || isSaving}
                 className={`flex-1 px-3 py-3 border-none rounded-lg text-white cursor-pointer text-base font-semibold transition-all duration-300 ease-in-out ${
-                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'
-                } ${loading ? 'opacity-60' : 'opacity-100'}`}
+                  isDeleting ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'
+                } ${isDeleting ? 'opacity-60' : 'opacity-100'}`}
               >
-                {loading ? 'УДАЛЕНИЕ...' : 'УДАЛИТЬ ПРУД'}
+                {isDeleting ? 'УДАЛЕНИЕ...' : 'УДАЛИТЬ ПРУД'}
               </button>
               
               <button
                 type="submit"
-                disabled={loading || !formData.name.trim() || !formData.topic}
+                disabled={isSaving || !formData.name.trim() || !formData.topic}
                 className={`flex-1 px-3 py-3 border-none rounded-lg text-white cursor-pointer text-base font-semibold transition-all duration-300 ease-in-out ${
-                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'
+                  isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'
                 } ${
-                  (loading || !formData.name.trim() || !formData.topic) ? 'opacity-60' : 'opacity-100'
+                  (isSaving || !formData.name.trim() || !formData.topic) ? 'opacity-60' : 'opacity-100'
                 }`}
               >
-                {loading ? 'СОХРАНЕНИЕ...' : 'СОХРАНИТЬ'}
+                {isSaving ? 'СОХРАНЕНИЕ...' : 'СОХРАНИТЬ'}
               </button>
             </div>
           </form>
