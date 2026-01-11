@@ -7,6 +7,7 @@ import { fishService } from '../services/fishService';
 import AuthModal from '../components/AuthModal';
 import InfoModal from '../components/InfoModal';
 import FeedbackModal from '../components/FeedbackModal';
+import { formatStringForDisplay } from '../helper/stringFormating';
 import '../index.css';
 
 export default function SinglePondPage() {
@@ -538,9 +539,9 @@ export default function SinglePondPage() {
               <div className="md:w-2/3 flex flex-col px-5 xs:px-6 sm:px-8 md:px-0 md:pr-5 lg:pr-8 pt-4 pb-6">
                 <div className="mb-3 xs:mb-6 md:mb-3 lg:mb-6">
                   {/* <h4 className="text-xl xs:text-2xl sm:text-4xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-black mb-3">{pond.name}</h4> */}
-                  <p className="text-black leading-snug sm:leading-normal md:leading-snug lg:leading-normal text-base xs:text-lg sm:text-xl md:text-base lg:text-lg xl:text-xl text-left sm:text-justify">
-                    {pond.description || 'Автор не добавил описание к этому пруду.'}
-                  </p>
+                  <div className="text-black leading-snug sm:leading-normal md:leading-snug lg:leading-normal text-base xs:text-lg sm:text-xl md:text-base lg:text-lg xl:text-xl text-left sm:text-justify"
+                    dangerouslySetInnerHTML={{ __html: formatStringForDisplay(pond.description || 'Автор не добавил описание к этому пруду.') } }
+                  />
                 </div>
                 
                 {/* Информация о пруде */}
@@ -658,18 +659,18 @@ export default function SinglePondPage() {
                           <h4 className="text-base sm:text-lg font-semibold text-black mb-0 ">
                             Вопрос:
                           </h4>
-                          <p className="text-gray-800 text-base sm:text-lg">
-                            {fish.question}
-                          </p>
+                          <div className="text-gray-800 text-base sm:text-lg"
+                            dangerouslySetInnerHTML={{ __html: formatStringForDisplay(fish.question) }}
+                          />
                         </div>
                         
                         <div>
                           <h4 className="text-base sm:text-lg font-semibold text-black mb-0">
                             Ответ:
                           </h4>
-                          <p className="text-gray-800 text-base sm:text-lg">
-                            {fish.answer}
-                          </p>
+                          <div className="text-gray-800 text-base sm:text-lg"
+                            dangerouslySetInnerHTML={{ __html: formatStringForDisplay(fish.answer) }}
+                          />
                         </div>
                       </div>
                     </div>

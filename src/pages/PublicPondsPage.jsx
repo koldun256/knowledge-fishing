@@ -6,6 +6,7 @@ import { pondService } from '../services/pondService';
 import AuthModal from '../components/AuthModal';
 import InfoModal from '../components/InfoModal';
 import FeedbackModal from '../components/FeedbackModal';
+import { formatStringForDisplay } from '../helper/stringFormating';
 import '../index.css';
 
 export default function PublicPondsPage() {
@@ -407,7 +408,7 @@ export default function PublicPondsPage() {
               }}>
               <h1 className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-bold text-black">Публичные пруды</h1>
             </div>
-            
+
             {/* Центральная часть: строка поиска вместо заголовка
             <div className="flex-1 px-4" style={{
                 maxWidth: 'calc(100vw - 180px)',
@@ -696,9 +697,9 @@ export default function PublicPondsPage() {
                       <div className={`md:w-2/3 flex flex-col px-5 xs:px-6 sm:px-8  ${!isEven ? 'md:px-0 md:pr-5 lg:pr-8' : 'md:px-0 md:pl-5 lg:pl-8'} pt-4 pb-6`}>
                         <div className="mb-3 xs:mb-6 md:mb-3 lg:mb-6">
                           <h4 className="text-xl xs:text-2xl sm:text-4xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-black mb-3">{pond.name}</h4>
-                          <p className="text-black leading-snug sm:leading-normal md:leading-snug lg:leading-normal text-base xs:text-lg sm:text-xl md:text-base lg:text-lg xl:text-xl text-left sm:text-justify">
-                            {pond.description 
-                              ? (() => {
+                          <div className="text-black leading-snug sm:leading-normal md:leading-snug lg:leading-normal text-base xs:text-lg sm:text-xl md:text-base lg:text-lg xl:text-xl text-left sm:text-justify"
+                            dangerouslySetInnerHTML={{ __html: formatStringForDisplay(
+                              pond.description ? (() => {
                                   let maxLength;
                                   if (window.innerWidth < 768) maxLength = 300;
                                   else if (window.innerWidth < 1024) maxLength = 350;
@@ -709,8 +710,9 @@ export default function PublicPondsPage() {
                                     : pond.description;
                                 })()
                               : 'Автор не добавил описание к этому пруду.'
+                              )}
                             }
-                          </p>
+                          />
                         </div>
                         
                         {/* Информация о пруде */}

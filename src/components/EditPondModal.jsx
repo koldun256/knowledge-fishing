@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
+import { formatString } from '../helper/stringFormating'
+
 export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond }) {
   const [formData, setFormData] = useState({
     name: '',
@@ -227,6 +229,8 @@ export default function EditPondModal({ isOpen, onClose, onSave, onDelete, pond 
       
       const pondData = {
         ...formData,
+        name: formatString(formData.name),
+        description: formatString(formData.description),
         topic: formData.topic || '',
         intervals: intervalObjects,
         is_public: formData.is_public
