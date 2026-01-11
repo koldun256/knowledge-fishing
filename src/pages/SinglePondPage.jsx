@@ -561,12 +561,12 @@ export default function SinglePondPage() {
                       </span>
                     </div>
                     
-                    <div className="flex items-center">
+                    { pond.cnt_copied > 0 && <div className="flex items-center">
                       <span className="text-gray-800 font-medium mr-2">Скопирован:</span>
                       <span className="font-semibold text-gray-800">
                         {pond.cnt_copied || 0} раз
                       </span>
-                    </div>
+                    </div> }
                     
                     {/* <div className="flex items-center">
                       <span className="text-gray-800 font-medium mr-2">Просмотров:</span>
