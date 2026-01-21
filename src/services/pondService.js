@@ -87,12 +87,31 @@ export const pondService = {
     return response.json();
   },
 
-  getPublicPonds: async (page = 1, cnt = 10, theme = "", query = "") => {
+  getPublicPonds: async (page = 1, cnt = 10, filters = {}, query = "") => {
     const params = new URLSearchParams();
     params.append('page', page);
     params.append('per_page', cnt);
-    if (theme !== "") {
-      params.append('theme', theme);
+    if (filters && typeof filters === 'object') {
+      for (const [key, value] of Object.entries(filters)) {
+        if (value === null || value === undefined || value === '') continue;
+        
+        if (Array.isArray(value)) {
+          // Для массивов: повторяем параметр или объединяем через запятую
+          value.forEach(item => {
+            params.append(`${key}[]`, item.toString());
+          });
+        } else if (typeof value === 'object' && value !== null) {
+          // Для вложенных объектов (например, диапазоны)
+          for (const [subKey, subValue] of Object.entries(value)) {
+            if (subValue !== null && subValue !== undefined && subValue !== '') {
+              params.append(`${key}[${subKey}]`, subValue.toString());
+            }
+          }
+        } else {
+          // Простые значения
+          params.append(key, value.toString());
+        }
+      }
     }
     if (query !== "") {
       params.append('query', query);
