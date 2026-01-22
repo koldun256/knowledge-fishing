@@ -118,7 +118,7 @@ export default function FeedbackModal({ isOpen, onClose, onSubmit }) {
         }
       `}</style>
       
-      <div className="bg-white p-4 xs:p-8 rounded-xl w-[90%] max-w-[500px] max-h-[90vh] shadow-2xl overflow-hidden flex flex-col relative">
+      <div className="bg-white p-4 xxs:p-6 xs:p-8 rounded-xl w-[90%] max-w-[500px] max-h-[90vh] shadow-2xl overflow-hidden flex flex-col relative">
         {/* Крестик закрытия в правом верхнем углу */}
         <button
           onClick={handleClose}

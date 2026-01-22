@@ -17,6 +17,7 @@ module.exports = {
         'dark-gray': '#3d5b44ff'
       },
       screens: {
+        'xxs': '420px',
         'xs': '500px',
         'mdlg': '900px'
       }

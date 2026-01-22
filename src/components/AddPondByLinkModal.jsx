@@ -118,7 +118,7 @@ export default function AddPondByLinkModal({ isOpen, onClose, onAddByLink }) {
       className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[10000] p-0"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white p-4 xs:p-8 rounded-xl w-[90%] max-w-[500px] max-h-[90vh] shadow-2xl overflow-hidden flex flex-col relative">
+      <div className="bg-white p-4 xxs:p-6 xs:p-8 rounded-xl w-[90%] max-w-[500px] max-h-[90vh] shadow-2xl overflow-hidden flex flex-col relative">
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 bg-transparent border-none text-2xl cursor-pointer text-gray-600 w-8 h-8 flex items-center justify-center rounded transition-all duration-300 ease-in-out z-10 hover:bg-gray-100 hover:text-gray-800"
