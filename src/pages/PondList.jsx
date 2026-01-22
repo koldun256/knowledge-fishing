@@ -479,7 +479,7 @@ export default function PondsList() {
 
   return (
     <>
-      <div className="min-h-screen bg-green-grass p-8 flex flex-col" style={{color: '#00a028ff'}}>
+      <div className="min-h-screen bg-green-grass p-4 xss:p-6 xs:p-8 flex flex-col" style={{color: '#00a028ff'}}>
         <div className="mx-auto flex-grow">
           <header className="flex justify-between items-center mb-8">
             <div style={{
@@ -596,7 +596,7 @@ export default function PondsList() {
                     }}
                   >
                     <h3 
-                      className="text-black text-2xl font-bold text-center w-full mb-2"
+                      className="text-black text-xl xxs:text-2xl lg:text-xl xl:text-2xl font-bold text-center w-full mb-1 xxs:mb-2 lg:mb-1 xl:mb-2"
                       style={{
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -611,7 +611,7 @@ export default function PondsList() {
                     >
                       {pond.name}
                     </h3>
-                    <div className="text-black text-base font-medium text-center w-full px-2 leading-tight">
+                    <div className="text-black text-sm xxs:text-base lg:text-sm xl:text-base font-medium text-center w-full px-2 leading-tight">
                       {pond.cnt_ready_fishes !== undefined && pond.cnt_fishes !== undefined ? (
                         <div className="flex flex-col items-center">
                           <span className="whitespace-nowrap">
