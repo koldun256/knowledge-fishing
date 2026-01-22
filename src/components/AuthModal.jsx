@@ -241,7 +241,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, onRegister }) {
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mx-auto"></div>
+                    {/* <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mx-auto"></div> */}
                     {isSignUp ? 'РЕГИСТРАЦИЯ...' : 'ВХОД...'}
                   </span>
                 ) : (
