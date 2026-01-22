@@ -78,7 +78,7 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
       className="fixed inset-0 bg-black/50 flex justify-center items-center z-[10000] p-4"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white p-6 rounded-xl w-full max-w-[500px] max-h-[90vh] shadow-2xl overflow-hidden flex flex-col relative">
+      <div className="bg-white p-4 xs:p-8 rounded-xl w-full max-w-[500px] max-h-[90vh] shadow-2xl overflow-hidden flex flex-col relative">
         {/* Крестик закрытия в правом верхнем углу */}
         <button
           onClick={handleClose}
@@ -127,7 +127,7 @@ export default function CreateFishModal({ isOpen, onClose, onCreate, pondId }) {
             </div>
 
             {/* Кнопка добавления */}
-            <div className="flex justify-end mb-5 flex-shrink-0">
+            <div className="flex justify-end flex-shrink-0">
               <button
                 type="submit"
                 className="p-3 border-none rounded-lg bg-green-500 text-white cursor-pointer text-base font-semibold transition-all duration-300 ease-in-out hover:bg-green-600"
