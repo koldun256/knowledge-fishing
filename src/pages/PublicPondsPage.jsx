@@ -606,7 +606,7 @@ export default function PublicPondsPage() {
               </button>
             </div>
 
-            <div className="flex-1 px-4" style={{
+            <div className="flex-1 pr-2 px-0 sm:px-4" style={{
                 maxWidth: 'calc(100vw - 180px)',
                 minWidth: 150
               }}>
@@ -620,21 +620,21 @@ export default function PublicPondsPage() {
                       onChange={(e) => setSearchTerm(e.target.value)}
                       onKeyPress={handleKeyPress}
                       placeholder="Поиск прудов по названию, описанию или автору..."
-                      className="w-full bg-white border-0 rounded-xl focus:outline-none py-2 px-4 text-base md:text-lg text-gray-800 placeholder-gray-600 transition-all duration-200 shadow-sm"
+                      className="w-full bg-white pr-16 sm:pr-20 border-0 rounded-xl focus:outline-none py-2 md:py-1.5 px-4 text-base md:text-lg text-gray-800 placeholder-gray-600 transition-all duration-200 shadow-sm"
                       style={{
                         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                        paddingRight: '5rem'
+                        // paddingRight: '4rem'
                       }}
                     />
                     {(searchTerm) && (
                       <button
                         type="button"
                         onClick={handleClearSearch}
-                        className="absolute right-12 top-1/2 transform -translate-y-1/2 bg-transparent border-none p-1 cursor-pointer"
+                        className="absolute right-8 sm:right-10 top-1/2 transform -translate-y-1/2 bg-transparent border-none p-1 cursor-pointer"
                         style={{ color: '#4A5568' }}
                         title="Очистить поиск и фильтры"
                       >
-                        <svg 
+                        <svg
                           xmlns="http://www.w3.org/2000/svg" 
                           className="h-5 w-5 md:h-6 md:w-6" 
                           fill="none" 
@@ -652,7 +652,7 @@ export default function PublicPondsPage() {
                     )}
                     <button
                       type="submit"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-transparent border-none p-1 cursor-pointer"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-transparent border-none p-1 cursor-pointer"
                       style={{ color: '#4A5568' }}
                       title="Искать"
                     >
@@ -783,7 +783,7 @@ export default function PublicPondsPage() {
                       flexShrink: 0
                     }}
                   >
-                    <span className="text-base md:text-lg font-semibold text-gray-800">
+                    <span className="text-lg font-semibold text-gray-800">
                       {itemsPerPage}
                     </span>
                   </button>
@@ -925,10 +925,10 @@ export default function PublicPondsPage() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Поиск прудов..."
-                  className="w-full bg-white border-0 rounded-xl focus:outline-none py-2 px-4 text-sm text-gray-800 placeholder-gray-600 transition-all duration-200 shadow-sm"
+                  className="w-full bg-white border-0 rounded-xl focus:outline-none py-2 px-4 text-base text-gray-800 placeholder-gray-600 transition-all duration-200 shadow-sm"
                   style={{
                     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                    paddingRight: '3.5rem'
+                    paddingRight: '4rem'
                   }}
                 />
                 {(searchTerm) && (
@@ -941,7 +941,7 @@ export default function PublicPondsPage() {
                   >
                     <svg 
                       xmlns="http://www.w3.org/2000/svg" 
-                      className="h-4 w-4" 
+                      className="h-5 w-5" 
                       fill="none" 
                       viewBox="0 0 24 24" 
                       stroke="currentColor"
@@ -963,7 +963,7 @@ export default function PublicPondsPage() {
                 >
                   <svg 
                     xmlns="http://www.w3.org/2000/svg" 
-                    className="h-4 w-4" 
+                    className="h-5 w-5" 
                     fill="none" 
                     viewBox="0 0 24 24" 
                     stroke="currentColor"
@@ -1085,7 +1085,7 @@ export default function PublicPondsPage() {
                 className="flex items-center justify-center w-10 h-10 bg-white rounded-xl shadow-sm transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
                 title={`${itemsPerPage} прудов на странице`}
               >
-                <span className="text-sm font-semibold text-gray-800">
+                <span className="text-lg font-semibold text-gray-800">
                   {itemsPerPage}
                 </span>
               </button>
