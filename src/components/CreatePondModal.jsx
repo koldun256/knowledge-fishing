@@ -227,7 +227,7 @@ export default function CreatePondModal({ isOpen, onClose, onCreate, userPonds =
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.topic) return;
+    if (!formData.name.trim()) return;
 
     setLoading(true);
     try {
@@ -616,11 +616,11 @@ export default function CreatePondModal({ isOpen, onClose, onCreate, userPonds =
             <div className="flex justify-end mb-5 mt-5 flex-shrink-0">
               <button
                 type="submit"
-                disabled={loading || !formData.name.trim() || !formData.topic}
+                disabled={loading || !formData.name.trim()}
                 className={`w-full px-6 py-3 border-none rounded-lg text-white cursor-pointer text-sm font-semibold transition-all duration-300 ease-in-out ${
                   loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'
                 } ${
-                  (loading || !formData.name.trim() || !formData.topic) ? 'opacity-60' : 'opacity-100'
+                  (loading || !formData.name.trim()) ? 'opacity-60' : 'opacity-100'
                 }`}
               >
                 {loading ? 'СОЗДАНИЕ...' : 'СОЗДАТЬ ПРУД'}
