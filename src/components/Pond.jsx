@@ -67,7 +67,7 @@ function PondInner() {
   // Брейкпоинты для адаптивного дизайна
   const BREAKPOINTS = {
     MEDIUM: 768, // tablet
-    SMALL: 480   // mobile
+    SMALL: 640   // mobile
   };
 
   // Проверка размера экрана и адаптация интерфейса
@@ -340,7 +340,7 @@ function PondInner() {
                 rounded-lg transition-all
                 ${buttonsDisabled ? 'opacity-50 cursor-not-allowed' : ''}
                 ${showBackAsArrow 
-                  ? 'text-slate-800 flex items-center justify-center bg-green-100 hover:bg-green-200' 
+                  ? 'text-slate-800 flex items-center justify-center' 
                   : 'px-4 py-2 bg-white/95 hover:bg-white shadow-lg border border-gray-300 text-slate-800'
                 }
               `}
