@@ -582,7 +582,7 @@ export default function PublicPondsPage() {
     <>
       <div className="min-h-screen bg-green-grass p-2 xs:p-4 lg:p-8 flex flex-col" style={{color: '#DAFFD5'}}>
         <div className="mx-auto w-full max-w-7xl flex-grow">
-          <header className="flex items-center justify-between mb-6 md:mb-8">
+          <header className="flex items-center justify-between mb-4 sm:mb-6 lg:mb-8">
             <div className="flex-shrink-0">
               <button
                 onClick={() => navigate('/')}
@@ -619,7 +619,7 @@ export default function PublicPondsPage() {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      placeholder="Поиск прудов по названию, описанию или автору..."
+                      placeholder="Поиск прудов по названию, описанию или категории..."
                       className="w-full bg-white pr-16 sm:pr-20 border-0 rounded-xl focus:outline-none py-2 md:py-1.5 px-4 text-base md:text-lg text-gray-800 placeholder-gray-600 transition-all duration-200 shadow-sm"
                       style={{
                         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
@@ -721,7 +721,7 @@ export default function PublicPondsPage() {
                               className="flex-grow bg-white border border-gray-300 rounded-lg py-2 px-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                             >
                               <option value="all">Все категории</option>
-                              <option value="custom">Вести свою категорию</option>
+                              <option value="custom">Ввести свою категорию</option>
                               {categories.map((category) => (
                                 <option key={category} value={category}>
                                   {category}
@@ -1126,12 +1126,11 @@ export default function PublicPondsPage() {
             </div>
           </div>
 
-          {/* Информация о фильтрах и поиске */}
+          {/* Информация о фильтрах и поиске
           <div className="mb-6 md:mb-8">
             <div className="text-gray-700">
               <p className="text-sm md:text-base">
-                Показано <span className="font-semibold">{ponds.length}</span> из{' '}
-                <span className="font-semibold">{totalPonds}</span> прудов
+                Найдено <span className="font-semibold">{totalPonds}</span> прудов
                 {searchTerm && (
                   <span> по запросу "<span className="font-semibold">{searchTerm}</span>"</span>
                 )}
@@ -1141,7 +1140,7 @@ export default function PublicPondsPage() {
                 <span className="ml-2">(<span className="font-semibold">{itemsPerPage}</span> на странице)</span>
               </p>
             </div>
-          </div>
+          </div> */}
 
           {/* Список прудов */}
           <div className="space-y-0">
@@ -1377,13 +1376,13 @@ export default function PublicPondsPage() {
                 <p className="text-sm md:text-base">
                   Страница <span className="font-semibold">{currentPage}</span> из{' '}
                   <span className="font-semibold">{totalPages}</span>
-                  {searchTerm && (
+                  {/* {searchTerm && (
                     <span> по запросу "<span className="font-semibold">{searchTerm}</span>"</span>
                   )}
                   {!filters.isEmpty() && (
                     <span> с фильтрами: <span className="font-semibold">{filters.getDisplayText()}</span></span>
                   )}
-                  <span className="ml-2">(<span className="font-semibold">{itemsPerPage}</span> на странице)</span>
+                  <span className="ml-2">(<span className="font-semibold">{itemsPerPage}</span> на странице)</span> */}
                 </p>
               </div>
             </div>
